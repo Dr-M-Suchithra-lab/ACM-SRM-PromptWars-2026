@@ -1,6 +1,8 @@
 
 # PromptWars × ACM SRM Student Chapter 2026
 **Vibe Coding Hackathon – Solo Event**
+
+
 Under the guidance of **Dr. M. Suchithra**, Associate Professor, Department of Computing Technologies, SRM Institute of Science and Technology, Kattankulathur
 
 > Surprise problem. Limited time. Build a working AI solution using nothing but your prompts.
