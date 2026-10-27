@@ -1,4 +1,3 @@
-# ACM-SRM-PromptWars-2026
 
 # PromptWars × ACM SRM Student Chapter 2026
 **Vibe Coding Hackathon – Solo Event**
@@ -11,12 +10,14 @@ Under the guidance of **Dr. M. Suchithra**, Associate Professor, Department of C
 ## 📁 What to Submit
 Create your own folder inside `students/`:
 
+```
 students/
 └── <RegisterNumber>-<Name>/
-├── README.md ← required (template below)
-├── src/ ← your full project code
-├── prompts.md ← key prompts you used to build it
-└── screenshots/ ← app screenshots
+    ├── README.md      ← required (template below)
+    ├── src/           ← your full project code
+    ├── prompts.md     ← key prompts you used to build it
+    └── screenshots/   ← app screenshots
+```
 
 
 
