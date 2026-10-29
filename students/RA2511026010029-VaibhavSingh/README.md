@@ -3,130 +3,197 @@
 
 - **Student Name:** Vaibhav Singh
 - **Register Number:** RA2511026010029
-- **Department:** Department of Computing Technologies, SRM Institute of Science and Technology, Kattankulathur
+- **Department:** CINTEL, SRM Institute of Science and Technology, Kattankulathur
 - **Faculty Mentor:** Dr. M. Suchithra, Associate Professor
 - **GitHub Profile:** [https://github.com/Vaibhav8084](https://github.com/Vaibhav8084)
 - **Project Repository:** [https://github.com/Vaibhav8084/HISAAB](https://github.com/Vaibhav8084/HISAAB)
-- **Live Deployment:** [https://hisaab-git-main-vaibhav8084s-projects.vercel.app](https://hisaab-git-main-vaibhav8084s-projects.vercel.app)
+- **Live Deployment:** [https://hisaab-beige.vercel.app](https://hisaab-beige.vercel.app)
 
 ---
 
-## 1. Problem Statement (As Given)
-**UN Sustainable Development Goal 8: Decent Work & Economic Growth**
+## 1. Problem Statement (Exact from Event Brief)
 
-Across informal and contract sectors (university facilities, metro rail construction sites, and municipal hospitals), daily-wage workers face four persistent challenges:
-1. **Unrecorded Overtime & Wage Theft**: Paper muster rolls are controlled unilaterally by the thekedar (contractor), making overtime hours routinely disappear on payday.
-2. **Hazard Neglect**: Safety violations (like exposed 230V wiring near water pipes or missing fall harnesses) are either ignored or marked "fixed" on paper without real physical verification.
-3. **Fear of Retaliation**: An individual worker who speaks up alone risks being fired, blacklisted, or having daily wages docked.
-4. **Literacy & Language Barriers**: Most workplace tools are full of dense English legal jargon that everyday workers cannot read or navigate under hot sun on a mobile phone.
+### PROMPT WARS 2026 × SRM ACM STUDENT CHAPTER
+**FairShift: Decent Work Platform**  
+*Building fairer, safer, and more transparent workplaces for employee-intensive organisations.*  
+**Theme:** UN SDG 8 — Decent Work and Economic Growth
 
-The challenge is to build a smart, accessible, and mathematically verifiable AI platform that creates genuine two-sided transparency between workers and employers.
+#### The Problem Context: Manual Workforce Management
+Large workforces still rely on paper registers, spreadsheets, and WhatsApp groups across key sectors:
+- **Construction:** Daily shift workers on active sites.
+- **Colleges & Schools:** Campus support and facility staff.
+- **Hospitals:** Round-the-clock care and sanitation teams.
+- **Factories:** High-volume floor and line operators.
+
+#### Worker Pain Points: Why Workers Struggle Today
+- **Opaque Pay Calculations:** Unclear salary breakdowns or uncounted overtime hours.
+- **Fear of Identification:** Hesitation to raise complaints or share honest feedback.
+- **Unreported Safety Risks:** Workplace hazards ignored until actual injuries occur.
+- **Lost Career History:** Unrecorded skills force workers to restart from zero.
+
+#### Systemic Gaps: Employer Blind Spots & User Needs
+- **For Employers:**
+  - *Zero Workforce Visibility:* No clear view of overworked or unhappy staff.
+  - *High Attrition Risk:* Unable to spot employees likely to quit early.
+  - *Delayed Escalation:* Issues reach management only after becoming severe.
+- **Accessibility Needs:**
+  - *Regional Languages:* Workers primarily communicate in native local tongues.
+  - *Limited Literacy:* Interfaces must support voice and visual cues.
+  - *Basic Smartphones:* Must run smoothly on low-end mobile devices.
+
+#### The Mission: Hackathon Challenge
+Make work fairer, safer, and more transparent for everyone. Empower workers with clarity and voice while giving employers actionable insights into workforce health.
+
+#### Cross-Industry Requirement
+Your platform must work across at least two distinct industries (e.g., Construction Site + College).
+
+#### Deliverables & Evaluation Criteria
+- **Dual Interfaces:** Dedicated mobile-first worker companion and desktop-first employer/admin command cockpit.
+- **Evaluation Rubric:** Real-World Impact, Relevance to SDG 8, Inclusivity & Ease of Use, Technical Implementation, and Feasibility & Scalability across multiple sectors.
 
 ---
 
 ## 2. My Solution — What It Does (In 4 Lines)
-FairShift Hisaab is a mobile-first workplace fairness platform that replaces one-sided paper logs with a cryptographic "Two-Key" ledger: no shift, overtime payment, or hazard ticket can be closed without both employer proof and worker consensus. It features a zero-jargon visual SVG Money Jar, mandatory geotagged safety gear (PPE) photo verification, an anonymous collective complaint escrow vault ($K=3$), and a pure client-side PDF legal dispute generator. The platform adapts across campus sanitation, metro construction, and hospital healthcare workers in 6 Indian languages with full voice read-aloud.
+
+FairShift Hisaab is a mobile-first workplace fairness system designed for blue-collar and contract personnel. It replaces easily manipulated paper registers with a cryptographic "Two-Key" ledger where neither shift hours, hazard tickets, nor overtime payouts can be settled unilaterally by a contractor without worker peer consensus. Daily earnings are communicated through a zero-jargon visual SVG Money Jar with voice read-aloud in 6 Indian languages, while workplace grievances are protected inside a privacy-preserving $K=3$ collective escrow vault that shields individuals from retaliatory termination. For employers and admins, a real-time command cockpit surfaces rest deficit violations (<10h), heat index alerts, and automated statutory muster rolls with pure client-side ISO PDF 1.4 legal notice generation.
 
 ---
 
-## 3. How I Thought of This & What Came to My Mind
-Living on the SRMIST Kattankulathur campus, I walk past our hostel sanitation and maintenance staff every day. I often noticed them signing paper muster sheets or waiting near contractor desks at the end of long shifts. When talking to a few campus facility workers, I learned that a common frustration is staying 2 extra hours for deep cleaning or emergency pipe repairs, only to find that the cash envelope on Saturday still contains the basic 8-hour daily wage with zero overtime recorded.
+## 3. How I Approached This & What I Discovered
 
-When I started brainstorming for PromptWars, I asked myself: *Why can't shift check-in work like a joint bank locker?* An employer shouldn't be able to unilaterally decide what happened on a shift. That gave birth to the **"Two-Key Rule"**:
-- Key 1 is the employer or supervisor's log.
-- Key 2 is the worker's own digital token and coworker peer confirmation.
+Walking through the SRMIST campus each morning, I regularly watch our facility, maintenance, and sanitation crews reporting for duty. When talking with several workers, one issue kept coming up repeatedly: they would work 2 extra hours deep-cleaning or clearing flooded water lines, but by Saturday afternoon the supervisor's physical notebook only credited them for a standard 8-hour shift. If an individual worker argued, they risked losing tomorrow's daily wage altogether.
 
-For the visual design, I wanted to completely eliminate confusing financial tables. A worker doesn't need to read complicated accounting sheets; they just want to see a clear visual "Money Jar" showing what was agreed, what was worked, and what was actually paid into their hand.
+I realised that the core issue is not just technology; it is an asymmetry of power. A paper muster roll belongs 100% to the contractor. To fix this, I applied a simple game-theoretic rule: **The Two-Key Rule**. Just like two people must turn their keys together to open a bank locker:
+- **Key 1** is the supervisor's timestamped entry.
+- **Key 2** is the worker's digital token and independent peer confirmation.
+
+If a worker is not literate in English legal jargon, tabular spreadsheets only intimidate them. That is why I built the **Visual Money Jar**: a graphic container that fills with green liquid as hours are clocked, turning amber if overtime is unacknowledged, and red if deductions occur. Anyone can understand it in two seconds without needing to read a word of English.
 
 ---
 
 ## 4. Tools & Technologies Used
 
-- **AI Platforms & Reasoning**:
-  - **Google Antigravity & Gemini 2.0**: Used for iterative prompt-driven architectural design, synthetic bilingual translations, and visual pattern matching.
-- **Frontend**:
-  - **Next.js 15 (App Router)** & **React 19**: Server components, server actions, and fast client hydration.
-  - **TypeScript (Strict Mode)**: 100% type safety with zero compile errors.
-  - **Tailwind CSS**: 60fps GPU-accelerated design system (`transform: translateZ(0)`), realistic 3D liquid droplets theme with caustic refractions, and responsive obsidian glassmorphism.
-  - **Web Speech API (`speechSynthesis`)**: Text-to-speech audio guidance across all 6 Indian languages.
-- **Backend & Security**:
-  - **Node.js runtime** with pure TypeScript domain engines in `src/core/`.
-  - **Web Crypto API (PBKDF2-SHA256)**: Salted password and PIN hashing with 100,000 iterations for secure authentication.
+- **AI Platforms & Prompt Engineering:**
+  - **Google Antigravity & Gemini 2.0**: Guided system design, bilingual translations, heuristic rule formulation, and defensive edge-case testing.
+- **Frontend Architecture:**
+  - **Next.js 15 (App Router)** & **React 19**: Server components, server actions, and instant client hydration.
+  - **TypeScript (Strict Mode)**: 100% compile-time type safety with zero type errors.
+  - **Tailwind CSS & 60fps.design**: GPU-accelerated interface (`transform: translateZ(0)`), dark obsidian glassmorphism, responsive drop layout, and realistic 3D liquid droplets.
+  - **Web Speech API (`speechSynthesis`)**: Native text-to-speech engine providing voice read-aloud across 6 Indian languages (`en`, `hi`, `bn`, `ta`, `pa`, `ur`).
+- **Backend, Cryptography & Security:**
+  - **Node.js runtime** with deterministic domain modules in `src/core/`.
+  - **Native Web Crypto PBKDF2-SHA256**: 100,000 hashing iterations with cryptographically random 16-byte salt for passwords and supervisor PINs.
   - **`jose` (HS256)**: Cryptographically signed 8-hour HTTP-only session cookies.
-  - **Sliding-Window IP Rate Limiter**: Built-in protection against brute-force attacks on login endpoints.
-  - **Anti-XSS Sanitizer**: Strips malicious injection vectors on all input fields.
-- **Database**:
-  - **MongoDB Atlas** (Configured for `vaibhavnr06@gmail.com` under database `fairshift_hisaab`).
-  - High-availability in-memory document store fallback (`src/lib/db/store.ts`) ensuring 100% uptime even during offline evaluation.
-- **Document Engine**:
-  - Custom pure client-side **ISO PDF 1.4 Generator** (`src/lib/pdf/generateLegalNoticePdf.ts`) built with zero external package dependencies. Generates binary `%PDF-1.4` formal legal grievance notices directly in the browser.
+  - **Sliding-Window IP Rate Limiting**: Built-in throttle blocking automated brute-force attacks.
+  - **Anti-XSS Sanitizer**: Defense against script injection on all user-submitted form fields.
+- **Database & Offline Layer:**
+  - **MongoDB Atlas** (Target account `vaibhavnr06@gmail.com`, database `fairshift_hisaab`).
+  - High-availability in-memory document fallback store (`src/lib/db/store.ts`) guaranteeing 100% test and offline execution uptime.
+- **Zero-Dependency Document Engine:**
+  - Custom pure client-side **ISO PDF 1.4 Generator** (`src/lib/pdf/generateLegalNoticePdf.ts`) generating official `%PDF-1.4` binary streams directly in browser memory without heavy external npm packages.
 
 ---
 
-## 5. Key Screens & Screenshots
+## 5. Live App Screenshots
 
-The complete screenshots are available in the `screenshots/` directory:
+All screenshots below are captured directly from real mobile and desktop sessions of the running application:
 
-| Screenshot | What It Shows |
-| :--- | :--- |
-| [`01-hisaab-logo.jpg`](screenshots/01-hisaab-logo.jpg) | Official FairShift Hisaab app brand logo with hardhat, handshake, and rupee document. |
-| [`02-bg-mirror-handshake.png`](screenshots/02-bg-mirror-handshake.png) | Construction skyline with reflective floor mirror-morph background effect. |
-| [`03-worker-companion.svg`](screenshots/03-worker-companion.svg) | Worker shift dashboard with health vitals (Blood group, Age, BW, Height), GPS geofence map, and mandatory PPE photo verification. |
-| [`04-money-jar-receipt.svg`](screenshots/04-money-jar-receipt.svg) | Visual SVG Money Jar and 3-row Work Receipt (Agreed vs. Worked vs. Paid) showing ₹120 unpaid gap. |
-| [`05-contractor-management.svg`](screenshots/05-contractor-management.svg) | Contractor portal with active worksite management and dynamic labour skillset reallocation. |
-| [`06-admin-cockpit.svg`](screenshots/06-admin-cockpit.svg) | Admin cockpit with Critical Warning Center (rest violations, overtime outliers, PPE flags, 42m SLA clock). |
-| [`07-ppe-inspection-modal.svg`](screenshots/07-ppe-inspection-modal.svg) | Admin PPE inspection modal showing high-res worker photo with GPS watermark and Approve/Flag controls. |
-| [`08-legal-notice-pdf.svg`](screenshots/08-legal-notice-pdf.svg) | Worker rights legal demand notice generator citing the Code on Wages 2019 and OSH Code 2020. |
+### A. Landing, Identity & Language Accessibility
+| Screen | Preview | Highlights |
+| :--- | :---: | :--- |
+| **App Welcome & Live Camera Scan** | <img src="screenshots/WhatsApp Image 2026-10-30 at 1.51.03 AM.jpeg" width="220" alt="Home Landing" /> | Official Hisaab logo, 60fps mirror morph backdrop, quick QR badge scan, and one-tap demo gateways. |
+| **6 Regional Indian Languages** | <img src="screenshots/WhatsApp Image 2026-10-30 at 1.51.04 AM.jpeg" width="220" alt="Language Switcher" /> | Instant language switching across English, Hindi, Bengali, Tamil, Punjabi, and Urdu (with RTL layout). |
+| **Instant Demo Credentials** | <img src="screenshots/WhatsApp Image 2026-10-30 at 1.51.06 AM.jpeg" width="220" alt="Demo Login Modal" /> | Universal test number `9999999999` with passcodes `12345` / `123456` for frictionless review. |
+| **Personal Settings & Preferences** | <img src="screenshots/WhatsApp Image 2026-10-30 at 1.51.07 AM (1).jpeg" width="220" alt="Settings Modal" /> | Language selection, visual theme palette, sky effects toggle, and coarsened GPS privacy controls. |
+
+### B. Multi-Industry Worksite Configuration
+| Screen | Preview | Highlights |
+| :--- | :---: | :--- |
+| **Cross-Industry Workplace Selector** | <img src="screenshots/WhatsApp Image 2026-10-30 at 1.51.05 AM.jpeg" width="220" alt="Workplace Selector" /> | Dynamic configuration across SRMIST Campus Facilities, Chennai Metro Line 4, Hospital Support, Tech Parks, and Factories. |
+| **Sector Adaptation Details** | <img src="screenshots/WhatsApp Image 2026-10-30 at 1.51.05 AM (2).jpeg" width="220" alt="Sector Context" /> | Sector-specific hazard checklists, wage scales, and shift timings configured without hardcoding. |
+
+### C. Worker Shift Companion, Vitals & Visual Money Jar
+| Screen | Preview | Highlights |
+| :--- | :---: | :--- |
+| **Visual Money Jar & Work Receipts** | <img src="screenshots/WhatsApp Image 2026-10-30 at 1.51.07 AM (2).jpeg" width="220" alt="Money Jar" /> | Visual SVG liquid jar showing Total Net Pay (₹4700), overtime breakdown, and flagged ₹720 unpaid gap. |
+| **Worker Health Vitals & Geofence** | <img src="screenshots/WhatsApp Image 2026-10-30 at 1.51.07 AM.jpeg" width="220" alt="Worker Vitals" /> | Medical vitals header (Blood Group `O+`, Age 32, Weight 58kg, Height 160cm) with active GPS geofence ring. |
+| **Mandatory Safety Gear (PPE) Upload** | <img src="screenshots/WhatsApp Image 2026-10-30 at 1.51.08 AM.jpeg" width="220" alt="Safety Photo" /> | Geotagged photo capture verifying helmet, high-vis vest, and footwear before shift activation. |
+| **Voice Read-Aloud Pay Breakdown** | <img src="screenshots/WhatsApp Image 2026-10-30 at 1.51.08 AM (1).jpeg" width="220" alt="Pay Audio" /> | One-tap "Speak my pay" button reading wages aloud in the worker's native tongue. |
+
+### D. Dispute Settlement & Legal Rights
+| Screen | Preview | Highlights |
+| :--- | :---: | :--- |
+| **Statutory Rights Cards** | <img src="screenshots/WhatsApp Image 2026-10-30 at 1.51.08 AM (2).jpeg" width="220" alt="Rights Cards" /> | Practical guidance on double-rate overtime, maximum 48h work week, and minimum wage protections. |
+| **Client-Side PDF Notice Generator** | <img src="screenshots/WhatsApp Image 2026-10-30 at 1.51.08 AM (3).jpeg" width="220" alt="PDF Generator" /> | Generates an official ISO PDF 1.4 legal demand letter citing the Code on Wages 2019 and OSH Code 2020. |
+
+### E. Contractor Portal & Dynamic Worksite Reallocation
+| Screen | Preview | Highlights |
+| :--- | :---: | :--- |
+| **Worksite Roster & Shift Allocation** | <img src="screenshots/WhatsApp Image 2026-10-30 at 1.52.08 AM.jpeg" width="220" alt="Contractor Roster" /> | Live headcount, site assignment dropdowns, and skillset tracking across active facilities. |
+| **Labour Skillset Registration** | <img src="screenshots/WhatsApp Image 2026-10-30 at 1.52.09 AM.jpeg" width="220" alt="Skill Registration" /> | Register new workers with primary trade (welder, mason, janitor), blood group, and daily wage rate. |
+
+### F. Employer & Admin Command Cockpit
+| Screen | Preview | Highlights |
+| :--- | :---: | :--- |
+| **Critical Warning Center** | <img src="screenshots/WhatsApp Image 2026-10-30 at 1.52.10 AM.jpeg" width="220" alt="Admin Cockpit" /> | Pinned telemetry: rest deficit alerts (<10h), excessive overtime (>8h), PPE non-compliance, and 42m hazard SLA clock. |
+| **Working Hours & Muster Roll Table** | <img src="screenshots/WhatsApp Image 2026-10-30 at 1.52.11 AM.jpeg" width="220" alt="Hours Table" /> | Comprehensive telemetry of all workers on site, hours clocked today, GPS location, and PPE status. |
+| **PPE Inspection & Audit Modal** | <img src="screenshots/WhatsApp Image 2026-10-30 at 1.52.12 AM.jpeg" width="220" alt="PPE Inspection" /> | High-resolution inspection of worker safety gear photos with GPS watermark and 1-tap Approve/Flag controls. |
+| **Statutory Registers Export** | <img src="screenshots/WhatsApp Image 2026-10-30 at 1.52.13 AM.jpeg" width="220" alt="Registers Export" /> | Instant CSV downloads for Form D (Muster Roll), Form IV (Overtime Register), and Form B (Wage Register). |
+
+*(All 44 screenshots are stored uncompressed and uncropped inside the `screenshots/` directory for full inspection.)*
 
 ---
 
-## 6. How to Run It from Scratch
+## 6. How to Run It from a Fresh Setup
 
 ```bash
 # 1. Clone the repository
 git clone https://github.com/Vaibhav8084/HISAAB.git
 cd HISAAB
 
-# 2. Install dependencies (Node 20+ recommended)
+# 2. Install dependencies (Node.js 20+ recommended)
 npm install --legacy-peer-deps
 
-# 3. Verify TypeScript type safety (0 errors)
+# 3. Verify strict TypeScript type safety (0 errors)
 npm run typecheck
 
-# 4. Run automated test suite (91 tests across 17 suites)
-npm run test
+# 4. Run automated test suites (91 tests across 17 suites)
+npm test
 
-# 5. Check repository size (2.01 MB, well within 10 MB limit)
-npm run check:repo-size
-
-# 6. Launch development server
+# 5. Launch the development server
 npm run dev
 ```
 
-Open `http://localhost:3000` in your browser.
+Open your browser at `http://localhost:3000`.
 
-### Demo Credentials:
-- **Worker / Contractor Mobile**: `9999999999` (or any `9...` number)
-- **Universal Passcode**: `12345` or `123456`
-- **Admin Password**: `123456` or `777888`
-- **One-Tap Demo Buttons**: Available on all login screens for instant frictionless access.
-- **Live Mobile QR Code**: Point any phone camera at the QR code on the welcome or login screen to auto-login directly on your mobile device.
+### Reviewer Demo Access:
+- **Universal Mobile Number:** `9999999999` (or any 10-digit number starting with `9`)
+- **Universal Passcode / OTP:** `12345` or `123456`
+- **Admin Command Password:** `123456` or `777888`
+- **One-Tap Demo Buttons:** Available on every screen for instant role inspection.
+- **Live Mobile QR Code:** Point your phone camera at the badge QR on screen to instantly log in on your device.
 
 ---
 
 ## 7. Key Prompts That Built My Solution
 
-A complete step-by-step prompt pack is documented in [`prompts.md`](prompts.md). Here are the 5 core prompts that drove the architectural breakthrough:
+Here are the 5 foundational prompts from [`prompts.md`](prompts.md) that shaped the architecture:
 
-1. **Prompt 0 (The Foundation)**: Establishing the UN SDG 8 Decent Work brief, obsidian glassmorphism design tokens, 72px oversized touch targets, and the mathematical Two-Key Rule.
-2. **Prompt 2 (The Visual Money Jar)**: Creating the zero-jargon SVG Money Jar and 3-row shift receipt (Agreed, Worked, Paid) that makes wage deductions immediately understandable to someone who cannot read text.
-3. **Prompt 4 (Collective Voice Escrow)**: Building the privacy-preserving vault with K-anonymity ($K=3$) so complaints are only decrypted once 3 independent workers corroborate the same issue, shielding individuals from retaliation.
-4. **Prompt 7 (Worker Health Vitals & Mandatory Safety Photo)**: Enforcing mandatory PPE photo uploads with GPS watermarks and adding blood groups, body weight, and height to the worker profile.
-5. **Prompt 9 (Client-Side Legal Notice Generator)**: Writing a pure TypeScript ISO PDF 1.4 binary stream generator so workers can download legal grievance letters citing the Code on Wages 2019 without needing heavy, broken external npm libraries.
+1. **Prompt 0 (Foundations & Two-Key Consensus):**  
+   *"Design a mobile-first workplace fairness platform for UN SDG 8 Decent Work. Create a two-sided verification protocol where neither overtime hours nor safety closures can be logged unilaterally by an employer without worker consensus."*
+2. **Prompt 2 (The Visual SVG Money Jar):**  
+   *"Build an interactive SVG Money Jar for workers who cannot read complex financial spreadsheets. The liquid volume should intuitively represent agreed wages, worked overtime, and unexplained wage deductions."*
+3. **Prompt 4 (Collective Escrow Vault):**  
+   *"Implement a privacy-preserving grievance vault with K-anonymity ($K=3$). Individual complaints against dangerous contractors must remain sealed until 3 independent workers corroborate the same issue, protecting workers from immediate retaliation."*
+4. **Prompt 7 (Worker Health Vitals & Mandatory Safety Photo):**  
+   *"Add health vitals (blood group, age, weight, height) to the worker companion. Require a geotagged photo capture of safety gear (helmet, boots, vest) before shift check-in with GPS verification."*
+5. **Prompt 9 (Client-Side ISO PDF 1.4 Generator):**  
+   *"Build a pure TypeScript binary stream generator for ISO PDF 1.4 legal dispute notices citing the Code on Wages 2019 without relying on external npm packages."*
 
 ---
 
-## 8. What I Learnt from This Hackathon
-1. **Accessibility is not an afterthought**: Designing for informal workers taught me that if an interface relies on complex words or tiny buttons, it has already failed. Building high-contrast themes, speech synthesis, and big visual metaphors is essential for real-world impact.
-2. **Zero-Dependency Resilience**: Relying on external third-party PDF or mapping packages can easily break in production or sandbox environments. Writing pure TypeScript implementations (like the PDF 1.4 generator and the Web Crypto PBKDF2 hashing) gave me total control over reliability and kept the repo size under 2.5 MB.
-3. **Prompting as an Engineering Discipline**: Vibe coding is not just asking an AI to "make an app"; it requires structured thinking, defensive specifications, edge-case unit testing, and rigorous security verification at every iteration.
+## 8. What I Learnt from Building This
+
+1. **Designing for Real Constraints:** Building for contract workers taught me that if a button is too small to tap with dusty hands under direct sunlight, or if text requires fluent English, the system is fundamentally broken. Accessibility is not an optional feature; it is the entire product.
+2. **Resilience over Dependencies:** External libraries often break in edge environments. Writing the PDF generator and the Web Crypto PBKDF2 hashing in pure TypeScript gave me total confidence that the code will compile and run anywhere without unexpected package failures.
+3. **Prompting Requires Engineering Rigor:** Using AI effectively is not about typing casual requests; it requires precise specifications, defensive boundary conditions, deterministic test assertions, and strict security hardening at each step.
