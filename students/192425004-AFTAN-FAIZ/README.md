@@ -4,6 +4,7 @@
 
 PromptWars × ACM SRM Student Chapter 2026  
 Participant: **AFTAN FAIZ** · Registration Number: **192425004**  
+Website : https://nyaveris-ai.vercel.app/
 Submission name: **192425004 - AFTAN FAIZ**  
 Submission branch: `192425004-AFTAN-FAIZ`  
 Organizer repository: [ACM-SRM-PromptWars-2026](https://github.com/Dr-M-Suchithra-lab/ACM-SRM-PromptWars-2026)  
