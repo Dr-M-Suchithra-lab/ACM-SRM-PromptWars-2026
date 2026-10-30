@@ -1,5 +1,27 @@
 import "dotenv/config";
 import { test, expect } from "@playwright/test";
+
+test("sign-in waits for Supabase configuration before allowing submission", async ({
+  page,
+}) => {
+  let release!: () => void;
+  const configured = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  await page.route("**/api/config", async (route) => {
+    await configured;
+    await route.continue();
+  });
+  await page.goto("/login");
+  const submit = page.getByRole("button", { name: "Sign in", exact: true });
+  try {
+    await expect(submit).toBeDisabled();
+  } finally {
+    release();
+  }
+  await expect(submit).toBeEnabled();
+});
+
 test("production domain supports sign-in, persisted sessions and both industry dashboards", async ({
   page,
   request,

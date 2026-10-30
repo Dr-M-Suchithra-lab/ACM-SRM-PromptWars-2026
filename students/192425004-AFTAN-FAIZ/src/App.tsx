@@ -2318,6 +2318,9 @@ export default function App() {
             className="form-stack"
             onSubmit={(e) => {
               e.preventDefault();
+              // The form is visible before the public configuration request
+              // finishes on a cold start. Do not submit until Auth is ready.
+              if (!client || busy) return;
               const f = new FormData(e.currentTarget);
               void run(async () => {
                 if (!client) throw new Error("Supabase configuration missing");
@@ -2347,7 +2350,7 @@ export default function App() {
                 autoComplete="current-password"
               />
             </Field>
-            <Button type="submit" disabled={busy}>
+            <Button type="submit" disabled={busy || !client}>
               {t.signIn}
               <ArrowRight size={16} />
             </Button>
