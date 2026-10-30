@@ -1,0 +1,288 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Default Obsidian Glass theme */
+  --color-black: #0A0B0A;
+  --color-obsidian: #101310;
+  --color-grey-900: #1A1D1B;
+  --color-grey-700: #2E332F;
+  --color-grey-500: #6B726C;
+  --color-grey-300: #B8BEB9;
+  --color-text: #F2F5F1;
+  --color-lime: #A3E635;
+  --color-lime-deep: #4D7C0F;
+  --color-danger: #FF5A4F;
+  --color-warn: #FBBF24;
+  --bg-page: #0A0B0A;
+  --card-bg: rgba(255, 255, 255, 0.06);
+  --card-border: rgba(255, 255, 255, 0.12);
+  --card-blur: 18px;
+  --card-radius: 20px;
+  --card-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  --btn-text-color: #0A0B0A;
+}
+
+[data-theme="droplets"] {
+  --color-black: #070F07;
+  --color-obsidian: #0D1A0E;
+  --color-grey-900: #142416;
+  --color-grey-700: #243D27;
+  --color-grey-500: #6B806E;
+  --color-grey-300: #B6C7B8;
+  --color-text: #F2F5F1;
+  --color-lime: #A3E635;
+  --color-lime-deep: #4D7C0F;
+  --color-danger: #FF5A4F;
+  --color-warn: #FBBF24;
+  --bg-page: #070F07;
+  --card-bg: rgba(163, 230, 53, 0.05);
+  --card-border: rgba(163, 230, 53, 0.18);
+  --card-blur: 18px;
+  --card-radius: 20px;
+  --card-shadow: 0 8px 32px 0 rgba(7, 25, 7, 0.45);
+  --btn-text-color: #0A0B0A;
+}
+
+[data-theme="sketch"] {
+  --color-black: #111827;
+  --color-obsidian: #FFFFFF;
+  --color-grey-900: #F3F4F6;
+  --color-grey-700: #1F2937;
+  --color-grey-500: #4B5563;
+  --color-grey-300: #9CA3AF;
+  --color-text: #111827;
+  --color-lime: #A3E635;
+  --color-lime-deep: #4D7C0F;
+  --color-danger: #DC2626;
+  --color-warn: #D97706;
+  --bg-page: #FAFAFA;
+  --card-bg: #FFFFFF;
+  --card-border: #111827;
+  --card-blur: 0px;
+  --card-radius: 6px;
+  --card-shadow: 3px 3px 0px 0px #111827;
+  --btn-text-color: #0A0B0A;
+}
+
+[data-theme="concrete"] {
+  --color-black: #0F172A;
+  --color-obsidian: #F1F5F9;
+  --color-grey-900: #E2E8F0;
+  --color-grey-700: #334155;
+  --color-grey-500: #64748B;
+  --color-grey-300: #94A3B8;
+  --color-text: #0F172A;
+  --color-lime: #4D7C0F;
+  --color-lime-deep: #365314;
+  --color-danger: #B91C1C;
+  --color-warn: #B45309;
+  --bg-page: #E5E7EB;
+  --card-bg: #F8FAFC;
+  --card-border: #CBD5E1;
+  --card-blur: 0px;
+  --card-radius: 12px;
+  --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --btn-text-color: #FFFFFF;
+}
+
+body {
+  background-color: var(--bg-page);
+  color: var(--color-text);
+  min-height: 100vh;
+  font-feature-settings: "tnum";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* 60fps.design: Hardware-Accelerated Smooth Animations */
+.gpu-accelerated {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+  will-change: transform, opacity;
+}
+
+/* Smooth 60fps modal and card transitions */
+.animate-scale-up {
+  animation: scaleUp60fps 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes scaleUp60fps {
+  0% {
+    opacity: 0;
+    transform: scale(0.96) translateY(6px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* 60fps Spring tap response */
+.spring-tap {
+  transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.15s ease;
+}
+.spring-tap:active {
+  transform: scale(0.975);
+}
+
+/* Shimmer Skeleton 60fps */
+.skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.03) 0%,
+    rgba(255, 255, 255, 0.09) 50%,
+    rgba(255, 255, 255, 0.03) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer60fps 1.8s infinite linear;
+}
+
+@keyframes shimmer60fps {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* Reduced motion accessibility compliance */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Glass card styling */
+.glass-card {
+  background: var(--card-bg);
+  backdrop-filter: blur(var(--card-blur));
+  -webkit-backdrop-filter: blur(var(--card-blur));
+  border: 1px solid var(--card-border);
+  border-radius: var(--card-radius);
+  box-shadow: var(--card-shadow);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Realistic 3D Liquid Water Droplets Effect */
+[data-theme="droplets"] .glass-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    /* Large 3D droplet 1 (top right) */
+    radial-gradient(circle at 76% 18%, rgba(255, 255, 255, 0.95) 1.5px, transparent 3px),
+    radial-gradient(ellipse at 78% 20%, rgba(163, 230, 53, 0.25) 0%, rgba(255, 255, 255, 0.15) 35%, rgba(0, 0, 0, 0.5) 75%, transparent 85%),
+    
+    /* Large 3D droplet 2 (bottom left) */
+    radial-gradient(circle at 21% 79%, rgba(255, 255, 255, 0.95) 2px, transparent 4px),
+    radial-gradient(ellipse at 23% 81%, rgba(163, 230, 53, 0.28) 0%, rgba(255, 255, 255, 0.18) 40%, rgba(0, 0, 0, 0.55) 75%, transparent 85%),
+    
+    /* Medium droplet 3 (mid right) */
+    radial-gradient(circle at 89% 62%, rgba(255, 255, 255, 0.9) 1px, transparent 2.5px),
+    radial-gradient(circle at 90% 63%, rgba(163, 230, 53, 0.22) 0%, rgba(0, 0, 0, 0.45) 65%, transparent 80%),
+    
+    /* Medium droplet 4 (top left) */
+    radial-gradient(circle at 14% 28%, rgba(255, 255, 255, 0.9) 1.5px, transparent 3px),
+    radial-gradient(circle at 15% 30%, rgba(163, 230, 53, 0.22) 0%, rgba(0, 0, 0, 0.5) 65%, transparent 80%),
+    
+    /* Micro condensation droplets cluster */
+    radial-gradient(circle at 45% 15%, rgba(255, 255, 255, 0.8) 1px, transparent 2px),
+    radial-gradient(circle at 62% 48%, rgba(255, 255, 255, 0.75) 1px, transparent 2.5px),
+    radial-gradient(circle at 35% 42%, rgba(255, 255, 255, 0.8) 1.2px, transparent 2.5px),
+    radial-gradient(circle at 70% 85%, rgba(255, 255, 255, 0.8) 1px, transparent 2px),
+    radial-gradient(circle at 8% 88%, rgba(255, 255, 255, 0.7) 1px, transparent 2px);
+  background-size: 100% 100%;
+  opacity: 0.95;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.35));
+}
+
+/* Sketch theme hand-drawn borders & wobble */
+[data-theme="sketch"] .glass-card {
+  border: 2px solid var(--color-black);
+  filter: url(#hand-drawn-wobble);
+}
+
+/* Typography and Script Safeguards */
+:lang(hi),
+:lang(bn),
+:lang(ta),
+:lang(pa),
+:lang(ur) {
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+  font-style: normal !important;
+}
+
+:lang(ur) {
+  line-height: 2.1 !important;
+  font-size: max(18px, 1em) !important;
+  direction: rtl;
+}
+
+/* Money tabular numbers */
+.money-tabular {
+  font-variant-numeric: tabular-nums;
+  font-weight: 800;
+  font-size: 44px;
+  line-height: 1.1;
+}
+
+/* Accessible focus ring */
+*:focus-visible {
+  outline: 3px solid var(--color-lime);
+  outline-offset: 3px;
+}
+
+/* Background Mirror Morph & Faddy Reflection Effect */
+.bg-mirror-morph {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background-image: url('/images/bg-mirror.png');
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center bottom;
+  opacity: 0.16;
+  filter: saturate(1.1) contrast(1.08);
+  transform: translateZ(0);
+}
+
+[data-theme="concrete"] .bg-mirror-morph {
+  opacity: 0.10;
+  filter: grayscale(0.2) contrast(1.05);
+}
+
+[data-theme="sketch"] .bg-mirror-morph {
+  opacity: 0.08;
+  filter: grayscale(1) contrast(1.4);
+}
+
+/* Faddy Mirror Morph Gradient Vignette Overlay */
+.bg-mirror-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 95% 65% at 50% 35%, transparent 0%, rgba(10, 11, 10, 0.72) 70%, rgba(10, 11, 10, 0.96) 100%),
+    linear-gradient(to bottom, rgba(10, 11, 10, 0.45) 0%, transparent 40%, rgba(10, 11, 10, 0.35) 75%, rgba(10, 11, 10, 0.98) 100%);
+}
+
+[data-theme="concrete"] .bg-mirror-overlay {
+  background:
+    radial-gradient(ellipse 95% 65% at 50% 35%, transparent 0%, rgba(229, 231, 235, 0.72) 70%, rgba(229, 231, 235, 0.96) 100%),
+    linear-gradient(to bottom, rgba(229, 231, 235, 0.45) 0%, transparent 40%, rgba(229, 231, 235, 0.35) 75%, rgba(229, 231, 235, 0.98) 100%);
+}
+
+[data-theme="sketch"] .bg-mirror-overlay {
+  background:
+    radial-gradient(ellipse 95% 65% at 50% 35%, transparent 0%, rgba(250, 250, 250, 0.72) 70%, rgba(250, 250, 250, 0.96) 100%),
+    linear-gradient(to bottom, rgba(250, 250, 250, 0.45) 0%, transparent 40%, rgba(250, 250, 250, 0.35) 75%, rgba(250, 250, 250, 0.98) 100%);
+}
+
