@@ -11,7 +11,7 @@ Organizer repository: [ACM-SRM-PromptWars-2026](https://github.com/Dr-M-Suchithr
 
 ## 1. Problem Statement
 
-**FairShift — Decent Work Platform** is the original hackathon problem-statement title supplied by the participant. NYAVERIS AI addresses opaque wages, unsafe working conditions and insufficient rest through worker and employer workflows for construction and healthcare.
+**NYAVERIS AI** is the original hackathon problem-statement title supplied by the participant. NYAVERIS AI addresses opaque wages, unsafe working conditions and insufficient rest through worker and employer workflows for construction and healthcare.
 
 This supports **UN SDG 8 — Decent Work and Economic Growth**, particularly transparent remuneration, safer workplaces and worker participation in resolving concerns.
 
