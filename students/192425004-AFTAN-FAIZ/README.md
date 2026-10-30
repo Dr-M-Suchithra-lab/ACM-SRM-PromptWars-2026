@@ -29,7 +29,7 @@ Implemented features include shifts, workforce/payroll views, policy versions, h
 
 ## 3. Tools Used
 
-- OpenAI Codex: development prompts recovered from the existing project chat, plus submission preparation in this chat.
+- Google Antigravity: development prompts recovered from the existing project chat, plus submission preparation in this chat.
 - React 19, TypeScript, Vite, Tailwind CSS 4, React Router, Radix UI and Lucide.
 - Node.js, Express 5, Zod and the official Google Gen AI SDK (`@google/genai`).
 - Supabase Auth and PostgreSQL: sole application database, RLS, protected RPCs and persistent rate limiting.
