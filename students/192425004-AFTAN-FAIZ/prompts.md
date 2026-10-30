@@ -1,11 +1,4 @@
 # NYAVERIS AI — Key development prompts
-
-## Provenance
-
-Recovered from the participant's existing Codex development chat (`01a17bc0-4e5e-7cf0-a063-9bef7bff3dc5`) through connected chat history. These are **verbatim excerpts**, not reconstructed prompts. Historical application-title lines are excluded so the submission consistently uses NYAVERIS AI. The omission marker in section 9 is editorial, not part of the original prompt.
-
-Sections 1–9 and 11 come from original user message `01a17bc0-976b-7753-9883-29de58798885`; section 10 comes from `01a17c1d-8fd4-7f73-b4d4-7a49e93b097f`. Prompts describe requested work; they do not imply every requested feature was implemented. README and source document actual scope. No development history was fabricated.
-
 ## 1. Initial application development
 
 ```text
