@@ -4,6 +4,36 @@ import { requestApi } from "../src/lib/api";
 afterEach(() => vi.unstubAllGlobals());
 
 describe("browser API transport", () => {
+  it("keeps an HTTP status when a serverless proxy returns HTML", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi
+        .fn()
+        .mockResolvedValue(
+          new Response("<html>Private upstream diagnostic</html>", {
+            status: 502,
+          }),
+        ),
+    );
+    await expect(requestApi("/workspace")).rejects.toMatchObject({
+      status: 502,
+      message: "Unable to complete the request",
+    });
+  });
+  it("retains authentication status for session recovery", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi
+        .fn()
+        .mockResolvedValue(
+          Response.json({ error: "Session expired" }, { status: 401 }),
+        ),
+    );
+    await expect(requestApi("/workspace")).rejects.toMatchObject({
+      status: 401,
+      message: "Session expired",
+    });
+  });
   it("preserves authenticated GET semantics without a body", async () => {
     const fetch = vi
       .fn()

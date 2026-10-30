@@ -60,6 +60,9 @@ test("production domain supports sign-in, persisted sessions and both industry d
   await expect(
     page.getByRole("heading", { name: "Make room for recovery." }),
   ).toBeVisible();
+  // The saved synthetic schedule may already have been corrected. Preview the
+  // original challenge scenario without resetting or changing that schedule.
+  await page.getByRole("slider", { name: "Schedule what-if" }).fill("13");
   await expect(page.locator(".whatif-card")).toContainText("6h rest window");
   await page.getByRole("button", { name: "Sign out", exact: true }).click();
   await expect(

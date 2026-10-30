@@ -59,7 +59,7 @@ import {
 import { Button } from "./components/ui/button";
 import { PolicyEditor } from "./components/PolicyEditor";
 import { Field } from "./components/Field";
-import { requestApi } from "./lib/api";
+import { ApiError, requestApi } from "./lib/api";
 import { Modal } from "./components/ui/dialog";
 import { dictionaries, type Language, type TextKey } from "./i18n";
 import {
@@ -207,6 +207,8 @@ export default function App() {
   const loadGeneration = useRef(0);
   const currentUser = useRef(session?.user.id);
   currentUser.current = session?.user.id;
+  const currentSession = useRef(session);
+  currentSession.current = session;
   useEffect(() => {
     // A shared browser must not carry anonymous tracking secrets across identities.
     setCredentials(null);
@@ -269,9 +271,28 @@ export default function App() {
     }
   }, [toast]);
   const api = useCallback(
-    <T,>(path: string, body?: unknown) =>
-      requestApi<T>(path, body, session?.access_token),
-    [session],
+    async <T,>(path: string, body?: unknown) => {
+      const token = session?.access_token;
+      try {
+        return await requestApi<T>(path, body, token);
+      } catch (error) {
+        if (
+          error instanceof ApiError &&
+          error.status === 401 &&
+          token &&
+          currentSession.current?.access_token === token
+        ) {
+          // Clear only the rejected session, never a newer login or refreshed token.
+          if (client) await client.auth.signOut({ scope: "local" });
+          if (currentSession.current?.access_token === token) {
+            setSession(null);
+            setWorkspace(null);
+          }
+        }
+        throw error;
+      }
+    },
+    [session, client],
   );
   const reload = useCallback(async () => {
     if (!session || currentUser.current !== session.user.id) return;

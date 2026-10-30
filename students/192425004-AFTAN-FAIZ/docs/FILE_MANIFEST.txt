@@ -7,6 +7,8 @@ students/192425004-AFTAN-FAIZ/README.md
 students/192425004-AFTAN-FAIZ/api/[...path].ts
 students/192425004-AFTAN-FAIZ/components.json
 students/192425004-AFTAN-FAIZ/docs/ARCHITECTURE.md
+students/192425004-AFTAN-FAIZ/docs/BACKEND_DATABASE_PLAN.md
+students/192425004-AFTAN-FAIZ/docs/BACKEND_VERIFICATION.md
 students/192425004-AFTAN-FAIZ/docs/BRANCH_AUDIT.md
 students/192425004-AFTAN-FAIZ/docs/DEMO.md
 students/192425004-AFTAN-FAIZ/docs/FILE_MANIFEST.txt
@@ -35,6 +37,7 @@ students/192425004-AFTAN-FAIZ/scripts/rls-readonly-test.ts
 students/192425004-AFTAN-FAIZ/scripts/rls-test.ts
 students/192425004-AFTAN-FAIZ/scripts/security-check.ts
 students/192425004-AFTAN-FAIZ/scripts/serverless-security-test.ts
+students/192425004-AFTAN-FAIZ/scripts/verify-backend.mjs
 students/192425004-AFTAN-FAIZ/server/ai.ts
 students/192425004-AFTAN-FAIZ/server/app.ts
 students/192425004-AFTAN-FAIZ/server/index.ts
@@ -57,6 +60,7 @@ students/192425004-AFTAN-FAIZ/supabase/migrations/20261027054306_fairness_check_
 students/192425004-AFTAN-FAIZ/supabase/migrations/20261027061310_whole_minute_boundaries.sql
 students/192425004-AFTAN-FAIZ/supabase/migrations/20261027062035_serverless_rate_limits.sql
 students/192425004-AFTAN-FAIZ/supabase/migrations/20261027062521_versioned_pay_policies.sql
+students/192425004-AFTAN-FAIZ/supabase/migrations/20261030195131_backend_policy_and_fk_performance.sql
 students/192425004-AFTAN-FAIZ/supabase/seed.sql
 students/192425004-AFTAN-FAIZ/tests/ai.test.ts
 students/192425004-AFTAN-FAIZ/tests/api-client.test.ts

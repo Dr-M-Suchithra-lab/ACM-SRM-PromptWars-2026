@@ -7,8 +7,10 @@ export default defineConfig({
   retries: 0,
   use: {
     baseURL: process.env.TEST_BASE_URL || "http://127.0.0.1:5173",
-    trace: "retain-on-failure",
-    screenshot: "only-on-failure",
+    // Auth responses and anonymous receipts contain credentials. Capture only
+    // explicitly reviewed screenshots; never persist automatic failure artifacts.
+    trace: "off",
+    screenshot: "off",
   },
   projects: [
     {

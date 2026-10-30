@@ -133,9 +133,11 @@ export function schedulingRisks(shifts: Shift[], policy: Policy) {
         detail: `${duration / 60}h shift exceeds configured ${policy.max_shift_minutes / 60}h limit`,
       });
     // Never compare different workers.
-    const prior = ordered
-      .slice(0, i)
-      .filter((p) => p.worker_id === s.worker_id)
+    const workerShifts = ordered
+      .slice(0, i + 1)
+      .filter((p) => p.worker_id === s.worker_id);
+    const prior = workerShifts
+      .slice(0, -1)
       .sort((a, b) => Date.parse(b.ends_at) - Date.parse(a.ends_at))[0];
     if (prior) {
       const r = restWindow(prior.ends_at, s.starts_at, policy.min_rest_minutes);
@@ -146,13 +148,9 @@ export function schedulingRisks(shifts: Shift[], policy: Policy) {
           detail: `${r.minutes / 60}h rest; configured minimum ${r.requiredMinutes / 60}h`,
         });
     }
-    const window = ordered
-      .slice(0, i + 1)
-      .filter(
-        (p) =>
-          p.worker_id === s.worker_id &&
-          Date.parse(s.starts_at) - Date.parse(p.starts_at) < 7 * 86400000,
-      );
+    const window = workerShifts.filter(
+      (p) => Date.parse(s.starts_at) - Date.parse(p.starts_at) < 7 * 86400000,
+    );
     if (
       window.filter((p) => calculatePay(p, policy).overtimeMinutes > 0)
         .length >= 3
@@ -162,7 +160,8 @@ export function schedulingRisks(shifts: Shift[], policy: Policy) {
         shiftId: s.id,
         detail: "At least three overtime shifts within seven days",
       });
-    const days = [...new Set(window.map(day))].sort();
+    // Consecutive-day policies permit up to 30 days; only overtime uses seven days.
+    const days = [...new Set(workerShifts.map(day))].sort();
     let streak = 1;
     for (let j = days.length - 1; j > 0; j--) {
       if (Date.parse(days[j]) - Date.parse(days[j - 1]) === 86400000) streak++;

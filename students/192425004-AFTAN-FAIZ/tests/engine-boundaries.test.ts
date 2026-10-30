@@ -23,6 +23,31 @@ const shift = {
 };
 
 describe("financial and scheduling boundaries", () => {
+  it("counts a consecutive-day streak beyond the seven-day overtime window", () => {
+    const shifts = Array.from({ length: 9 }, (_, index) => ({
+      ...shift,
+      id: `day-${index + 1}`,
+      worker_id: "A",
+      starts_at: `2026-10-${String(index + 1).padStart(2, "0")}T08:00:00+05:30`,
+      ends_at: `2026-10-${String(index + 1).padStart(2, "0")}T16:00:00+05:30`,
+    }));
+    const risks = schedulingRisks(shifts, {
+      ...policy,
+      max_consecutive_days: 8,
+    });
+    expect(risks).toContainEqual({
+      type: "consecutive_days",
+      shiftId: "day-9",
+      detail: "9 consecutive scheduled days exceeds configured 8-day limit",
+    });
+    expect(risks.filter((r) => r.type === "consecutive_days")).toHaveLength(1);
+    const withGap = shifts.filter((s) => s.id !== "day-5");
+    expect(
+      schedulingRisks(withGap, { ...policy, max_consecutive_days: 8 }).some(
+        (r) => r.type === "consecutive_days",
+      ),
+    ).toBe(false);
+  });
   it("starts overtime only after the exact threshold", () => {
     expect(calculatePay(shift, policy)).toMatchObject({
       regularMinutes: 480,

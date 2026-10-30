@@ -191,7 +191,8 @@ test("anonymous concern UI, secure tracking and admin update", async ({
   const receipt = page.locator(".credential-receipt");
   const reference = (await receipt.locator("dd").nth(0).innerText()).trim(),
     token = (await receipt.locator("dd").nth(1).innerText()).trim();
-  expect(token).toMatch(/^[a-f0-9]{64}$/);
+  // Keep tracking credentials out of assertion diagnostics if validation fails.
+  expect(/^[a-f0-9]{64}$/.test(token)).toBe(true);
   await page
     .getByRole("button", { name: "Track a concern", exact: true })
     .last()
@@ -246,10 +247,11 @@ test("hospital RestGuard what-if updates instantly and preserves original until 
     "Lotus Care Hospital",
   );
   await page.getByRole("link", { name: "RestGuard", exact: true }).click();
-  await expect(
-    page.getByRole("heading", { name: "Rest window warning", exact: true }),
-  ).toBeVisible();
   const card = page.locator(".whatif-card");
+  // Exercise an unsaved warning even if a prior demonstration corrected the
+  // stored schedule. Never reset shared synthetic data to satisfy a test.
+  await page.getByRole("slider", { name: "Schedule what-if" }).fill("13");
+  await expect(card).toContainText("Rest window warning");
   await expect(card).toContainText("6h rest window");
   await page.getByRole("slider", { name: "Schedule what-if" }).fill("18");
   await expect(card).toContainText("Rest policy met");

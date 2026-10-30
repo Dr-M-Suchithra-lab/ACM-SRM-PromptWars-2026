@@ -14,6 +14,7 @@ const db = vi.hoisted(() => ({
   eq: vi.fn(),
   tables: {} as Record<string, Record<string, unknown>[]>,
   queryError: false,
+  queryErrors: [] as string[],
 }));
 
 vi.mock("../server/supabase.js", () => {
@@ -25,10 +26,14 @@ vi.mock("../server/supabase.js", () => {
     rpc: db.rpc,
     from: (name: string) => {
       const result = () => ({
-        data: db.tables[name] ?? [],
-        error: db.queryError
-          ? { message: "private database diagnostic" }
-          : null,
+        data:
+          db.queryError || db.queryErrors.includes(name)
+            ? null
+            : (db.tables[name] ?? []),
+        error:
+          db.queryError || db.queryErrors.includes(name)
+            ? { message: "private database diagnostic" }
+            : null,
       });
       const query = {
         select: () => query,
@@ -37,10 +42,10 @@ vi.mock("../server/supabase.js", () => {
           db.eq(name, ...args);
           return query;
         },
-        single: async () => ({ ...result(), data: result().data[0] ?? null }),
+        single: async () => ({ ...result(), data: result().data?.[0] ?? null }),
         maybeSingle: async () => ({
           ...result(),
-          data: result().data[0] ?? null,
+          data: result().data?.[0] ?? null,
         }),
         then: <T>(resolve: (value: ReturnType<typeof result>) => T) =>
           Promise.resolve(result()).then(resolve),
@@ -77,6 +82,7 @@ beforeEach(() => {
   db.user = "20000000-0000-4000-8000-000000000001";
   db.role = "worker";
   db.queryError = false;
+  db.queryErrors = [];
   db.rpc.mockResolvedValue({ data: dispute, error: null });
   db.getUser.mockImplementation(async () => ({
     data: {
@@ -122,6 +128,66 @@ beforeEach(() => {
 afterEach(() => vi.unstubAllEnvs());
 
 describe("authenticated API orchestration (isolated adapter)", () => {
+  it.each([
+    "reviews",
+    "reviews/resolve",
+    "reviews/confirm",
+    "reviews/reopen",
+    "shifts",
+    "shifts/confirm",
+    "payroll",
+    "policies",
+    "safety/update",
+    "assistant",
+  ])(
+    "rejects malformed authenticated input at /%s before an RPC",
+    async (path) => {
+      expect((await authenticated(`/${path}`).send({})).status).toBe(400);
+      expect(db.rpc).not.toHaveBeenCalled();
+    },
+  );
+  it("forwards a validated policy version and review reopening to their existing RPCs", async () => {
+    expect(
+      (
+        await authenticated("/policies").send({
+          ...policy,
+          organization_id: org,
+          note: "Verified synthetic policy change.",
+        })
+      ).status,
+    ).toBe(200);
+    expect(db.rpc).toHaveBeenLastCalledWith("configure_pay_policy", {
+      p_org: org,
+      p_policy: { ...policy, basis: "hourly", daily_paise: 80000 },
+      p_note: "Verified synthetic policy change.",
+    });
+    expect(
+      (
+        await authenticated("/reviews/reopen").send({
+          dispute_id: dispute,
+          reason: "Please clarify the correction.",
+        })
+      ).status,
+    ).toBe(200);
+    expect(db.rpc).toHaveBeenLastCalledWith("reopen_review", {
+      p_dispute: dispute,
+      p_reason: "Please clarify the correction.",
+    });
+  });
+  it.each(["pay_policies", "payroll_entries"])(
+    "does not explain invented pay when the %s read fails",
+    async (table) => {
+      db.queryErrors = [table];
+      const response = await authenticated("/assistant").send({
+        topic: "pay",
+        language: "en",
+        shift_id: shift,
+      });
+      expect(response.status).toBe(503);
+      expect(response.body).not.toHaveProperty("explanation");
+      expect(response.text).not.toContain("private database diagnostic");
+    },
+  );
   it.each(["worker", "admin"])(
     "preserves %s demo login without accepting a supplied account",
     async (role) => {

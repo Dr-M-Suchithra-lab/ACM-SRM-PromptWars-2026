@@ -367,6 +367,8 @@ export function createApp(options: { rateGuard?: RateGuard } = {}) {
         .select("gross_paise")
         .eq("shift_id", b.shift_id)
         .maybeSingle();
+      if (p.error || !p.data || payroll.error)
+        throw new Error("Unable to load pay explanation");
       context = calculatePay(
         s.data,
         policyInput.parse(p.data),

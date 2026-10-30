@@ -95,6 +95,7 @@ test("employer safety, payroll and rest screens pass automated accessibility che
     "Lotus Care Hospital",
   );
   await page.getByRole("link", { name: "RestGuard", exact: true }).click();
+  await page.getByRole("slider", { name: "Schedule what-if" }).fill("13");
   await expect(page.locator(".whatif-card")).toContainText("6h rest window");
   await expectAccessible(page);
   await page.getByRole("slider", { name: "Schedule what-if" }).fill("18");
