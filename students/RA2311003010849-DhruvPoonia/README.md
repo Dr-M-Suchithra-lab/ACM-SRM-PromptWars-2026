@@ -113,14 +113,32 @@ The full prompts are in [`prompts.md`](prompts.md). The ones that mattered most:
 
 ## Screenshots
 
-| | |
-|---|---|
-| ![Landing page with three sectors](screenshots/landing-three-sectors.png) | ![Worker home](screenshots/worker-home.png) |
-| ![Underpaid payslip with reasons](screenshots/worker-payslip-underpaid.png) | ![Attendance dispute](screenshots/worker-dispute.png) |
-| ![Worker settings](screenshots/worker-settings.png) | ![Offline mode with queued actions](screenshots/worker-offline.png) |
-| ![Decent Work Score](screenshots/admin-decent-work-score.png) | ![Dispute review queue](screenshots/admin-disputes.png) |
-| ![Hospital fatigue alerts](screenshots/hospital-people-care.png) | ![Light mode](screenshots/light-mode.png) |
+### Worker app (phone)
 
+<p align="center">
+  <img src="screenshots/worker-home.png" width="200" alt="Worker home">
+  <img src="screenshots/worker-payslip-underpaid.png" width="200" alt="Underpaid payslip with reasons">
+  <img src="screenshots/worker-dispute.png" width="200" alt="Attendance dispute">
+  <img src="screenshots/worker-settings.png" width="200" alt="Worker settings">
+  <img src="screenshots/worker-offline.png" width="200" alt="Offline mode with queued actions">
+</p>
+
+### Landing and employer app (desktop)
+
+<p align="center">
+  <img src="screenshots/landing-three-sectors.png" width="420" alt="Landing page with three sectors">
+  <img src="screenshots/admin-decent-work-score.png" width="420" alt="Decent Work Score">
+</p>
+<p align="center">
+  <img src="screenshots/admin-disputes.png" width="420" alt="Dispute review queue">
+  <img src="screenshots/hospital-people-care.png" width="420" alt="Hospital fatigue alerts">
+</p>
+
+### Light mode
+
+<p align="center">
+  <img src="screenshots/light-mode.png" width="420" alt="Light mode">
+</p>
 ## Features
 
 **Worker app:** check in by QR, typed code or "I'm at work" (automatic overtime, works offline) · explained payslip in integer paise with PF and ESI, read aloud · "Paid correctly / Underpaid" badge with reasons · contest a day's attendance with a visible audit trail · safety and complaint reports with icons, voice and an anonymous tracking code · anonymous feedback · skill passport with a shareable link · fatigue and rest notices · English, Hindi, Tamil · installable PWA with offline queue · text size, high contrast, light/dark theme.
