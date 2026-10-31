@@ -7,8 +7,6 @@ PromptWars × ACM SRM Student Chapter 2026 · Arnav Mehta · RA2311056010137
 
 ## 1. Problem statement
 
-*As given in the event brief, PROMPT WARS 2026 × SRM ACM STUDENT CHAPTER.*
-
 ### FairShift: Decent Work Platform
 **Building fairer, safer, and more transparent workplaces for employee-intensive organisations.**
 **Theme:** UN SDG 8 — Decent Work and Economic Growth
@@ -58,28 +56,16 @@ Empower workers with clarity and voice while giving employers actionable insight
 7. **Admin Dashboard:** Tracks attendance trends, complaints, and quit risks.
 8. **Voice & Local:** Multilingual voice support for low-end smartphones.
 
-#### Deliverables: What You Need to Submit
-- **3+ Working Features:** Functional prototype (custom ideas welcome).
-- **2 UIs, Dual Interfaces:** One for workers, one for employers/admins.
-- **2+ Industry Use Cases:** Short explanation of cross-sector adoption.
-
-#### Evaluation Rubric: How Projects Will Be Judged
-| Judging Criterion | Core Focus Area |
-|---|---|
-| 1. Real-World Impact | Tangible improvement to worker safety and employer visibility |
-| 2. Relevance to SDG 8 | Direct alignment with Decent Work and Economic Growth |
-| 3. Inclusivity & Ease of Use | Accessible for regional languages, low literacy, and basic phones |
-| 4. Technical Implementation | Clean code quality, security, and working dual interfaces |
-| 5. Feasibility & Scalability | Practical adoption across two or more distinct industries |
-
 ## 2. Solution
 
-ShiftSaathi is a voice-first phone app for workers and a dashboard for employers. A worker checks in by scanning the
-site's QR code, sees a payslip explained line by line, and can talk to it in Hindi, Tamil, Telugu, Kannada or English
-to ask about pay and hours, report a hazard or give anonymous feedback, all from live data. Employers see who is on
-site, who needs rest and who might quit, and watch hazards escalate when deadlines are missed. **A built-in payment
-gateway (PhonePe) lets the employer settle each worker's wages from the platform itself**: the amount comes straight
-from the payslip, and the worker sees the date they were paid.
+ShiftSaathi is a voice-first phone app for workers and a dashboard for employers that brings all eight features in
+the brief together in one place. A worker checks in by scanning the site's QR code, sees a payslip explained line by
+line, gets fatigue alerts before overwork turns into an accident, carries their skills to the next job in a signed
+Skill Passport, and can talk to the app in Hindi, Tamil, Telugu, Kannada or English to ask about pay and hours, report
+a hazard or give anonymous feedback, all from live data. Employers see who is on site, who needs rest and who might
+quit, and watch hazards escalate when deadlines are missed. **A built-in payment gateway (PhonePe) lets the employer
+settle each worker's wages from the platform itself**: the amount comes straight from the payslip, and the worker
+sees the date they were paid.
 
 ## 3. Tools used
 
