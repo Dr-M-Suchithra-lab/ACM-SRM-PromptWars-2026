@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <meta name="theme-color" content="#1d4ed8">
+  <meta name="description" content="FairShift – A Decent Work Platform for Employee-Intensive Organisations (SDG 8)">
+  <title>FairShift – Decent Work Platform (SDG 8)</title>
+  
+  <link rel="stylesheet" href="/css/style.css?v=7">
+</head>
+<body>
+  <!-- WCAG AA Required Skip Link -->
+  <a id="skip-link-el" href="#main-content" class="skip-link">Skip to main content</a>
+
+  <!-- Top App Header -->
+  <header class="app-header" role="banner">
+    <div class="header-inner">
+      <div class="brand">
+        <span class="brand-icon" aria-hidden="true">⚖️</span>
+        <div>
+          <h1 id="brand-title-el" class="brand-title">FairShift</h1>
+          <span class="brand-sub">Decent Work & Shift Welfare (SDG 8)</span>
+        </div>
+      </div>
+
+      <div class="header-controls">
+        <select id="lang-toggle-btn" class="lang-toggle-btn" aria-label="Select Language (English, Tamil, Hindi)">
+          <option value="en">🌐 English</option>
+          <option value="ta">🌐 தமிழ்</option>
+          <option value="hi">🌐 हिन्दी</option>
+        </select>
+        <button id="demo-modal-btn" class="demo-btn" aria-label="View Demo Persona Credentials">
+          🎭 Demo Personas
+        </button>
+        <button id="portal-logout-btn" class="demo-btn" style="display:none; background:#fef2f2; border-color:#fecaca; color:#991b1b;" aria-label="Sign Out">
+          🚪 Sign Out
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Active Industry & Worker Profile Banner (Visible only when logged in) -->
+  <div id="industry-banner" class="industry-banner" style="display:none;" role="complementary" aria-label="Active Context">
+    <div class="industry-info">
+      <span id="current-industry-name">🏗️ Metro Rail Site (METRO-4)</span>
+    </div>
+    <div id="user-badge-display" class="user-badge"></div>
+  </div>
+
+  <!-- Role-Based Navigation Tabs (Visible only when logged in) -->
+  <nav id="app-nav" class="app-nav" style="display:none;" role="navigation" aria-label="Primary Navigation">
+    <div id="main-nav" class="nav-inner">
+      <!-- Tabs injected dynamically via app.js -->
+    </div>
+  </nav>
+
+  <!-- Main Application Content Area -->
+  <main id="main-content" role="main" tabindex="-1">
+    <div id="tab-content-area" aria-live="polite">
+      <!-- Active view rendered here -->
+    </div>
+  </main>
+
+  <!-- Floating Toast Notifications (ARIA Live Region) -->
+  <div id="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- Modal Dialog Container -->
+  <div id="modal-container"></div>
+
+  <!-- Footer -->
+  <footer class="app-footer" role="contentinfo">
+    <p id="footer-line-1">
+      <strong>FairShift</strong> &bull; UN SDG 8: Decent Work & Economic Growth
+    </p>
+    <p id="footer-line-2" style="margin-top: 4px; font-size: 0.8rem; color: #64748b;">
+      Zero worker identifiers stored for anonymous feedback &bull; Multi-industry schema engine
+    </p>
+  </footer>
+
+  <!-- Modular Vanilla JS Bundle (< 25 KB uncompressed) -->
+  <script src="/js/app.js?v=11"></script>
+</body>
+</html>
+

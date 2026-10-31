@@ -1,0 +1,51 @@
+{
+  "id": "construction",
+  "name": "Metro Rail & Infrastructure Site",
+  "icon": "🏗️",
+  "siteCode": "METRO-4",
+  "terminology": {
+    "worker": "Worker",
+    "workers": "Workers",
+    "supervisor": "Site Foreman",
+    "workplace": "Construction Yard / Site",
+    "shiftUnit": "Day Shift",
+    "overtimeUnit": "Overtime Hours"
+  },
+  "roles": [
+    { "id": "mason", "title": "Mason", "baseHourlyRate": 81.25, "dailyRate": 650 },
+    { "id": "electrician", "title": "Electrician", "baseHourlyRate": 100.0, "dailyRate": 800 },
+    { "id": "welder", "title": "Welder", "baseHourlyRate": 93.75, "dailyRate": 750 },
+    { "id": "scaffolder", "title": "Scaffolder", "baseHourlyRate": 87.5, "dailyRate": 700 },
+    { "id": "supervisor", "title": "Site Supervisor", "baseHourlyRate": 137.5, "dailyRate": 1100 }
+  ],
+  "shifts": [
+    { "id": "cs-morn", "name": "Morning Shift", "start": "07:00", "end": "15:30", "hours": 8 },
+    { "id": "cs-eve", "name": "Evening Shift", "start": "15:30", "end": "23:30", "hours": 8 },
+    { "id": "cs-night", "name": "Night Pouring Shift", "start": "23:30", "end": "07:00", "hours": 7 }
+  ],
+  "wageRules": {
+    "standardDayHours": 8,
+    "overtimeMultiplier": 2.0,
+    "currencySymbol": "₹",
+    "currencyCode": "INR",
+    "deductions": [
+      { "id": "epf", "name": "Employees Provident Fund (12%)", "type": "percentage", "rate": 0.12 },
+      { "id": "safety-fund", "name": "Site Safety Welfare Fund", "type": "fixed", "amount": 50 }
+    ]
+  },
+  "hazardCategories": [
+    { "id": "fall_hazard", "label": "Working at Heights / Loose Scaffolding", "severityDefault": "high" },
+    { "id": "electrical_hazard", "label": "Exposed Wiring / Power Generator Hazard", "severityDefault": "critical" },
+    { "id": "heavy_machinery", "label": "Excavator & Crane Safety Blindspot", "severityDefault": "high" },
+    { "id": "ppe_violation", "label": "Damaged Helmet / Boots / Missing Lifeline", "severityDefault": "medium" },
+    { "id": "heat_exhaustion", "label": "Severe Heat Stress / No Drinking Water", "severityDefault": "medium" },
+    { "id": "wage_discrepancy", "label": "Overtime Unrecorded / Pay Dispute", "severityDefault": "medium" },
+    { "id": "harassment", "label": "Verbal Abuse or Unfair Treatment", "severityDefault": "high" }
+  ],
+  "geofence": {
+    "name": "Metro Rail Station Sector 4 Yard",
+    "latitude": 13.0827,
+    "longitude": 80.2707,
+    "radiusMeters": 400
+  }
+}
