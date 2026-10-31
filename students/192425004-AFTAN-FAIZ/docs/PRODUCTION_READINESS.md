@@ -1,5 +1,6 @@
 # NYAVERIS AI — final integration and production readiness
 
+Latest screenshot/routing/branding repair: [SCREENSHOT_REPAIRS_2026-11-01.md](SCREENSHOT_REPAIRS_2026-11-01.md). Earlier failure/publication statements below are historical.
 Latest functional evidence: [FUNCTIONAL_REPAIR_2026-11-01.md](FUNCTIONAL_REPAIR_2026-11-01.md). The backend ESM hotfix is deployed; subsequent contextual assistant/RestGuard repairs retain disabled SaaS/Google flags. Gemini's missing production key and model are confirmed. Historical route failures and publication blockers below must not be mistaken for the latest deployment result; final handoff records live verification.
 
 Latest evidence: [EXECUTION_2026-11-01.md](EXECUTION_2026-11-01.md). Historical results below do not supersede current live browser failures. Publication and deployment are authorized subject to the latest request's prerequisites; GitHub access and verified backup conditions remain blocked.

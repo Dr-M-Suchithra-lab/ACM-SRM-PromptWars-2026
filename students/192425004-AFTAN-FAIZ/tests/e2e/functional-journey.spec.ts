@@ -940,7 +940,7 @@ test("case filters, assistant topics, speech handler and keyboard menus respond"
       .getByRole("button", { name: label, exact: true })
       .click();
     await expect(page.locator(".assistant-response")).toBeVisible();
-    await expect(page.getByRole("dialog")).toContainText(
+    await expect(page.getByRole("dialog")).not.toContainText(
       "Reliable text guidance",
     );
   }

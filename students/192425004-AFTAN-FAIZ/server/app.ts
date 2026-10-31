@@ -1,4 +1,5 @@
 import { readRecords } from "./records.js";
+import { rpcFailure } from "./rpc-errors.js";
 import {
   assistantFacts,
   assistantActions,
@@ -195,13 +196,20 @@ export function createApp(options: { rateGuard?: RateGuard } = {}) {
     args: Record<string, unknown>,
   ) => {
     const { data, error } = await identity(req).client.rpc(name, args);
-    if (error)
-      return res.status(error.code === "23505" ? 409 : 403).json({
-        error:
-          error.code === "23505"
-            ? "An open review already exists for this shift."
-            : "Action denied. Check permissions, case status and input. Verified records cannot be silently overwritten.",
-      });
+    if (error) {
+      const failure = rpcFailure(name, error);
+      console.warn(
+        JSON.stringify({
+          event: "rpc_failed",
+          operation: name,
+          code: /^[A-Z0-9]{5,10}$/.test(error.code || "")
+            ? error.code
+            : "unknown",
+          status: failure.status,
+        }),
+      );
+      return res.status(failure.status).json({ error: failure.error });
+    }
     res.json({ data, success: true });
   };
   app.get("/api/workspace", async (req, res) => {

@@ -735,6 +735,8 @@ button,
   gap: 14px;
 }
 .demo-strip select {
+  min-height: 44px;
+  font-size: 16px;
   background: transparent;
   border: 0;
   color: #395d4d;
@@ -743,6 +745,8 @@ button,
   min-height: 26px;
 }
 .demo-strip button {
+  min-height: 44px;
+  font-size: 16px;
   display: flex;
   align-items: center;
   gap: 5px;
@@ -4353,3 +4357,7 @@ td .button-row {
 
 /* Long workplace navigation remains reachable in short desktop and mobile viewports. */
 .sidebar{overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain}
+
+/* Keep demonstration switches readable and touch-accessible at every breakpoint. */
+.demo-strip select, .demo-strip button { font-size:16px; min-height:44px; padding:8px 12px; }
+.demo-strip > div { flex-wrap:wrap; }

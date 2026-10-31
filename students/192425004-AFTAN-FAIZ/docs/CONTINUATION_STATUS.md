@@ -1,5 +1,6 @@
 # NYAVERIS AI — continuation verification, 31 October 2026
 
+Latest screenshot/routing/branding repair: [SCREENSHOT_REPAIRS_2026-11-01.md](SCREENSHOT_REPAIRS_2026-11-01.md). Earlier failure/publication statements below are historical.
 Latest functional repairs: [FUNCTIONAL_REPAIR_2026-11-01.md](FUNCTIONAL_REPAIR_2026-11-01.md), covering contextual Saarthi conversations, working navigation, privacy boundaries and actionable overlap/rest warnings. Older execution and publication status below is historical; use the latest handoff for actual remote/deployment SHAs.
 
 Latest: [1 November execution](EXECUTION_2026-11-01.md) supersedes the results below. Current local suite: 154 unit/API tests and 34 browser tests PASS. Two live browser checks FAIL. GitHub publication remains denied/rejected. Authenticated backup inspection confirms Free plan has no included scheduled backups; an external restorable backup remains unverified.

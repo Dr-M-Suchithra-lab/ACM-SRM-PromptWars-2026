@@ -87,6 +87,11 @@ it("loads the unbundled Node ESM serverless entry and preserves public/auth boun
       try {
         const response = await fetch('http://127.0.0.1:' + protectedServer.address().port + '/api/workspace');
         assert.equal(response.status, 401);
+        for (const path of ['/api/shifts/confirm','/api/reviews/resolve','/api/safety/update']) {
+          const denied = await fetch('http://127.0.0.1:' + protectedServer.address().port + path, {method:'POST',headers:{'Content-Type':'application/json'},body:'{}'});
+          assert.equal(denied.status, 401, path);
+          assert.equal(denied.headers.get('content-type').includes('application/json'), true);
+        }
       } finally { await new Promise(resolve => protectedServer.close(resolve)); }
       console.log(JSON.stringify({ health: 200, config: 200, unauthenticatedWorkspace: 401, hostedRequests: 0 }));
     `;

@@ -17,7 +17,11 @@ describe("Vercel client-route refreshes", () => {
       destination: "/index.html",
     });
   });
-  it("keeps the health function and protected workspace rewrite", () => {
+  it("routes every API path including nested mutations to the actual Express function", () => {
+    expect(configuration.rewrites[0]).toEqual({
+      source: "/api/:path*",
+      destination: "/api/[...path]",
+    });
     expect(configuration.rewrites).toContainEqual({
       source: "/health",
       destination: "/api/health",
@@ -26,8 +30,5 @@ describe("Vercel client-route refreshes", () => {
       source: "/app/:path*",
       destination: "/index.html",
     });
-    expect(
-      configuration.rewrites.some((r) => r.source.startsWith("/api/")),
-    ).toBe(false);
   });
 });

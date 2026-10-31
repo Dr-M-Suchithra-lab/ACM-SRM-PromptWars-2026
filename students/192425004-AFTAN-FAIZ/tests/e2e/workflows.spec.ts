@@ -41,7 +41,7 @@ test("worker navigation, Fairness Replay, Tamil fallback and narrow mobile layou
   await page
     .getByRole("button", { name: "ஊதியத்தை விளக்கவும்", exact: true })
     .click();
-  await expect(page.getByRole("dialog")).toContainText("AI கிடைக்கவில்லை");
+  await expect(page.getByRole("dialog")).not.toContainText("AI கிடைக்கவில்லை");
   await expect(page.getByRole("dialog")).toContainText(
     "உறுதிப்படுத்திய வேலை நேரம்",
   );

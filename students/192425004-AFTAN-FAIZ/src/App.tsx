@@ -1,6 +1,7 @@
 import { ShiftCalendar } from "./components/ShiftCalendar";
 import { ReadAloud } from "./components/ReadAloud";
 import { assistanceCopy, riskLabels } from "./lib/assistance";
+import { shiftTimes } from "./lib/shift-form";
 import { zonedDateTimeToIso } from "../shared/timezone";
 import {
   AuthExperience,
@@ -2534,6 +2535,7 @@ export default function App() {
     return (
       <form
         className="form-stack"
+        noValidate
         onSubmit={(e) => {
           e.preventDefault();
           const f = new FormData(e.currentTarget);
@@ -2543,15 +2545,12 @@ export default function App() {
                 id: s?.id || null,
                 organization_id: org!.id,
                 worker_id: f.get("worker_id"),
-                starts_at: zonedDateTimeToIso(
+                ...shiftTimes(
                   String(f.get("starts_at")),
-                  workspace!.pay_policies[0].timezone,
-                ),
-                ends_at: zonedDateTimeToIso(
                   String(f.get("ends_at")),
+                  Number(f.get("break_minutes")),
                   workspace!.pay_policies[0].timezone,
                 ),
-                break_minutes: Number(f.get("break_minutes")),
                 location: f.get("location"),
               }),
             t.scheduleSaved,
@@ -2574,20 +2573,33 @@ export default function App() {
           </select>
         </Field>
         <div className="form-grid">
-          <Field label={t.start}>
+          <Field label={t.start} hint="Select both the date and time.">
             <input
               name="starts_at"
               type="datetime-local"
               required
-              defaultValue={local(s?.starts_at)}
+              step="60"
+              defaultValue={
+                s
+                  ? local(s.starts_at)
+                  : local(new Date().toISOString()).slice(0, 10) + "T09:00"
+              }
             />
           </Field>
-          <Field label={t.end}>
+          <Field
+            label={t.end}
+            hint="For overnight shifts, use the following date."
+          >
             <input
               name="ends_at"
               type="datetime-local"
               required
-              defaultValue={local(s?.ends_at)}
+              step="60"
+              defaultValue={
+                s
+                  ? local(s.ends_at)
+                  : local(new Date().toISOString()).slice(0, 10) + "T17:30"
+              }
             />
           </Field>
         </div>
@@ -3445,10 +3457,6 @@ export default function App() {
         )}
         {assistant ? (
           <div className="assistant-response">
-            <Badge tone={assistant.source === "gemini" ? "blue" : "green"}>
-              <Sparkles size={13} />
-              {assistant.source === "gemini" ? t.ai : t.fallback}
-            </Badge>
             <p className="assistant-explanation">{assistant.explanation}</p>
             <Button
               variant="outline"
