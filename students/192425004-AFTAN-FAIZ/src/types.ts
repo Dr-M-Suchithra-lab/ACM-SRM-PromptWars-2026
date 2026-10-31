@@ -59,6 +59,7 @@ export type Member = {
   user_id: string;
   organization_id: string;
   role: "worker" | "admin";
+  active?: boolean;
   display_name: string;
 };
 export type Workspace = {
@@ -68,9 +69,11 @@ export type Workspace = {
   organizations: {
     id: string;
     name: string;
-    sector_id: "construction" | "healthcare";
+    sector_id: "construction" | "healthcare" | "generic";
     is_demo: boolean;
   }[];
+  business_events?: { id: string; event_type: string; created_at: string }[];
+  employee_profiles?: { id: string; user_id: string | null; status: string }[];
   pay_policies: Policy[];
   organization_members: Member[];
   shifts: WorkShift[];

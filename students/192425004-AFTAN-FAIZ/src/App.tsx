@@ -1,3 +1,18 @@
+import { ShiftCalendar } from "./components/ShiftCalendar";
+import { ReadAloud } from "./components/ReadAloud";
+import { zonedDateTimeToIso } from "../shared/timezone";
+import {
+  AuthExperience,
+  AuthCallback,
+  LegalPage,
+  authStorage,
+} from "./components/AuthExperience";
+import {
+  Onboarding,
+  InvitationExperience,
+  WorkforceManagement,
+  BusinessOverview,
+} from "./components/BusinessExperience";
 import {
   useCallback,
   useEffect,
@@ -47,7 +62,6 @@ import {
   Play,
   Plus,
   RefreshCw,
-  Volume2,
   FileCheck2,
   MessageSquareText,
   LockKeyhole,
@@ -76,6 +90,8 @@ type Config = {
   publishableKey: string;
   demoEnabled: boolean;
   aiConfigured: boolean;
+  saasEnabled?: boolean;
+  googleEnabled?: boolean;
 };
 type ModalState = {
   type: "clarify" | "replay" | "review" | "resolve" | "safety" | "shift";
@@ -173,6 +189,7 @@ function ProgressLine() {
 export default function App() {
   const [caseFilter, setCaseFilter] = useState("all"),
     [safetyFilter, setSafetyFilter] = useState("open");
+  const [shiftSearch, setShiftSearch] = useState("");
   const [credentials, setCredentials] = useState<{
       reference: string;
       token: string;
@@ -187,9 +204,15 @@ export default function App() {
     () => (localStorage.getItem("fairshift-language") as Language) || "en",
   );
   const t = dictionaries[language] || dictionaries.en;
+  const [authReady, setAuthReady] = useState(false);
   const [config, setConfig] = useState<Config | null>(null),
     [client, setClient] = useState<SupabaseClient | null>(null),
     [session, setSession] = useState<Session | null>(null);
+  const [needsOnboarding, setNeedsOnboarding] = useState(false);
+  const [pendingInvitations, setPendingInvitations] = useState<
+    { business_name: string }[]
+  >([]);
+  const [selectedOrg, setSelectedOrg] = useState("");
   const [workspace, setWorkspace] = useState<Workspace | null>(null),
     [loading, setLoading] = useState(false),
     [busy, setBusy] = useState(false),
@@ -229,7 +252,7 @@ export default function App() {
   useEffect(() => {
     let dispose: () => void = () => {};
     let active = true;
-    fetch("/api/config")
+    fetch("/api/config", { signal: AbortSignal.timeout(15000) })
       .then((r) => {
         if (!r.ok) throw new Error("Configuration unavailable");
         return r.json();
@@ -237,9 +260,17 @@ export default function App() {
       .then(async (c: Config) => {
         if (!active) return;
         setConfig(c);
-        if (!c.url || !c.publishableKey) return;
-        const s = createClient(c.url, c.publishableKey);
-        setClient(s);
+        if (!c.url || !c.publishableKey) {
+          setAuthReady(true);
+          return;
+        }
+        const s = createClient(c.url, c.publishableKey, {
+          auth: {
+            flowType: "pkce",
+            detectSessionInUrl: false,
+            storage: authStorage,
+          },
+        });
         const result = await s.auth.getSession();
         if (!active) return;
         setSession(result.data.session);
@@ -247,10 +278,20 @@ export default function App() {
           setSession(current),
         );
         dispose = () => sub.data.subscription.unsubscribe();
+        setClient(s);
+        setAuthReady(true);
       })
       .catch(() => {
-        if (active)
+        if (active) {
           setError("Cannot reach the NYAVERIS AI service. Please retry.");
+          setConfig({
+            url: "",
+            publishableKey: "",
+            demoEnabled: false,
+            aiConfigured: false,
+          });
+          setAuthReady(true);
+        }
       });
     return () => {
       active = false;
@@ -303,14 +344,30 @@ export default function App() {
     setLoading(true);
     setError("");
     try {
-      const data = await api<Workspace>("/workspace");
+      const account = await api<{
+        memberships: { organization_id: string }[];
+        pendingInvitations?: { business_name: string }[];
+      }>("/account");
+      if (isCurrent()) setPendingInvitations(account.pendingInvitations ?? []);
+      if (!account.memberships.length) {
+        if (isCurrent()) {
+          setNeedsOnboarding(true);
+          setWorkspace(null);
+        }
+        return;
+      }
+      if (isCurrent()) setNeedsOnboarding(false);
+      const activeOrg =
+        account.memberships.find((m) => m.organization_id === selectedOrg)
+          ?.organization_id ?? account.memberships[0].organization_id;
+      const data = await api<Workspace>("/workspace?org=" + activeOrg);
       if (isCurrent()) setWorkspace(data);
     } catch (e) {
       if (isCurrent()) setError((e as Error).message);
     } finally {
       if (isCurrent()) setLoading(false);
     }
-  }, [api, session]);
+  }, [api, session, selectedOrg]);
   useEffect(() => {
     if (session) void reload();
     else setWorkspace(null);
@@ -605,8 +662,9 @@ export default function App() {
               <Metric
                 title={t.activeWorkers}
                 value={
-                  w.organization_members.filter((m) => m.role === "worker")
-                    .length
+                  w.organization_members.filter(
+                    (m) => m.role === "worker" && m.active !== false,
+                  ).length
                 }
                 icon={<UsersRound size={19} />}
                 note={org?.name}
@@ -950,6 +1008,16 @@ export default function App() {
             )
           }
         />
+        {!org?.is_demo && workspace && (
+          <ShiftCalendar workspace={workspace} onSelect={setShiftSearch} />
+        )}
+        <Field label="Filter shifts by date, employee or location">
+          <input
+            type="search"
+            value={shiftSearch}
+            onChange={(e) => setShiftSearch(e.target.value)}
+          />
+        </Field>
         <section className="card table-card">
           <div className="table-scroll">
             <table>
@@ -964,6 +1032,11 @@ export default function App() {
               </thead>
               <tbody>
                 {workspace?.shifts
+                  .filter((s) =>
+                    `${new Intl.DateTimeFormat("en-CA", { timeZone: workspace.pay_policies[0].timezone }).format(new Date(s.starts_at))} ${fmt(s.starts_at)} ${s.location} ${workspace.organization_members.find((m) => m.user_id === s.worker_id)?.display_name}`
+                      .toLowerCase()
+                      .includes(shiftSearch.toLowerCase()),
+                  )
                   .slice()
                   .sort(
                     (a, b) => Date.parse(b.starts_at) - Date.parse(a.starts_at),
@@ -1002,6 +1075,34 @@ export default function App() {
                           >
                             {t.replay}
                           </Button>
+                          {admin &&
+                            config?.saasEnabled &&
+                            !org?.is_demo &&
+                            !s.confirmed &&
+                            !workspace.payroll_entries.some(
+                              (p) => p.shift_id === s.id,
+                            ) && (
+                              <Button
+                                variant="ghost"
+                                disabled={busy}
+                                onClick={() => {
+                                  if (
+                                    confirm(
+                                      "Cancel this unconfirmed shift? Its audit history will be retained.",
+                                    )
+                                  )
+                                    void run(() =>
+                                      mutate("/shifts/cancel", {
+                                        organization_id: org!.id,
+                                        shift_id: s.id,
+                                        note: "Administrator cancelled this unconfirmed shift.",
+                                      }),
+                                    );
+                                }}
+                              >
+                                Cancel shift
+                              </Button>
+                            )}
                           {!s.confirmed && !admin && (
                             <Button
                               disabled={busy}
@@ -1623,12 +1724,33 @@ export default function App() {
         hourCycle: "h23",
       }).format(new Date(shift.starts_at)),
     );
-    const start = new Date(
-      Date.parse(shift.starts_at) + (hour - original) * 3600000,
-    ).toISOString();
-    const end = new Date(
-      Date.parse(shift.ends_at) + (hour - original) * 3600000,
-    ).toISOString();
+    let start = shift.starts_at,
+      end = shift.ends_at,
+      previewError = "";
+    try {
+      const wall = new Intl.DateTimeFormat("sv-SE", {
+        timeZone: policy.timezone,
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        hourCycle: "h23",
+      })
+        .format(new Date(shift.starts_at))
+        .replace(" ", "T");
+      start = zonedDateTimeToIso(
+        wall.slice(0, 11) + String(hour).padStart(2, "0") + wall.slice(13),
+        policy.timezone,
+      );
+      end = new Date(
+        Date.parse(start) +
+          Date.parse(shift.ends_at) -
+          Date.parse(shift.starts_at),
+      ).toISOString();
+    } catch (e) {
+      previewError = (e as Error).message;
+    }
     const prior = workspace!.shifts
       .filter(
         (s) =>
@@ -1680,7 +1802,8 @@ export default function App() {
           <span>12:00</span>
           <span>23:00</span>
         </div>
-        {rest && (
+        {previewError && <p role="alert">{previewError}</p>}
+        {rest && !previewError && (
           <div
             className={`rest-result ${rest.warning ? "rest-warning" : "rest-clear"}`}
           >
@@ -1705,7 +1828,7 @@ export default function App() {
         </p>
         {editable && (
           <Button
-            disabled={busy || hour === original}
+            disabled={busy || hour === original || !!previewError}
             onClick={() =>
               void run(
                 () =>
@@ -1804,6 +1927,29 @@ export default function App() {
     );
     return (
       <>
+        {config?.saasEnabled && !org?.is_demo && (
+          <Button
+            disabled={
+              busy ||
+              workspace!.business_events?.some(
+                (e) => e.event_type === "workforce_dashboard_reviewed",
+              )
+            }
+            onClick={() =>
+              void run(
+                () =>
+                  mutate("/businesses/review", { organization_id: org!.id }),
+                "Dashboard review recorded.",
+              )
+            }
+          >
+            {workspace!.business_events?.some(
+              (e) => e.event_type === "workforce_dashboard_reviewed",
+            )
+              ? "Dashboard review recorded"
+              : "Mark workforce dashboard reviewed"}
+          </Button>
+        )}
         <PageTitle title={t.analytics} subtitle={t.insight} />
         <div className="stats-grid three">
           <Metric
@@ -1893,7 +2039,9 @@ export default function App() {
               <dd>
                 {org?.sector_id === "construction"
                   ? t.construction
-                  : t.healthcare}
+                  : org?.sector_id === "healthcare"
+                    ? t.healthcare
+                    : "General workplace"}
               </dd>
               <dt>{t.timezone}</dt>
               <dd>{workspace!.pay_policies[0].timezone}</dd>
@@ -1904,7 +2052,10 @@ export default function App() {
             </dl>
             <Button
               variant="outline"
-              onClick={() => void client?.auth.signOut()}
+              onClick={() => {
+                sessionStorage.removeItem("nyaveris-invitation");
+                void client?.auth.signOut();
+              }}
             >
               <LogOut size={16} />
               {t.logout}
@@ -2232,12 +2383,14 @@ export default function App() {
                 id: s?.id || null,
                 organization_id: org!.id,
                 worker_id: f.get("worker_id"),
-                starts_at: new Date(
-                  String(f.get("starts_at")) + "+05:30",
-                ).toISOString(),
-                ends_at: new Date(
-                  String(f.get("ends_at")) + "+05:30",
-                ).toISOString(),
+                starts_at: zonedDateTimeToIso(
+                  String(f.get("starts_at")),
+                  workspace!.pay_policies[0].timezone,
+                ),
+                ends_at: zonedDateTimeToIso(
+                  String(f.get("ends_at")),
+                  workspace!.pay_policies[0].timezone,
+                ),
                 break_minutes: Number(f.get("break_minutes")),
                 location: f.get("location"),
               }),
@@ -2246,13 +2399,13 @@ export default function App() {
         }}
       >
         <p className="caption">
-          Times use Asia/Kolkata (+05:30). For overnight shifts, select the next
-          day's end date.
+          Times use {workspace!.pay_policies[0].timezone}. For overnight shifts,
+          select the next day's end date.
         </p>
         <Field label={t.workerName}>
           <select name="worker_id" required defaultValue={s?.worker_id}>
             {workspace!.organization_members
-              .filter((m) => m.role === "worker")
+              .filter((m) => m.role === "worker" && m.active !== false)
               .map((m) => (
                 <option value={m.user_id} key={m.user_id}>
                   {m.display_name}
@@ -2304,78 +2457,39 @@ export default function App() {
       </form>
     );
   }
+  async function openBusiness(orgId: string, message: string) {
+    setNeedsOnboarding(false);
+    setSelectedOrg(orgId);
+    setToast(message);
+    navigate("/app/home");
+  }
   function Login() {
     return (
-      <div className="login-page">
-        <Brand />
-        <section className="card">
-          <span className="mini-icon">
-            <LockKeyhole size={25} />
-          </span>
-          <h1>{t.signIn}</h1>
-          <p>{t.sessionExpired}</p>
-          <form
-            className="form-stack"
-            onSubmit={(e) => {
-              e.preventDefault();
-              // The form is visible before the public configuration request
-              // finishes on a cold start. Do not submit until Auth is ready.
-              if (!client || busy) return;
-              const f = new FormData(e.currentTarget);
-              void run(async () => {
-                if (!client) throw new Error("Supabase configuration missing");
-                const r = await client.auth.signInWithPassword({
-                  email: String(f.get("email")),
-                  password: String(f.get("password")),
-                });
-                if (r.error)
-                  throw new Error("Email or password not recognized");
-                navigate("/app/home");
-              });
-            }}
-          >
-            <Field label={t.email}>
-              <input
-                name="email"
-                type="email"
-                required
-                autoComplete="username"
-              />
-            </Field>
-            <Field label={t.password}>
-              <input
-                name="password"
-                type="password"
-                required
-                autoComplete="current-password"
-              />
-            </Field>
-            <Button type="submit" disabled={busy || !client}>
-              {t.signIn}
-              <ArrowRight size={16} />
-            </Button>
-          </form>
-          {config?.demoEnabled && (
+      <AuthExperience
+        client={client}
+        session={session}
+        googleEnabled={!!config?.googleEnabled}
+        demo={
+          config?.demoEnabled ? (
             <div className="demo-login">
               <Button
                 variant="outline"
-                disabled={busy}
+                disabled={busy || !client}
                 onClick={() => void demo("worker")}
               >
                 {t.getStarted}
               </Button>
               <Button
                 variant="outline"
-                disabled={busy}
+                disabled={busy || !client}
                 onClick={() => void demo("admin")}
               >
                 {t.employerDemo}
               </Button>
             </div>
-          )}
-          {notifyError}
-        </section>
-      </div>
+          ) : undefined
+        }
+      />
     );
   }
   function Landing() {
@@ -2389,6 +2503,9 @@ export default function App() {
           </div>
           <div className="button-row">
             <LanguageSelect />
+            <Link className="button" to="/signup">
+              Create Account
+            </Link>
             <Link className="button button-outline" to="/login">
               {t.signIn}
               <ArrowUpRight size={15} />
@@ -2602,6 +2719,65 @@ export default function App() {
       <Routes>
         <Route path="/" element={Landing()} />
         <Route
+          path="/signup"
+          element={
+            <AuthExperience
+              key="signup"
+              client={client}
+              session={session}
+              googleEnabled={!!config?.googleEnabled}
+            />
+          }
+        />
+        {["forgot-password", "reset-password", "verify-email"].map((path) => (
+          <Route
+            key={path}
+            path={"/" + path}
+            element={
+              <AuthExperience
+                key={path}
+                client={client}
+                session={session}
+                googleEnabled={!!config?.googleEnabled}
+              />
+            }
+          />
+        ))}
+        <Route
+          path="/auth/callback"
+          element={<AuthCallback client={client} />}
+        />
+        <Route path="/terms" element={<LegalPage />} />
+        <Route path="/privacy" element={<LegalPage privacy />} />
+        <Route
+          path="/onboarding"
+          element={
+            <Onboarding
+              api={api}
+              session={session}
+              enabled={!!config?.saasEnabled}
+              hasMembership={!!workspace}
+              onCreated={(id) =>
+                openBusiness(id, "Your business is ready. Let's add your team.")
+              }
+            />
+          }
+        />
+        <Route
+          path="/invite"
+          element={
+            <InvitationExperience
+              pendingInvitations={pendingInvitations}
+              api={api}
+              session={session}
+              onAccepted={(id) =>
+                openBusiness(id, "Welcome to your workplace.")
+              }
+            />
+          }
+        />
+
+        <Route
           path="/login"
           element={session ? <Navigate to="/app/home" replace /> : Login()}
         />
@@ -2621,10 +2797,15 @@ export default function App() {
         <Route
           path="/app/*"
           element={
-            !config ? (
+            !config || !authReady ? (
               <div className="loading-screen">{t.loading}</div>
             ) : !session ? (
               <Navigate to="/login" replace />
+            ) : needsOnboarding ? (
+              <Navigate
+                to={pendingInvitations.length ? "/invite" : "/onboarding"}
+                replace
+              />
             ) : (
               <div className="app-shell">
                 <a className="skip-link" href="#main-content">
@@ -2653,8 +2834,49 @@ export default function App() {
                     </div>
                     <span className="workspace-live" />
                   </div>
+                  {workspace && workspace.memberships.length > 1 && (
+                    <label className="workspace-selector">
+                      Workspace
+                      <select
+                        aria-label="Authorized workspace"
+                        value={org?.id ?? ""}
+                        onChange={(e) => {
+                          setSelectedOrg(e.target.value);
+                          setWorkspace(null);
+                        }}
+                      >
+                        {workspace.memberships.map((m) => (
+                          <option
+                            key={m.organization_id}
+                            value={m.organization_id}
+                          >
+                            {m.organization_id === org?.id
+                              ? org.name
+                              : m.display_name +
+                                " · " +
+                                m.organization_id.slice(0, 8)}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                  )}
                   <span className="nav-label">{t.overviewLabel}</span>
                   <nav aria-label="Main navigation">
+                    {admin && config.saasEnabled && !org?.is_demo && (
+                      <NavLink
+                        className="nav-link"
+                        to="/app/employees"
+                        onClick={() => setMobile(false)}
+                      >
+                        <UsersRound size={19} />
+                        <span>Employees</span>
+                      </NavLink>
+                    )}
+                    {!org?.is_demo && (
+                      <NavLink className="nav-link" to="/onboarding">
+                        Create / join workplace
+                      </NavLink>
+                    )}
                     {navKeys.map((key) => {
                       const Icon = iconFor[key as keyof typeof iconFor];
                       return (
@@ -2750,25 +2972,30 @@ export default function App() {
                       <b>
                         {org?.sector_id === "healthcare"
                           ? t.healthcare
-                          : t.construction}
+                          : org?.sector_id === "generic"
+                            ? "General workplace"
+                            : t.construction}
                       </b>
                     </div>
                     <div className="topbar-actions">
                       <Badge tone="green">
                         <span className="status-dot" />
-                        {t.demo}
+                        {org?.is_demo ? t.demo : "Authorized workspace"}
                       </Badge>
                       <LanguageSelect />
                       <button
                         className="icon-button"
                         aria-label={t.logout}
-                        onClick={() => void client?.auth.signOut()}
+                        onClick={() => {
+                          sessionStorage.removeItem("nyaveris-invitation");
+                          void client?.auth.signOut();
+                        }}
                       >
                         <LogOut size={18} />
                       </button>
                     </div>
                   </header>
-                  {config.demoEnabled && (
+                  {config.demoEnabled && org?.is_demo && (
                     <div className="demo-strip">
                       <span>
                         <Radio size={13} /> {t.demo} · {t.switch}
@@ -2793,7 +3020,9 @@ export default function App() {
                           onClick={() =>
                             void demo(
                               admin ? "worker" : "admin",
-                              org?.sector_id,
+                              org?.sector_id === "healthcare"
+                                ? "healthcare"
+                                : "construction",
                             )
                           }
                         >
@@ -2821,7 +3050,16 @@ export default function App() {
                       </div>
                     ) : (
                       <Routes>
-                        <Route path="home" element={Home()} />
+                        <Route
+                          path="home"
+                          element={
+                            admin && !org?.is_demo ? (
+                              <BusinessOverview workspace={workspace} />
+                            ) : (
+                              Home()
+                            )
+                          }
+                        />
                         <Route path="shifts" element={ShiftsPage()} />
                         <Route path="pay" element={PayPage()} />
                         <Route
@@ -2856,7 +3094,35 @@ export default function App() {
                           }
                         />
                         <Route path="profile" element={Profile()} />
-                        <Route path="settings" element={Profile()} />
+                        <Route
+                          path="employees"
+                          element={
+                            admin && config.saasEnabled && !org?.is_demo ? (
+                              <WorkforceManagement
+                                api={api}
+                                workspace={workspace}
+                                reload={reload}
+                              />
+                            ) : (
+                              <Navigate to="/app/home" />
+                            )
+                          }
+                        />
+                        <Route
+                          path="settings"
+                          element={
+                            admin && config.saasEnabled && !org?.is_demo ? (
+                              <WorkforceManagement
+                                api={api}
+                                workspace={workspace}
+                                reload={reload}
+                                settings
+                              />
+                            ) : (
+                              Profile()
+                            )
+                          }
+                        />
                         <Route
                           path="*"
                           element={<Navigate to="home" replace />}
@@ -2995,25 +3261,11 @@ export default function App() {
               <ArrowRight size={17} />
               {assistant.nextAction}
             </div>
-            {"speechSynthesis" in window && (
-              <Button
-                variant="outline"
-                onClick={() => {
-                  speechSynthesis.cancel();
-                  const u = new SpeechSynthesisUtterance(assistant.explanation);
-                  u.lang =
-                    language === "en"
-                      ? "en-IN"
-                      : language === "ta"
-                        ? "ta-IN"
-                        : "hi-IN";
-                  speechSynthesis.speak(u);
-                }}
-              >
-                <Volume2 size={16} />
-                {t.readAloud}
-              </Button>
-            )}
+            <ReadAloud
+              text={assistant.explanation}
+              language={language}
+              label={t.readAloud}
+            />
           </div>
         ) : (
           <div className="loading-screen">{busy ? t.loading : t.explain}</div>

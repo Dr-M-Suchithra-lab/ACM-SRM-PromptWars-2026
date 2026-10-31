@@ -38,6 +38,8 @@ vi.mock("../server/supabase.js", () => {
       const query = {
         select: () => query,
         limit: () => query,
+        range: () => query,
+        order: () => query,
         eq: (...args: unknown[]) => {
           db.eq(name, ...args);
           return query;
@@ -126,6 +128,136 @@ beforeEach(() => {
 });
 
 afterEach(() => vi.unstubAllEnvs());
+
+describe("SaaS authenticated onboarding boundary", () => {
+  beforeEach(() => {
+    vi.stubEnv("ENABLE_SAAS", "true");
+    vi.stubEnv("APP_ORIGIN", "https://nyaveris-ai.vercel.app");
+    db.getUser.mockResolvedValue({
+      data: {
+        user: {
+          id: db.user,
+          email: "worker@example.test",
+          email_confirmed_at: "2026-10-31T00:00:00Z",
+          user_metadata: { role: "admin" },
+        },
+      },
+      error: null,
+    });
+  });
+  it("discovers onboarding without granting workspace access", async () => {
+    db.tables.organization_members = [];
+    const r = await request(app)
+      .get("/api/account")
+      .set("Authorization", "Bearer synthetic");
+    expect(r.status).toBe(200);
+    expect(r.body.memberships).toEqual([]);
+    expect(
+      (
+        await request(app)
+          .get("/api/workspace")
+          .set("Authorization", "Bearer synthetic")
+      ).status,
+    ).toBe(403);
+  });
+  it("passes only a hash for existing-user invitation acceptance", async () => {
+    db.tables.organization_members = [];
+    const r = await authenticated("/invitations/accept").send({
+      token: "a".repeat(64),
+    });
+    expect(r.status).toBe(200);
+    expect(db.rpc).toHaveBeenCalledWith("saas_action", {
+      p_action: "accept_invitation",
+      p_org: null,
+      p_data: {
+        token_hash: createHash("sha256").update("a".repeat(64)).digest("hex"),
+      },
+    });
+  });
+  it("requires authenticated account discovery", async () =>
+    expect((await request(app).get("/api/account")).status).toBe(401));
+  it("rejects unverified acceptance before an RPC", async () => {
+    db.getUser.mockResolvedValue({
+      data: { user: { id: db.user, email_confirmed_at: null } },
+      error: null,
+    });
+    expect(
+      (
+        await authenticated("/invitations/accept").send({
+          token: "a".repeat(64),
+        })
+      ).status,
+    ).toBe(403);
+    expect(db.rpc).not.toHaveBeenCalled();
+  });
+  it("denies workforce records to a worker", async () =>
+    expect(
+      (
+        await request(app)
+          .get("/api/employees?org=" + org)
+          .set("Authorization", "Bearer synthetic")
+      ).status,
+    ).toBe(403));
+  it("rejects forged invitation privileges", async () => {
+    expect(
+      (
+        await authenticated("/invitations/accept").send({
+          token: "a".repeat(64),
+          role: "admin",
+        })
+      ).status,
+    ).toBe(400);
+    expect(db.rpc).not.toHaveBeenCalled();
+  });
+  it("reports missing migrations without database diagnostics", async () => {
+    db.rpc.mockResolvedValue({
+      data: null,
+      error: { code: "PGRST202", message: "private details" },
+    });
+    const r = await authenticated("/invitations/accept").send({
+      token: "a".repeat(64),
+    });
+    expect(r.status).toBe(503);
+    expect(r.body.error).toContain("approved database migration");
+    expect(JSON.stringify(r.body)).not.toContain("private details");
+  });
+  it("excludes deactivated memberships from routing", async () => {
+    db.tables.organization_members = [
+      { organization_id: org, user_id: db.user, role: "worker", active: false },
+    ];
+    const r = await request(app)
+      .get("/api/account")
+      .set("Authorization", "Bearer synthetic");
+    expect(r.body.memberships).toEqual([]);
+  });
+  it("gates new writes before rollout", async () => {
+    vi.stubEnv("ENABLE_SAAS", "false");
+    expect(
+      (
+        await authenticated("/invitations/accept").send({
+          token: "a".repeat(64),
+        })
+      ).status,
+    ).toBe(503);
+    expect(db.rpc).not.toHaveBeenCalled();
+  });
+  it.each(["/invitations", "/invitations/resend"])(
+    "does not create or rotate a token when its business cannot be read at %s",
+    async (path) => {
+      vi.stubEnv("APP_ORIGIN", "https://example.test");
+      db.tables.organizations = [];
+      const result = await authenticated(path).send({
+        organization_id: org,
+        ...(path.endsWith("resend")
+          ? { invitation_id: dispute }
+          : { employee_id: db.user }),
+      });
+      expect(result.status).toBe(403);
+      expect(db.rpc).not.toHaveBeenCalled();
+      expect(db.eq).toHaveBeenCalledWith("organizations", "id", org);
+    },
+  );
+});
 
 describe("authenticated API orchestration (isolated adapter)", () => {
   it.each([

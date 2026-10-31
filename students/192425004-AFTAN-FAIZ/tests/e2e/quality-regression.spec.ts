@@ -39,6 +39,23 @@ test("anonymous reporting hints are programmatically associated without changing
 test("pay review dialog supports labels, focus containment and keyboard dismissal", async ({
   page,
 }) => {
+  // This accessibility test opens but never submits a review. Keep the UI
+  // fixture independent of already-open reviews in the shared synthetic demo.
+  await page.route("**/api/workspace**", async (route) => {
+    const response = await route.fetch();
+    const data = await response.json();
+    const ids = new Set(
+      data.shifts
+        .filter((s: { starts_at: string }) =>
+          s.starts_at.startsWith("2026-10-26"),
+        )
+        .map((s: { id: string }) => s.id),
+    );
+    data.pay_disputes = data.pay_disputes.filter(
+      (d: { shift_id: string }) => !ids.has(d.shift_id),
+    );
+    await route.fulfill({ json: data });
+  });
   await page.goto("/");
   await page
     .getByRole("button", { name: "Explore worker demo", exact: true })

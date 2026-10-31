@@ -1,3 +1,5 @@
+import { readRecords } from "./records.js";
+import { registerSaas, type Identity } from "./saas.js";
 import express, {
   type Request,
   type Response,
@@ -24,17 +26,8 @@ import {
   policyInput,
 } from "../shared/engines.js";
 import { explain } from "./ai.js";
-import type { SupabaseClient } from "@supabase/supabase-js";
 
-type Auth = {
-  client: SupabaseClient;
-  userId: string;
-  memberships: {
-    organization_id: string;
-    role: string;
-    display_name: string;
-  }[];
-};
+type Auth = Identity;
 type AuthedRequest = Request & { identity?: Auth };
 const hash = (token: string) =>
   createHash("sha256").update(token).digest("hex");
@@ -75,6 +68,8 @@ export function createApp(options: { rateGuard?: RateGuard } = {}) {
       url: process.env.SUPABASE_URL || "",
       publishableKey: process.env.SUPABASE_PUBLISHABLE_KEY || "",
       demoEnabled: process.env.ENABLE_DEMO === "true",
+      saasEnabled: process.env.ENABLE_SAAS === "true",
+      googleEnabled: process.env.GOOGLE_AUTH_ENABLED === "true",
       aiConfigured: !!(process.env.GEMINI_API_KEY && process.env.GEMINI_MODEL),
     }),
   );
@@ -158,20 +153,35 @@ export function createApp(options: { rateGuard?: RateGuard } = {}) {
       return res.status(401).json({ error: "Session expired. Sign in again." });
     const memberships = await client
       .from("organization_members")
-      .select("organization_id,role,display_name")
+      .select(
+        process.env.ENABLE_SAAS === "true"
+          ? "organization_id,role,display_name,active"
+          : "organization_id,role,display_name",
+      )
       .eq("user_id", data.user.id);
-    if (memberships.error || !memberships.data?.length)
+    if (memberships.error)
       return res
         .status(403)
         .json({ error: "No authorized organization membership" });
     req.identity = {
       client,
       userId: data.user.id,
-      memberships: memberships.data,
+      user: data.user,
+      memberships: (
+        (memberships.data ?? []) as unknown as Identity["memberships"]
+      ).filter((m) => m.active !== false),
     };
     next();
   });
   const identity = (req: Request) => (req as AuthedRequest).identity!;
+  registerSaas(app, identity);
+  app.use("/api", (req, res, next) => {
+    if (!identity(req).memberships.length)
+      return res
+        .status(403)
+        .json({ error: "No authorized organization membership" });
+    next();
+  });
   const rpc = async (
     req: Request,
     res: Response,
@@ -209,20 +219,38 @@ export function createApp(options: { rateGuard?: RateGuard } = {}) {
       "safety_case_events",
     ] as const;
     const results = await Promise.all(
-      names.map((name) => {
-        let q = client.from(name).select("*").limit(500);
-        if (name === "organizations") q = q.eq("id", orgId);
-        else if (!["payroll_entries", "safety_case_events"].includes(name))
-          q = q.eq("organization_id", orgId);
-        return q;
-      }),
+      names.map((name) =>
+        readRecords((offset) => {
+          let q = client
+            .from(name)
+            .select("*")
+            .range(offset, offset + 499)
+            .order(name === "payroll_entries" ? "shift_id" : "id");
+          if (name === "organization_members")
+            q = client
+              .from(name)
+              .select("*")
+              .range(offset, offset + 499)
+              .order("user_id");
+          if (name === "pay_policies")
+            q = client
+              .from(name)
+              .select("*")
+              .range(offset, offset + 499)
+              .order("organization_id");
+          if (name === "organizations") q = q.eq("id", orgId);
+          else if (!["payroll_entries", "safety_case_events"].includes(name))
+            q = q.eq("organization_id", orgId);
+          return q;
+        }),
+      ),
     );
     if (results.some((r) => r.error))
       throw new Error("Unable to load workspace");
     const rows = Object.fromEntries(
       names.map((name, i) => [name, results[i].data || []]),
     );
-    const shifts = rows.shifts,
+    const shifts = rows.shifts.filter((s) => !s.cancelled_at),
       shiftIds = new Set(shifts.map((s) => s.id));
     rows.payroll_entries = rows.payroll_entries.filter((p) =>
       shiftIds.has(p.shift_id),
@@ -231,18 +259,68 @@ export function createApp(options: { rateGuard?: RateGuard } = {}) {
     rows.safety_case_events = rows.safety_case_events.filter((e) =>
       reportIds.has(e.report_id),
     );
+    let businessEvents: Record<string, unknown>[] = [];
+    let employees: Record<string, unknown>[] = [];
+    if (process.env.ENABLE_SAAS === "true") {
+      const profiles = await readRecords((offset) =>
+        client
+          .from("employee_profiles")
+          .select("*")
+          .eq("organization_id", orgId)
+          .order("id")
+          .range(offset, offset + 499),
+      );
+      if (profiles.error) throw new Error("Unable to load employee policies");
+      employees = profiles.data ?? [];
+      if (member.role === "admin") {
+        const events = await readRecords((offset) =>
+          client
+            .from("business_events")
+            .select("*")
+            .eq("organization_id", orgId)
+            .order("id")
+            .range(offset, offset + 499),
+        );
+        if (events.error)
+          throw new Error("Unable to load business audit history");
+        businessEvents = events.data;
+      }
+    }
     const policy = policyInput.parse(rows.pay_policies[0]);
+    const employeePolicy = (workerId: string) => {
+      const e = employees.find((e) => e.user_id === workerId);
+      return e
+        ? {
+            ...policy,
+            basis: e.pay_basis,
+            hourly_paise:
+              e.pay_basis === "hourly" ? e.rate_paise : policy.hourly_paise,
+            daily_paise:
+              e.pay_basis === "daily" ? e.rate_paise : policy.daily_paise,
+          }
+        : policy;
+    };
     const pay = shifts.map((s) => ({
       shiftId: s.id,
       ...calculatePay(
         s,
-        policy,
+        policyInput.parse(employeePolicy(s.worker_id)),
         rows.payroll_entries.find((p) => p.shift_id === s.id)?.gross_paise ?? 0,
       ),
       hasPayroll: rows.payroll_entries.some((p) => p.shift_id === s.id),
     }));
     const risks = schedulingRisks(shifts, policy);
-    res.json({ userId, member, memberships, ...rows, pay, risks });
+    res.json({
+      userId,
+      member,
+      memberships,
+      ...rows,
+      shifts,
+      employee_profiles: employees,
+      business_events: businessEvents,
+      pay,
+      risks,
+    });
   });
   app.post("/api/reviews", async (req, res) => {
     const b = reviewInput.parse(req.body);
@@ -369,9 +447,28 @@ export function createApp(options: { rateGuard?: RateGuard } = {}) {
         .maybeSingle();
       if (p.error || !p.data || payroll.error)
         throw new Error("Unable to load pay explanation");
+      let explanationPolicy = p.data;
+      if (process.env.ENABLE_SAAS === "true") {
+        const employee = await c
+          .from("employee_profiles")
+          .select("pay_basis,rate_paise")
+          .eq("organization_id", s.data.organization_id)
+          .eq("user_id", s.data.worker_id)
+          .maybeSingle();
+        if (employee.error)
+          throw new Error("Unable to load employee pay policy");
+        if (employee.data)
+          explanationPolicy = {
+            ...p.data,
+            basis: employee.data.pay_basis,
+            ...(employee.data.pay_basis === "daily"
+              ? { daily_paise: employee.data.rate_paise }
+              : { hourly_paise: employee.data.rate_paise }),
+          };
+      }
       context = calculatePay(
         s.data,
-        policyInput.parse(p.data),
+        policyInput.parse(explanationPolicy),
         payroll.data?.gross_paise ?? 0,
       );
     }

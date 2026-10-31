@@ -24,7 +24,9 @@ describe("API request boundary", () => {
     expect(Object.keys(r.body).sort()).toEqual([
       "aiConfigured",
       "demoEnabled",
+      "googleEnabled",
       "publishableKey",
+      "saasEnabled",
       "url",
     ]);
     expect(r.headers["cache-control"]).toBe("no-store");

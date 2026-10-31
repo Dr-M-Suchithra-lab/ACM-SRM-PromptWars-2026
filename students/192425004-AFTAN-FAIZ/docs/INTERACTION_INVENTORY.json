@@ -1,0 +1,2674 @@
+{
+  "application": "NYAVERIS AI",
+  "generated": "2026-10-31",
+  "routes": [
+    {
+      "file": "src/App.tsx",
+      "line": 2720,
+      "component": "App",
+      "tag": "Route",
+      "attributes": {
+        "path": "\"/\"",
+        "element": "{Landing()}"
+      },
+      "text": "",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 2721,
+      "component": "App",
+      "tag": "Route",
+      "attributes": {
+        "path": "\"/signup\"",
+        "element": "{\n            <AuthExperience\n              key=\"signup\"\n              client={client}\n              session={session}\n              googleEnabled={!!config?.googleEnabled}\n            />\n          }"
+      },
+      "text": "",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 2733,
+      "component": "inline",
+      "tag": "Route",
+      "attributes": {
+        "key": "{path}",
+        "path": "{\"/\" + path}",
+        "element": "{\n              <AuthExperience\n                key={path}\n                client={client}\n                session={session}\n                googleEnabled={!!config?.googleEnabled}\n              />\n            }"
+      },
+      "text": "",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 2746,
+      "component": "App",
+      "tag": "Route",
+      "attributes": {
+        "path": "\"/auth/callback\"",
+        "element": "{<AuthCallback client={client} />}"
+      },
+      "text": "",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 2750,
+      "component": "App",
+      "tag": "Route",
+      "attributes": {
+        "path": "\"/terms\"",
+        "element": "{<LegalPage />}"
+      },
+      "text": "",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 2751,
+      "component": "App",
+      "tag": "Route",
+      "attributes": {
+        "path": "\"/privacy\"",
+        "element": "{<LegalPage privacy />}"
+      },
+      "text": "",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 2752,
+      "component": "App",
+      "tag": "Route",
+      "attributes": {
+        "path": "\"/onboarding\"",
+        "element": "{\n            <Onboarding\n              api={api}\n              session={session}\n              enabled={!!config?.saasEnabled}\n              hasMembership={!!workspace}\n              onCreated={(id) =>\n                openBusiness(id, \"Your business is ready. Let's add your team.\")\n              }\n            />\n          }"
+      },
+      "text": "",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 2766,
+      "component": "App",
+      "tag": "Route",
+      "attributes": {
+        "path": "\"/invite\"",
+        "element": "{\n            <InvitationExperience\n              pendingInvitations={pendingInvitations}\n              api={api}\n              session={session}\n              onAccepted={(id) =>\n                openBusiness(id, \"Welcome to your workplace.\")\n              }\n            />\n          }"
+      },
+      "text": "",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 2780,
+      "component": "App",
+      "tag": "Route",
+      "attributes": {
+        "path": "\"/login\"",
+        "element": "{session ? <Navigate to=\"/app/home\" replace /> : Login()}"
+      },
+      "text": "",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 2784,
+      "component": "App",
+      "tag": "Route",
+      "attributes": {
+        "path": "\"/safety\"",
+        "element": "{\n            <div className=\"standalone-safety\">\n              <div className=\"standalone-nav\">\n                <Brand />\n                <LanguageSelect />\n              </div>\n              {notifyError}\n              {SafetyPage()}\n            </div>\n          }"
+      },
+      "text": "",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 2797,
+      "component": "App",
+      "tag": "Route",
+      "attributes": {
+        "path": "\"/app/*\"",
+        "element": "{\n            !config || !authReady ? (\n              <div className=\"loading-screen\">{t.loading}</div>\n            ) : !session ? (\n              <Navigate to=\"/login\" replace />\n            ) : needsOnboarding ? (\n              <Navigate\n                to={pendingInvitations.length ? \"/invite\" : \"/onboarding\"}\n                replace\n              />\n            ) : (\n              <div className=\"app-shell\">\n                <a className=\"skip-link\" href=\"#main-content\">\n                  Skip to main content\n                </a>\n                {mobile && (\n                  <button\n                    aria-label=\"Close navigation\"\n                    className=\"nav-backdrop\"\n                    onClick={() => setMobile(false)}\n                  />\n                )}\n                <aside className={`sidebar ${mobile ? \"mobile-open\" : \"\"}`}>\n                  <Brand light />\n                  <div className=\"workspace-tag\">\n                    <span className=\"workspace-icon\">\n                      {org?.sector_id === \"healthcare\" ? (\n                        <HeartPulse size={20} />\n                      ) : (\n                        <HardHat size={20} />\n                      )}\n                    </span>\n                    <div>\n                      <strong>{org?.name || \"NYAVERIS AI\"}</strong>\n                      <small>{admin ? t.admin : t.worker}</small>\n                    </div>\n                    <span className=\"workspace-live\" />\n                  </div>\n                  {workspace && workspace.memberships.length > 1 && (\n                    <label className=\"workspace-selector\">\n                      Workspace\n                      <select\n                        aria-label=\"Authorized workspace\"\n                        value={org?.id ?? \"\"}\n                        onChange={(e) => {\n                          setSelectedOrg(e.target.value);\n                          setWorkspace(null);\n                        }}\n                      >\n                        {workspace.memberships.map((m) => (\n                          <option\n                            key={m.organization_id}\n                            value={m.organization_id}\n                          >\n                            {m.organization_id === org?.id\n                              ? org.name\n                              : m.display_name +\n                                \" · \" +\n                                m.organization_id.slice(0, 8)}\n                          </option>\n                        ))}\n                      </select>\n                    </label>\n                  )}\n                  <span className=\"nav-label\">{t.overviewLabel}</span>\n                  <nav aria-label=\"Main navigation\">\n                    {admin && config.saasEnabled && !org?.is_demo && (\n                      <NavLink\n                        className=\"nav-link\"\n                        to=\"/app/employees\"\n                        onClick={() => setMobile(false)}\n                      >\n                        <UsersRound size={19} />\n                        <span>Employees</span>\n                      </NavLink>\n                    )}\n                    {!org?.is_demo && (\n                      <NavLink className=\"nav-link\" to=\"/onboarding\">\n                        Create / join workplace\n                      </NavLink>\n                    )}\n                    {navKeys.map((key) => {\n                      const Icon = iconFor[key as keyof typeof iconFor];\n                      return (\n                        <NavLink\n                          key={key}\n                          className={({ isActive }) =>\n                            isActive ? \"nav-link active\" : \"nav-link\"\n                          }\n                          to={`/app/${key}`}\n                          onClick={() => setMobile(false)}\n                        >\n                          <Icon size={19} />\n                          <span>{t[key]}</span>\n                          {key === \"cases\" &&\n                            !!workspace?.pay_disputes.filter(\n                              (d) => d.status !== \"closed\",\n                            ).length && (\n                              <em>\n                                {\n                                  workspace.pay_disputes.filter(\n                                    (d) => d.status !== \"closed\",\n                                  ).length\n                                }\n                              </em>\n                            )}\n                          {key === \"disputes\" &&\n                            !!workspace?.pay_disputes.filter(\n                              (d) => d.status === \"requested\",\n                            ).length && (\n                              <em>\n                                {\n                                  workspace.pay_disputes.filter(\n                                    (d) => d.status === \"requested\",\n                                  ).length\n                                }\n                              </em>\n                            )}\n                          {key === \"home\" && (\n                            <span className=\"nav-active-dot\" />\n                          )}\n                        </NavLink>\n                      );\n                    })}\n                  </nav>\n                  <div className=\"sidebar-bottom\">\n                    <div className=\"support-card\">\n                      <ShieldCheck size={22} />\n                      <h4>Built on trust.</h4>\n                      <p>\n                        Transparent records.\n                        <br />\n                        Accountable actions.\n                      </p>\n                      <span>\n                        SDG 8 · DECENT WORK <ArrowUpRight size={13} />\n                      </span>\n                    </div>\n                    <button\n                      className=\"sidebar-user\"\n                      onClick={() => navigate(\"/app/profile\")}\n                    >\n                      <span className=\"avatar\">\n                        {workspace?.member.display_name\n                          .split(\" \")\n                          .map((x) => x[0])\n                          .join(\"\")\n                          .slice(0, 2) || \"FS\"}\n                      </span>\n                      <span>\n                        <strong>\n                          {workspace?.member.display_name || \"NYAVERIS AI\"}\n                        </strong>\n                        <small>\n                          {admin ? \"Administrator\" : \"Worker account\"}\n                        </small>\n                      </span>\n                      <Settings2 size={16} />\n                    </button>\n                  </div>\n                </aside>\n                <div className=\"workspace-main\">\n                  <header className=\"topbar\">\n                    <div className=\"breadcrumb\">\n                      <button\n                        className=\"mobile-menu\"\n                        aria-label=\"Open navigation\"\n                        onClick={() => setMobile(true)}\n                      >\n                        <Menu size={21} />\n                      </button>\n                      <span>{admin ? t.admin : t.worker}</span>\n                      <ChevronRight size={14} />\n                      <b>\n                        {org?.sector_id === \"healthcare\"\n                          ? t.healthcare\n                          : org?.sector_id === \"generic\"\n                            ? \"General workplace\"\n                            : t.construction}\n                      </b>\n                    </div>\n                    <div className=\"topbar-actions\">\n                      <Badge tone=\"green\">\n                        <span className=\"status-dot\" />\n                        {org?.is_demo ? t.demo : \"Authorized workspace\"}\n                      </Badge>\n                      <LanguageSelect />\n                      <button\n                        className=\"icon-button\"\n                        aria-label={t.logout}\n                        onClick={() => {\n                          sessionStorage.removeItem(\"nyaveris-invitation\");\n                          void client?.auth.signOut();\n                        }}\n                      >\n                        <LogOut size={18} />\n                      </button>\n                    </div>\n                  </header>\n                  {config.demoEnabled && org?.is_demo && (\n                    <div className=\"demo-strip\">\n                      <span>\n                        <Radio size={13} /> {t.demo} · {t.switch}\n                      </span>\n                      <div>\n                        <select\n                          aria-label=\"Demo industry\"\n                          value={org?.sector_id || \"construction\"}\n                          disabled={busy}\n                          onChange={(e) =>\n                            void demo(\n                              admin ? \"admin\" : \"worker\",\n                              e.target.value as \"construction\" | \"healthcare\",\n                            )\n                          }\n                        >\n                          <option value=\"construction\">{t.construction}</option>\n                          <option value=\"healthcare\">{t.healthcare}</option>\n                        </select>\n                        <button\n                          disabled={busy}\n                          onClick={() =>\n                            void demo(\n                              admin ? \"worker\" : \"admin\",\n                              org?.sector_id === \"healthcare\"\n                                ? \"healthcare\"\n                                : \"construction\",\n                            )\n                          }\n                        >\n                          {admin ? t.worker : t.admin}\n                          <ArrowUpRight size={13} />\n                        </button>\n                      </div>\n                    </div>\n                  )}\n                  <main\n                    className=\"main-content\"\n                    id=\"main-content\"\n                    tabIndex={-1}\n                  >\n                    {notifyError}\n                    {!workspace ? (\n                      <div className=\"loading-screen\">\n                        <span className=\"spinner\" />\n                        {t.loading}\n                        {error && (\n                          <Button onClick={() => void reload()}>\n                            {t.refresh}\n                          </Button>\n                        )}\n                      </div>\n                    ) : (\n                      <Routes>\n                        <Route\n                          path=\"home\"\n                          element={\n                            admin && !org?.is_demo ? (\n                              <BusinessOverview workspace={workspace} />\n                            ) : (\n                              Home()\n                            )\n                          }\n                        />\n                        <Route path=\"shifts\" element={ShiftsPage()} />\n                        <Route path=\"pay\" element={PayPage()} />\n                        <Route\n                          path=\"payroll\"\n                          element={\n                            admin ? PayPage() : <Navigate to=\"/app/pay\" />\n                          }\n                        />\n                        <Route path=\"cases\" element={CasesPage()} />\n                        <Route\n                          path=\"disputes\"\n                          element={\n                            admin ? CasesPage() : <Navigate to=\"/app/cases\" />\n                          }\n                        />\n                        <Route path=\"report\" element={SafetyPage()} />\n                        <Route\n                          path=\"safety\"\n                          element={admin ? AdminSafety() : SafetyPage()}\n                        />\n                        <Route path=\"rest\" element={RestPage()} />\n                        <Route\n                          path=\"workforce\"\n                          element={\n                            admin ? Workforce() : <Navigate to=\"/app/home\" />\n                          }\n                        />\n                        <Route\n                          path=\"analytics\"\n                          element={\n                            admin ? Insights() : <Navigate to=\"/app/home\" />\n                          }\n                        />\n                        <Route path=\"profile\" element={Profile()} />\n                        <Route\n                          path=\"employees\"\n                          element={\n                            admin && config.saasEnabled && !org?.is_demo ? (\n                              <WorkforceManagement\n                                api={api}\n                                workspace={workspace}\n                                reload={reload}\n                              />\n                            ) : (\n                              <Navigate to=\"/app/home\" />\n                            )\n                          }\n                        />\n                        <Route\n                          path=\"settings\"\n                          element={\n                            admin && config.saasEnabled && !org?.is_demo ? (\n                              <WorkforceManagement\n                                api={api}\n                                workspace={workspace}\n                                reload={reload}\n                                settings\n                              />\n                            ) : (\n                              Profile()\n                            )\n                          }\n                        />\n                        <Route\n                          path=\"*\"\n                          element={<Navigate to=\"home\" replace />}\n                        />\n                      </Routes>\n                    )}\n                  </main>\n                  <div className=\"workspace-footer\">\n                    <span>\n                      <ShieldCheck size={13} /> Fairness You Can Trace. Trust\n                      You Can Prove.\n                    </span>\n                    <span>NYAVERIS AI</span>\n                  </div>\n                </div>\n                <button\n                  className=\"assistant-fab\"\n                  onClick={() => void ask(\"pay\")}\n                >\n                  <Sparkles size={20} />\n                  <span>{t.assistant}</span>\n                </button>\n              </div>\n            )\n          }"
+      },
+      "text": "",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 3053,
+      "component": "App",
+      "tag": "Route",
+      "attributes": {
+        "path": "\"home\"",
+        "element": "{\n                            admin && !org?.is_demo ? (\n                              <BusinessOverview workspace={workspace} />\n                            ) : (\n                              Home()\n                            )\n                          }"
+      },
+      "text": "",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 3063,
+      "component": "App",
+      "tag": "Route",
+      "attributes": {
+        "path": "\"shifts\"",
+        "element": "{ShiftsPage()}"
+      },
+      "text": "",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 3064,
+      "component": "App",
+      "tag": "Route",
+      "attributes": {
+        "path": "\"pay\"",
+        "element": "{PayPage()}"
+      },
+      "text": "",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 3065,
+      "component": "App",
+      "tag": "Route",
+      "attributes": {
+        "path": "\"payroll\"",
+        "element": "{\n                            admin ? PayPage() : <Navigate to=\"/app/pay\" />\n                          }"
+      },
+      "text": "",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 3071,
+      "component": "App",
+      "tag": "Route",
+      "attributes": {
+        "path": "\"cases\"",
+        "element": "{CasesPage()}"
+      },
+      "text": "",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 3072,
+      "component": "App",
+      "tag": "Route",
+      "attributes": {
+        "path": "\"disputes\"",
+        "element": "{\n                            admin ? CasesPage() : <Navigate to=\"/app/cases\" />\n                          }"
+      },
+      "text": "",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 3078,
+      "component": "App",
+      "tag": "Route",
+      "attributes": {
+        "path": "\"report\"",
+        "element": "{SafetyPage()}"
+      },
+      "text": "",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 3079,
+      "component": "App",
+      "tag": "Route",
+      "attributes": {
+        "path": "\"safety\"",
+        "element": "{admin ? AdminSafety() : SafetyPage()}"
+      },
+      "text": "",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 3083,
+      "component": "App",
+      "tag": "Route",
+      "attributes": {
+        "path": "\"rest\"",
+        "element": "{RestPage()}"
+      },
+      "text": "",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 3084,
+      "component": "App",
+      "tag": "Route",
+      "attributes": {
+        "path": "\"workforce\"",
+        "element": "{\n                            admin ? Workforce() : <Navigate to=\"/app/home\" />\n                          }"
+      },
+      "text": "",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 3090,
+      "component": "App",
+      "tag": "Route",
+      "attributes": {
+        "path": "\"analytics\"",
+        "element": "{\n                            admin ? Insights() : <Navigate to=\"/app/home\" />\n                          }"
+      },
+      "text": "",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 3096,
+      "component": "App",
+      "tag": "Route",
+      "attributes": {
+        "path": "\"profile\"",
+        "element": "{Profile()}"
+      },
+      "text": "",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 3097,
+      "component": "App",
+      "tag": "Route",
+      "attributes": {
+        "path": "\"employees\"",
+        "element": "{\n                            admin && config.saasEnabled && !org?.is_demo ? (\n                              <WorkforceManagement\n                                api={api}\n                                workspace={workspace}\n                                reload={reload}\n                              />\n                            ) : (\n                              <Navigate to=\"/app/home\" />\n                            )\n                          }"
+      },
+      "text": "",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 3111,
+      "component": "App",
+      "tag": "Route",
+      "attributes": {
+        "path": "\"settings\"",
+        "element": "{\n                            admin && config.saasEnabled && !org?.is_demo ? (\n                              <WorkforceManagement\n                                api={api}\n                                workspace={workspace}\n                                reload={reload}\n                                settings\n                              />\n                            ) : (\n                              Profile()\n                            )\n                          }"
+      },
+      "text": "",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 3126,
+      "component": "App",
+      "tag": "Route",
+      "attributes": {
+        "path": "\"*\"",
+        "element": "{<Navigate to=\"home\" replace />}"
+      },
+      "text": "",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 3152,
+      "component": "App",
+      "tag": "Route",
+      "attributes": {
+        "path": "\"*\"",
+        "element": "{<Navigate to=\"/\" />}"
+      },
+      "text": "",
+      "evidence": "static inventory; execution status is reported separately"
+    }
+  ],
+  "controls": [
+    {
+      "file": "src/App.tsx",
+      "line": 134,
+      "component": "Brand",
+      "tag": "Link",
+      "attributes": {
+        "className": "{`brand ${light ? \"brand-light\" : \"\"}`}",
+        "to": "\"/\"",
+        "aria-label": "\"NYAVERIS AI home\""
+      },
+      "text": " <span className=\"brand-symbol\" aria-hidden=\"true\"> <span /> <span /> <span /> </span> <span className=\"brand-wordmark\"> NYAVERIS<span className=\"brand-ai\"> AI</span> </span> ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 467,
+      "component": "inline",
+      "tag": "select",
+      "attributes": {
+        "aria-label": "{t.language}",
+        "value": "{language}",
+        "onChange": "{(e) => setLanguage(e.target.value as Language)}"
+      },
+      "text": " <option value=\"en\">English</option> <option value=\"ta\">தமிழ்</option> <option value=\"hi\">हिन्दी</option> ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 482,
+      "component": "App",
+      "tag": "button",
+      "attributes": {
+        "onClick": "{() => setError(\"\")}",
+        "aria-label": "\"Dismiss error\""
+      },
+      "text": " <X size={16} /> ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 551,
+      "component": "inline",
+      "tag": "Button",
+      "attributes": {
+        "variant": "\"outline\"",
+        "onClick": "{() => setModal({ type: \"replay\", id: s.id })}"
+      },
+      "text": " <Play size={15} /> {t.replay} ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 563,
+      "component": "inline",
+      "tag": "Button",
+      "attributes": {
+        "onClick": "{() => openReview(s)}"
+      },
+      "text": " {t.request} <ArrowUpRight size={15} /> ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 570,
+      "component": "inline",
+      "tag": "Button",
+      "attributes": {
+        "disabled": "{busy}",
+        "onClick": "{() =>\n                void run(() => mutate(\"/shifts/confirm\", { shift_id: s.id }))\n              }"
+      },
+      "text": " {t.confirm} ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 619,
+      "component": "Home",
+      "tag": "Button",
+      "attributes": {
+        "variant": "\"outline\"",
+        "onClick": "{() => void reload()}",
+        "disabled": "{loading}"
+      },
+      "text": " <RefreshCw size={16} /> {t.refresh} ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 635,
+      "component": "Home",
+      "tag": "Button",
+      "attributes": {
+        "variant": "\"accent\"",
+        "onClick": "{() => navigate(\"/app/\" + (admin ? \"disputes\" : \"pay\"))}"
+      },
+      "text": " {admin ? t.actionQueue : t.viewPay} <ArrowUpRight size={17} /> ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 795,
+      "component": "Home",
+      "tag": "Button",
+      "attributes": {
+        "variant": "\"ghost\"",
+        "onClick": "{() =>\n                      setModal({ type: \"replay\", id: focusShift.id })\n                    }"
+      },
+      "text": " {t.replay} <ArrowRight size={15} /> ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 842,
+      "component": "Home",
+      "tag": "Button",
+      "attributes": {
+        "variant": "\"outline\"",
+        "onClick": "{() => navigate(\"/app/shifts\")}"
+      },
+      "text": " {t.shifts} <ArrowRight size={15} /> ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 864,
+      "component": "Home",
+      "tag": "button",
+      "attributes": {
+        "onClick": "{() => void ask(\"pay\")}"
+      },
+      "text": " {t.explain} <ArrowUpRight size={15} /> ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 877,
+      "component": "Home",
+      "tag": "Link",
+      "attributes": {
+        "to": "\"/app/cases\""
+      },
+      "text": " {t.viewAll} <ArrowUpRight size={14} /> ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 909,
+      "component": "Home",
+      "tag": "Button",
+      "attributes": {
+        "variant": "\"outline\"",
+        "onClick": "{() => navigate(\"/app/report\")}"
+      },
+      "text": " {t.report} <ArrowUpRight size={15} /> ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 971,
+      "component": "PayPage",
+      "tag": "Button",
+      "attributes": {
+        "variant": "\"outline\"",
+        "onClick": "{() => void ask(\"pay\")}"
+      },
+      "text": " <Sparkles size={16} /> {t.explain} ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 1004,
+      "component": "ShiftsPage",
+      "tag": "Button",
+      "attributes": {
+        "onClick": "{() => setModal({ type: \"shift\" })}"
+      },
+      "text": " <Plus size={16} /> {t.newShift} ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 1015,
+      "component": "ShiftsPage",
+      "tag": "input",
+      "attributes": {
+        "type": "\"search\"",
+        "value": "{shiftSearch}",
+        "onChange": "{(e) => setShiftSearch(e.target.value)}"
+      },
+      "text": "",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 1070,
+      "component": "inline",
+      "tag": "Button",
+      "attributes": {
+        "variant": "\"ghost\"",
+        "onClick": "{() =>\n                              setModal({ type: \"replay\", id: s.id })\n                            }"
+      },
+      "text": " {t.replay} ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 1085,
+      "component": "inline",
+      "tag": "Button",
+      "attributes": {
+        "variant": "\"ghost\"",
+        "disabled": "{busy}",
+        "onClick": "{() => {\n                                  if (\n                                    confirm(\n                                      \"Cancel this unconfirmed shift? Its audit history will be retained.\",\n                                    )\n                                  )\n                                    void run(() =>\n                                      mutate(\"/shifts/cancel\", {\n                                        organization_id: org!.id,\n                                        shift_id: s.id,\n                                        note: \"Administrator cancelled this unconfirmed shift.\",\n                                      }),\n                                    );\n                                }}"
+      },
+      "text": "Cancel shift ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 1107,
+      "component": "inline",
+      "tag": "Button",
+      "attributes": {
+        "disabled": "{busy}",
+        "onClick": "{() =>\n                                void run(() =>\n                                  mutate(\"/shifts/confirm\", { shift_id: s.id }),\n                                )\n                              }"
+      },
+      "text": " {t.confirm} ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 1123,
+      "component": "inline",
+      "tag": "Button",
+      "attributes": {
+        "variant": "\"outline\"",
+        "onClick": "{() =>\n                                  setModal({ type: \"shift\", id: s.id })\n                                }"
+      },
+      "text": " {t.whatif} ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 1136,
+      "component": "inline",
+      "tag": "Button",
+      "attributes": {
+        "variant": "\"outline\"",
+        "onClick": "{() => void recordPayroll(s)}"
+      },
+      "text": " {t.payroll} ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 1171,
+      "component": "inline",
+      "tag": "button",
+      "attributes": {
+        "key": "{f}",
+        "className": "{filter === f ? \"active\" : \"\"}",
+        "onClick": "{() => setFilter(f)}"
+      },
+      "text": " {f === \"all\" ? t.viewAll : t[f as \"requested\" | \"responded\" | \"closed\"]} ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 1221,
+      "component": "inline",
+      "tag": "Button",
+      "attributes": {
+        "variant": "\"outline\"",
+        "onClick": "{() =>\n                        setModal({ type: \"replay\", id: d.shift_id })\n                      }"
+      },
+      "text": " <Play size={14} /> {t.replay} ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 1231,
+      "component": "inline",
+      "tag": "Button",
+      "attributes": {
+        "onClick": "{() => setModal({ type: \"resolve\", id: d.id })}"
+      },
+      "text": " {t.resolve} <ArrowUpRight size={15} /> ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 1239,
+      "component": "inline",
+      "tag": "Button",
+      "attributes": {
+        "variant": "\"outline\"",
+        "onClick": "{() => setModal({ type: \"clarify\", id: d.id })}"
+      },
+      "text": " {language === \"ta\" ? \"மேலும் விளக்கம் கேளுங்கள்\" : language === \"hi\" ? \"स्पष्टीकरण माँगें\" : \"Request clarification\"} ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 1251,
+      "component": "inline",
+      "tag": "Button",
+      "attributes": {
+        "disabled": "{busy}",
+        "onClick": "{() =>\n                          void run(() =>\n                            mutate(\"/reviews/confirm\", { dispute_id: d.id }),\n                          )\n                        }"
+      },
+      "text": " <CheckCheck size={16} /> {t.confirmResolution} ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 1314,
+      "component": "SafetyPage",
+      "tag": "button",
+      "attributes": {
+        "className": "{tab === \"submit\" ? \"active\" : \"\"}",
+        "onClick": "{() => setTab(\"submit\")}"
+      },
+      "text": " <ShieldAlert size={17} /> {t.report} ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 1321,
+      "component": "SafetyPage",
+      "tag": "button",
+      "attributes": {
+        "className": "{tab === \"track\" ? \"active\" : \"\"}",
+        "onClick": "{() => setTab(\"track\")}"
+      },
+      "text": " <Fingerprint size={17} /> {t.track} ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 1344,
+      "component": "SafetyPage",
+      "tag": "Button",
+      "attributes": {
+        "onClick": "{() =>\n                        void run(async () => {\n                          await navigator.clipboard.writeText(\n                            `${credentials.reference}\\n${credentials.token}`,\n                          );\n                        }, t.copied)\n                      }"
+      },
+      "text": " {t.copy} ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 1355,
+      "component": "SafetyPage",
+      "tag": "Button",
+      "attributes": {
+        "variant": "\"outline\"",
+        "onClick": "{() => {\n                        setTab(\"track\");\n                      }}"
+      },
+      "text": " {t.track} <ArrowRight size={15} /> ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 1367,
+      "component": "SafetyPage",
+      "tag": "form",
+      "attributes": {
+        "onSubmit": "{(e) => void submit(e)}",
+        "className": "\"form-stack\""
+      },
+      "text": " <Field label={t.settings}> <select name=\"organization_id\" defaultValue={org?.id} required > {org ? ( <option value={org.id}>{org.name}</option> ) : ( <option value=\"\">Choose organization</option> )} {orgs .filter((o) =>",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 1369,
+      "component": "SafetyPage",
+      "tag": "select",
+      "attributes": {
+        "name": "\"organization_id\"",
+        "defaultValue": "{org?.id}",
+        "required": "true"
+      },
+      "text": " {org ? ( <option value={org.id}>{org.name}</option> ) : ( <option value=\"\">Choose organization</option> )} {orgs .filter((o) => o.id !== org?.id) .map((o) => ( <option key={o.id} value={o.id}> {o.name} </option> ))} ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 1390,
+      "component": "SafetyPage",
+      "tag": "select",
+      "attributes": {
+        "name": "\"category\"",
+        "required": "true"
+      },
+      "text": " {(org?.sector_id === \"healthcare\" ? [\"sanitation\", \"equipment\", \"workload\", \"other\"] : [ \"equipment\", \"fall_hazard\", \"sanitation\", \"workload\", \"other\", ] ).map((c) => ( <option value={c} key={c}> {categoryLabel(c)} </op",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 1408,
+      "component": "SafetyPage",
+      "tag": "select",
+      "attributes": {
+        "name": "\"priority\""
+      },
+      "text": " <option value=\"normal\"> {language === \"ta\" ? \"வழக்கமான\" : language === \"hi\" ? \"सामान्य\" : \"Normal\"} </option> <option value=\"high\"> {language === \"ta\" ? \"உயர்\" : language === \"hi\" ? \"उच्च\" : \"High\"} </option> ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 1427,
+      "component": "SafetyPage",
+      "tag": "textarea",
+      "attributes": {
+        "name": "\"description\"",
+        "required": "true",
+        "minLength": "{20}",
+        "maxLength": "{4000}",
+        "rows": "{5}",
+        "placeholder": "{\n                        language === \"en\"\n                          ? \"Describe the concern and where action is needed. Avoid identifying yourself.\"\n                          : t.description\n                      }"
+      },
+      "text": "",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 1444,
+      "component": "SafetyPage",
+      "tag": "Button",
+      "attributes": {
+        "disabled": "{busy}",
+        "type": "\"submit\""
+      },
+      "text": " <ShieldCheck size={17} /> {t.submit} <ArrowUpRight size={15} /> ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 1453,
+      "component": "SafetyPage",
+      "tag": "form",
+      "attributes": {
+        "className": "\"form-stack\"",
+        "onSubmit": "{(e) => void track(e)}"
+      },
+      "text": " <Field label={t.reference}> <input name=\"reference\" defaultValue={credentials?.reference} placeholder=\"FS-0123456789ABCDEF\" required pattern=\"FS-[A-F0-9]{16}\" autoComplete=\"off\" /> </Field> <Field label={t.secret}> <inp",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 1455,
+      "component": "SafetyPage",
+      "tag": "input",
+      "attributes": {
+        "name": "\"reference\"",
+        "defaultValue": "{credentials?.reference}",
+        "placeholder": "\"FS-0123456789ABCDEF\"",
+        "required": "true",
+        "pattern": "\"FS-[A-F0-9]{16}\"",
+        "autoComplete": "\"off\""
+      },
+      "text": "",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 1465,
+      "component": "SafetyPage",
+      "tag": "input",
+      "attributes": {
+        "name": "\"token\"",
+        "defaultValue": "{credentials?.token}",
+        "type": "\"password\"",
+        "required": "true",
+        "pattern": "\"[a-f0-9]{64}\"",
+        "autoComplete": "\"off\""
+      },
+      "text": "",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 1474,
+      "component": "SafetyPage",
+      "tag": "Button",
+      "attributes": {
+        "type": "\"submit\"",
+        "disabled": "{busy}"
+      },
+      "text": " {t.check} <ArrowRight size={15} /> ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 1581,
+      "component": "inline",
+      "tag": "button",
+      "attributes": {
+        "className": "{filter === f ? \"active\" : \"\"}",
+        "onClick": "{() => setFilter(f)}",
+        "key": "{f}"
+      },
+      "text": " {f === \"all\" ? t.viewAll : t.openSafety} ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 1614,
+      "component": "inline",
+      "tag": "Button",
+      "attributes": {
+        "onClick": "{() => setModal({ type: \"safety\", id: r.id })}"
+      },
+      "text": " {t.acknowledge} <ArrowUpRight size={15} /> ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 1790,
+      "component": "WhatIf",
+      "tag": "input",
+      "attributes": {
+        "aria-label": "{t.whatif}",
+        "type": "\"range\"",
+        "min": "{0}",
+        "max": "{23}",
+        "step": "{1}",
+        "value": "{hour}",
+        "onChange": "{(e) => setHour(Number(e.target.value))}"
+      },
+      "text": "",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 1830,
+      "component": "WhatIf",
+      "tag": "Button",
+      "attributes": {
+        "disabled": "{busy || hour === original || !!previewError}",
+        "onClick": "{() =>\n              void run(\n                () =>\n                  mutate(\"/shifts\", {\n                    id: shift.id,\n                    organization_id: shift.organization_id,\n                    worker_id: shift.worker_id,\n                    starts_at: start,\n                    ends_at: end,\n                    break_minutes: shift.break_minutes,\n                    location: shift.location,\n                  }),\n                t.scheduleSaved,\n              )\n            }"
+      },
+      "text": " {t.saveSchedule} <Check size={16} /> ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 1931,
+      "component": "Insights",
+      "tag": "Button",
+      "attributes": {
+        "disabled": "{\n              busy ||\n              workspace!.business_events?.some(\n                (e) => e.event_type === \"workforce_dashboard_reviewed\",\n              )\n            }",
+        "onClick": "{() =>\n              void run(\n                () =>\n                  mutate(\"/businesses/review\", { organization_id: org!.id }),\n                \"Dashboard review recorded.\",\n              )\n            }"
+      },
+      "text": " {workspace!.business_events?.some( (e) => e.event_type === \"workforce_dashboard_reviewed\", ) ? \"Dashboard review recorded\" : \"Mark workforce dashboard reviewed\"} ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 2053,
+      "component": "Profile",
+      "tag": "Button",
+      "attributes": {
+        "variant": "\"outline\"",
+        "onClick": "{() => {\n                sessionStorage.removeItem(\"nyaveris-invitation\");\n                void client?.auth.signOut();\n              }}"
+      },
+      "text": " <LogOut size={16} /> {t.logout} ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 2215,
+      "component": "ReviewForm",
+      "tag": "form",
+      "attributes": {
+        "className": "\"form-stack\"",
+        "onSubmit": "{(e) => {\n          e.preventDefault();\n          const f = new FormData(e.currentTarget);\n          void run(() =>\n            mutate(\n              modal?.type === \"clarify\" ? \"/reviews/reopen\" : \"/reviews\",\n              modal?.type === \"clarify\"\n                ? {\n                    dispute_id: modal.id,\n                    reason: f.get(\"reason\"),\n                  }\n                : { shift_id: modal?.id, reason: f.get(\"reason\") },\n            ),\n          );\n        }}"
+      },
+      "text": " <div className=\"info-strip\"> <Wallet size={20} /> {t.expected}: {money(selectedPay?.expectedPaise || 0)} · {t.recorded}:{\" \"} {money(selectedPay?.recordedPaise || 0)} </div> <Field label={t.reason}> <textarea name=\"reas",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 2239,
+      "component": "ReviewForm",
+      "tag": "textarea",
+      "attributes": {
+        "name": "\"reason\"",
+        "minLength": "{10}",
+        "maxLength": "{1000}",
+        "required": "true",
+        "rows": "{4}",
+        "defaultValue": "{\n              language === \"ta\"\n                ? \"எனது உறுதிப்படுத்திய வேலை நேரத்தின் கூடுதல் நேர ஊதியத்தை மறுஆய்வு செய்யவும்.\"\n                : language === \"hi\"\n                  ? \"कृपया मेरी पुष्टि की गई शिफ्ट के अतिरिक्त समय के वेतन की समीक्षा करें।\"\n                  : \"Please review the overtime earnings for my confirmed working hours.\"\n            }"
+      },
+      "text": "",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 2254,
+      "component": "ReviewForm",
+      "tag": "Button",
+      "attributes": {
+        "type": "\"submit\"",
+        "disabled": "{busy}"
+      },
+      "text": " {t.request} <ArrowRight size={16} /> ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 2266,
+      "component": "ResolveForm",
+      "tag": "form",
+      "attributes": {
+        "className": "\"form-stack\"",
+        "onSubmit": "{(e) => {\n          e.preventDefault();\n          const f = new FormData(e.currentTarget);\n          void run(() =>\n            mutate(\"/reviews/resolve\", {\n              dispute_id: modal?.id,\n              corrected_paise: Math.round(Number(f.get(\"amount\")) * 100),\n              explanation: f.get(\"note\"),\n            }),\n          );\n        }}"
+      },
+      "text": " <div className=\"info-strip\"> <CircleHelp size={20} /> {selectedDispute?.reason} </div> <Field label={t.amount}> <input name=\"amount\" type=\"number\" min=\"0\" max=\"1000000\" step=\"0.01\" required defaultValue={(p?.expectedPai",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 2285,
+      "component": "ResolveForm",
+      "tag": "input",
+      "attributes": {
+        "name": "\"amount\"",
+        "type": "\"number\"",
+        "min": "\"0\"",
+        "max": "\"1000000\"",
+        "step": "\"0.01\"",
+        "required": "true",
+        "defaultValue": "{(p?.expectedPaise || 0) / 100}"
+      },
+      "text": "",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 2296,
+      "component": "ResolveForm",
+      "tag": "textarea",
+      "attributes": {
+        "name": "\"note\"",
+        "rows": "{4}",
+        "minLength": "{10}",
+        "maxLength": "{2000}",
+        "required": "true",
+        "placeholder": "\"Explain the correction or why the recorded amount is appropriate.\""
+      },
+      "text": "",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 2308,
+      "component": "ResolveForm",
+      "tag": "Button",
+      "attributes": {
+        "type": "\"submit\"",
+        "disabled": "{busy}"
+      },
+      "text": " {t.save} <Check size={16} /> ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 2320,
+      "component": "SafetyUpdate",
+      "tag": "form",
+      "attributes": {
+        "className": "\"form-stack\"",
+        "onSubmit": "{(e) => {\n            e.preventDefault();\n            const f = new FormData(e.currentTarget);\n            void run(() =>\n              mutate(\"/safety/update\", {\n                report_id: modal?.id,\n                status: f.get(\"status\"),\n                note: f.get(\"note\"),\n              }),\n            );\n          }}"
+      },
+      "text": " <Field label={t.nextStatus}> <select name=\"status\"> <option value={safetyStates[index + 1]}> {statusLabel(safetyStates[index + 1] || \"closed\")} </option> </select> </Field> <Field label={t.note}> <textarea name=\"note\" r",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 2335,
+      "component": "SafetyUpdate",
+      "tag": "select",
+      "attributes": {
+        "name": "\"status\""
+      },
+      "text": " <option value={safetyStates[index + 1]}> {statusLabel(safetyStates[index + 1] || \"closed\")} </option> ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 2342,
+      "component": "SafetyUpdate",
+      "tag": "textarea",
+      "attributes": {
+        "name": "\"note\"",
+        "required": "true",
+        "minLength": "{10}",
+        "maxLength": "{2000}",
+        "rows": "{4}"
+      },
+      "text": "",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 2350,
+      "component": "SafetyUpdate",
+      "tag": "Button",
+      "attributes": {
+        "disabled": "{busy}",
+        "type": "\"submit\""
+      },
+      "text": " {t.save} <Check size={16} /> ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 2375,
+      "component": "ShiftForm",
+      "tag": "form",
+      "attributes": {
+        "className": "\"form-stack\"",
+        "onSubmit": "{(e) => {\n          e.preventDefault();\n          const f = new FormData(e.currentTarget);\n          void run(\n            () =>\n              mutate(\"/shifts\", {\n                id: s?.id || null,\n                organization_id: org!.id,\n                worker_id: f.get(\"worker_id\"),\n                starts_at: zonedDateTimeToIso(\n                  String(f.get(\"starts_at\")),\n                  workspace!.pay_policies[0].timezone,\n                ),\n                ends_at: zonedDateTimeToIso(\n                  String(f.get(\"ends_at\")),\n                  workspace!.pay_policies[0].timezone,\n                ),\n                break_minutes: Number(f.get(\"break_minutes\")),\n                location: f.get(\"location\"),\n              }),\n            t.scheduleSaved,\n          );\n        }}"
+      },
+      "text": " <p className=\"caption\"> Times use {workspace!.pay_policies[0].timezone}. For overnight shifts, select the next day's end date. </p> <Field label={t.workerName}> <select name=\"worker_id\" required defaultValue={s?.worker_",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 2406,
+      "component": "ShiftForm",
+      "tag": "select",
+      "attributes": {
+        "name": "\"worker_id\"",
+        "required": "true",
+        "defaultValue": "{s?.worker_id}"
+      },
+      "text": " {workspace!.organization_members .filter((m) => m.role === \"worker\" && m.active !== false) .map((m) => ( <option value={m.user_id} key={m.user_id}> {m.display_name} </option> ))} ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 2418,
+      "component": "ShiftForm",
+      "tag": "input",
+      "attributes": {
+        "name": "\"starts_at\"",
+        "type": "\"datetime-local\"",
+        "required": "true",
+        "defaultValue": "{local(s?.starts_at)}"
+      },
+      "text": "",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 2426,
+      "component": "ShiftForm",
+      "tag": "input",
+      "attributes": {
+        "name": "\"ends_at\"",
+        "type": "\"datetime-local\"",
+        "required": "true",
+        "defaultValue": "{local(s?.ends_at)}"
+      },
+      "text": "",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 2435,
+      "component": "ShiftForm",
+      "tag": "input",
+      "attributes": {
+        "name": "\"break_minutes\"",
+        "type": "\"number\"",
+        "min": "\"0\"",
+        "max": "\"1440\"",
+        "required": "true",
+        "defaultValue": "{s?.break_minutes ?? 30}"
+      },
+      "text": "",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 2445,
+      "component": "ShiftForm",
+      "tag": "input",
+      "attributes": {
+        "name": "\"location\"",
+        "required": "true",
+        "minLength": "{2}",
+        "maxLength": "{100}",
+        "defaultValue": "{s?.location || \"\"}"
+      },
+      "text": "",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 2453,
+      "component": "ShiftForm",
+      "tag": "Button",
+      "attributes": {
+        "disabled": "{busy}",
+        "type": "\"submit\""
+      },
+      "text": " {t.save} <Check size={16} /> ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 2475,
+      "component": "Login",
+      "tag": "Button",
+      "attributes": {
+        "variant": "\"outline\"",
+        "disabled": "{busy || !client}",
+        "onClick": "{() => void demo(\"worker\")}"
+      },
+      "text": " {t.getStarted} ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 2482,
+      "component": "Login",
+      "tag": "Button",
+      "attributes": {
+        "variant": "\"outline\"",
+        "disabled": "{busy || !client}",
+        "onClick": "{() => void demo(\"admin\")}"
+      },
+      "text": " {t.employerDemo} ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 2501,
+      "component": "Landing",
+      "tag": "a",
+      "attributes": {
+        "href": "\"#engine\""
+      },
+      "text": "The fairness engine",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 2502,
+      "component": "Landing",
+      "tag": "a",
+      "attributes": {
+        "href": "\"#industries\""
+      },
+      "text": "Built for people",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 2506,
+      "component": "Landing",
+      "tag": "Link",
+      "attributes": {
+        "className": "\"button\"",
+        "to": "\"/signup\""
+      },
+      "text": "Create Account ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 2509,
+      "component": "Landing",
+      "tag": "Link",
+      "attributes": {
+        "className": "\"button button-outline\"",
+        "to": "\"/login\""
+      },
+      "text": " {t.signIn} <ArrowUpRight size={15} /> ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 2533,
+      "component": "Landing",
+      "tag": "Button",
+      "attributes": {
+        "disabled": "{busy || !config?.demoEnabled}",
+        "onClick": "{() => void demo(\"worker\")}"
+      },
+      "text": " {t.getStarted} <ArrowUpRight size={17} /> ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 2540,
+      "component": "Landing",
+      "tag": "Button",
+      "attributes": {
+        "variant": "\"outline\"",
+        "disabled": "{busy || !config?.demoEnabled}",
+        "onClick": "{() => void demo(\"admin\")}"
+      },
+      "text": " {t.employerDemo} <ArrowRight size={17} /> ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 2696,
+      "component": "Landing",
+      "tag": "Link",
+      "attributes": {
+        "to": "\"/safety\""
+      },
+      "text": " {t.track} <ArrowUpRight size={14} /> ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 2811,
+      "component": "App",
+      "tag": "a",
+      "attributes": {
+        "className": "\"skip-link\"",
+        "href": "\"#main-content\""
+      },
+      "text": "Skip to main content ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 2815,
+      "component": "App",
+      "tag": "button",
+      "attributes": {
+        "aria-label": "\"Close navigation\"",
+        "className": "\"nav-backdrop\"",
+        "onClick": "{() => setMobile(false)}"
+      },
+      "text": "",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 2840,
+      "component": "App",
+      "tag": "select",
+      "attributes": {
+        "aria-label": "\"Authorized workspace\"",
+        "value": "{org?.id ?? \"\"}",
+        "onChange": "{(e) => {\n                          setSelectedOrg(e.target.value);\n                          setWorkspace(null);\n                        }}"
+      },
+      "text": " {workspace.memberships.map((m) => ( <option key={m.organization_id} value={m.organization_id} > {m.organization_id === org?.id ? org.name : m.display_name + \" · \" + m.organization_id.slice(0, 8)} </option> ))} ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 2866,
+      "component": "App",
+      "tag": "NavLink",
+      "attributes": {
+        "className": "\"nav-link\"",
+        "to": "\"/app/employees\"",
+        "onClick": "{() => setMobile(false)}"
+      },
+      "text": " <UsersRound size={19} /> <span>Employees</span> ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 2876,
+      "component": "App",
+      "tag": "NavLink",
+      "attributes": {
+        "className": "\"nav-link\"",
+        "to": "\"/onboarding\""
+      },
+      "text": "Create / join workplace ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 2883,
+      "component": "inline",
+      "tag": "NavLink",
+      "attributes": {
+        "key": "{key}",
+        "className": "{({ isActive }) =>\n                            isActive ? \"nav-link active\" : \"nav-link\"\n                          }",
+        "to": "{`/app/${key}`}",
+        "onClick": "{() => setMobile(false)}"
+      },
+      "text": " <Icon size={19} /> <span>{t[key]}</span> {key === \"cases\" && !!workspace?.pay_disputes.filter( (d) => d.status !== \"closed\", ).length && ( <em> { workspace.pay_disputes.filter( (d) => d.status !== \"closed\", ).length } <",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 2937,
+      "component": "App",
+      "tag": "button",
+      "attributes": {
+        "className": "\"sidebar-user\"",
+        "onClick": "{() => navigate(\"/app/profile\")}"
+      },
+      "text": " <span className=\"avatar\"> {workspace?.member.display_name .split(\" \") .map((x) => x[0]) .join(\"\") .slice(0, 2) || \"FS\"} </span> <span> <strong> {workspace?.member.display_name || \"NYAVERIS AI\"} </strong> <small> {admin ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 2963,
+      "component": "App",
+      "tag": "button",
+      "attributes": {
+        "className": "\"mobile-menu\"",
+        "aria-label": "\"Open navigation\"",
+        "onClick": "{() => setMobile(true)}"
+      },
+      "text": " <Menu size={21} /> ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 2986,
+      "component": "App",
+      "tag": "button",
+      "attributes": {
+        "className": "\"icon-button\"",
+        "aria-label": "{t.logout}",
+        "onClick": "{() => {\n                          sessionStorage.removeItem(\"nyaveris-invitation\");\n                          void client?.auth.signOut();\n                        }}"
+      },
+      "text": " <LogOut size={18} /> ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 3004,
+      "component": "App",
+      "tag": "select",
+      "attributes": {
+        "aria-label": "\"Demo industry\"",
+        "value": "{org?.sector_id || \"construction\"}",
+        "disabled": "{busy}",
+        "onChange": "{(e) =>\n                            void demo(\n                              admin ? \"admin\" : \"worker\",\n                              e.target.value as \"construction\" | \"healthcare\",\n                            )\n                          }"
+      },
+      "text": " <option value=\"construction\">{t.construction}</option> <option value=\"healthcare\">{t.healthcare}</option> ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 3018,
+      "component": "App",
+      "tag": "button",
+      "attributes": {
+        "disabled": "{busy}",
+        "onClick": "{() =>\n                            void demo(\n                              admin ? \"worker\" : \"admin\",\n                              org?.sector_id === \"healthcare\"\n                                ? \"healthcare\"\n                                : \"construction\",\n                            )\n                          }"
+      },
+      "text": " {admin ? t.worker : t.admin} <ArrowUpRight size={13} /> ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 3046,
+      "component": "App",
+      "tag": "Button",
+      "attributes": {
+        "onClick": "{() => void reload()}"
+      },
+      "text": " {t.refresh} ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 3141,
+      "component": "App",
+      "tag": "button",
+      "attributes": {
+        "className": "\"assistant-fab\"",
+        "onClick": "{() => void ask(\"pay\")}"
+      },
+      "text": " <Sparkles size={20} /> <span>{t.assistant}</span> ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 3154,
+      "component": "App",
+      "tag": "Modal",
+      "attributes": {
+        "open": "{!!modal}",
+        "onOpenChange": "{(open) => {\n          if (!open) setModal(null);\n        }}",
+        "title": "{\n          modal?.type === \"replay\"\n            ? t.replay\n            : modal?.type === \"review\" || modal?.type === \"clarify\"\n              ? t.request\n              : modal?.type === \"resolve\"\n                ? t.resolve\n                : modal?.type === \"safety\"\n                  ? t.acknowledge\n                  : t.newShift\n        }",
+        "description": "{modal?.type === \"replay\" ? t.proofSub : undefined}"
+      },
+      "text": " {error && ( <div className=\"error-banner\" role=\"alert\"> {error} </div> )} {modal?.type === \"replay\" ? Replay() : modal?.type === \"review\" || modal?.type === \"clarify\" ? ReviewForm() : modal?.type === \"resolve\" ? Resolve",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 3189,
+      "component": "App",
+      "tag": "Modal",
+      "attributes": {
+        "open": "{!!payrollShift}",
+        "onOpenChange": "{(open) => {\n          if (!open) setPayrollShift(null);\n        }}",
+        "title": "{t.payroll}"
+      },
+      "text": " <form className=\"form-stack\" onSubmit={(e) => { e.preventDefault(); const f = new FormData(e.currentTarget); void run(async () => { await mutate(\"/payroll\", { shift_id: payrollShift!.id, gross_paise: Math.round(Number(f",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 3196,
+      "component": "App",
+      "tag": "form",
+      "attributes": {
+        "className": "\"form-stack\"",
+        "onSubmit": "{(e) => {\n            e.preventDefault();\n            const f = new FormData(e.currentTarget);\n            void run(async () => {\n              await mutate(\"/payroll\", {\n                shift_id: payrollShift!.id,\n                gross_paise: Math.round(Number(f.get(\"amount\")) * 100),\n                note: f.get(\"note\"),\n              });\n              setPayrollShift(null);\n            });\n          }}"
+      },
+      "text": " <Field label=\"Gross amount (₹)\"> <input name=\"amount\" type=\"number\" min=\"0\" max=\"1000000\" step=\"0.01\" required /> </Field> <Field label={t.note}> <textarea name=\"note\" minLength={10} maxLength={2000} required rows={3} /",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 3212,
+      "component": "App",
+      "tag": "input",
+      "attributes": {
+        "name": "\"amount\"",
+        "type": "\"number\"",
+        "min": "\"0\"",
+        "max": "\"1000000\"",
+        "step": "\"0.01\"",
+        "required": "true"
+      },
+      "text": "",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 3222,
+      "component": "App",
+      "tag": "textarea",
+      "attributes": {
+        "name": "\"note\"",
+        "minLength": "{10}",
+        "maxLength": "{2000}",
+        "required": "true",
+        "rows": "{3}"
+      },
+      "text": "",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 3230,
+      "component": "App",
+      "tag": "Button",
+      "attributes": {
+        "type": "\"submit\"",
+        "disabled": "{busy}"
+      },
+      "text": " {t.save} ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 3235,
+      "component": "App",
+      "tag": "Modal",
+      "attributes": {
+        "open": "{assistantOpen}",
+        "onOpenChange": "{setAssistantOpen}",
+        "title": "{t.assistant}",
+        "description": "{t.assistSub}"
+      },
+      "text": " <div className=\"assistant-topics\"> {([\"pay\", \"safety\", \"rest\", \"cases\"] as const).map((topic) => ( <Button variant=\"outline\" disabled={busy} key={topic} onClick={() => void ask(topic)} > {t[topic === \"safety\" ? \"report\"",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 3243,
+      "component": "inline",
+      "tag": "Button",
+      "attributes": {
+        "variant": "\"outline\"",
+        "disabled": "{busy}",
+        "key": "{topic}",
+        "onClick": "{() => void ask(topic)}"
+      },
+      "text": " {t[topic === \"safety\" ? \"report\" : topic]} ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 3265,
+      "component": "App",
+      "tag": "Button",
+      "attributes": {
+        "variant": "\"outline\"",
+        "onClick": "{() => {\n                  speechSynthesis.cancel();\n                  const u = new SpeechSynthesisUtterance(assistant.explanation);\n                  u.lang =\n                    language === \"en\"\n                      ? \"en-IN\"\n                      : language === \"ta\"\n                        ? \"ta-IN\"\n                        : \"hi-IN\";\n                  speechSynthesis.speak(u);\n                }}"
+      },
+      "text": " <Volume2 size={16} /> {t.readAloud} ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 3292,
+      "component": "App",
+      "tag": "button",
+      "attributes": {
+        "aria-label": "\"Dismiss notification\"",
+        "onClick": "{() => setToast(\"\")}"
+      },
+      "text": " <X size={15} /> ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/components/AuthExperience.tsx",
+      "line": 33,
+      "component": "Password",
+      "tag": "input",
+      "attributes": {
+        "name": "{confirm ? \"confirm\" : \"password\"}",
+        "type": "{show ? \"text\" : \"password\"}",
+        "autoComplete": "{confirm ? \"new-password\" : \"current-password\"}",
+        "minLength": "{confirm ? 12 : undefined}",
+        "maxLength": "{128}",
+        "required": "true"
+      },
+      "text": "",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/components/AuthExperience.tsx",
+      "line": 42,
+      "component": "Password",
+      "tag": "button",
+      "attributes": {
+        "type": "\"button\"",
+        "aria-label": "{\n          show ? `Hide ${label.toLowerCase()}` : `Show ${label.toLowerCase()}`\n        }",
+        "aria-pressed": "{show}",
+        "onClick": "{() => setShow(!show)}"
+      },
+      "text": " {show ? <EyeOff size={18} /> : <Eye size={18} />} ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/components/AuthExperience.tsx",
+      "line": 67,
+      "component": "AuthFrame",
+      "tag": "Link",
+      "attributes": {
+        "className": "\"brand\"",
+        "to": "\"/\"",
+        "aria-label": "\"NYAVERIS AI home\""
+      },
+      "text": "NYAVERIS AI ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/components/AuthExperience.tsx",
+      "line": 88,
+      "component": "AuthFrame",
+      "tag": "Link",
+      "attributes": {
+        "className": "\"auth-mobile-brand\"",
+        "to": "\"/\"",
+        "aria-label": "\"NYAVERIS AI home\""
+      },
+      "text": "NYAVERIS AI ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/components/AuthExperience.tsx",
+      "line": 185,
+      "component": "AuthExperience",
+      "tag": "form",
+      "attributes": {
+        "className": "\"form-stack\"",
+        "onSubmit": "{async (e) => {\n              e.preventDefault();\n              if (!client || busy) return;\n              const email = String(new FormData(e.currentTarget).get(\"email\"));\n              setBusy(true);\n              try {\n                await client.auth.resend({\n                  type: \"signup\",\n                  email,\n                  options: {\n                    emailRedirectTo: window.location.origin + \"/auth/callback\",\n                  },\n                });\n                setMessage(\n                  \"If eligible, a verification email has been requested. Check your inbox.\",\n                );\n              } finally {\n                setBusy(false);\n              }\n            }}"
+      },
+      "text": " <Field label=\"Email address\"> <input name=\"email\" type=\"email\" autoComplete=\"email\" required /> </Field> <Button disabled={busy || !client}> Request verification email </Button> ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/components/AuthExperience.tsx",
+      "line": 209,
+      "component": "AuthExperience",
+      "tag": "input",
+      "attributes": {
+        "name": "\"email\"",
+        "type": "\"email\"",
+        "autoComplete": "\"email\"",
+        "required": "true"
+      },
+      "text": "",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/components/AuthExperience.tsx",
+      "line": 211,
+      "component": "AuthExperience",
+      "tag": "Button",
+      "attributes": {
+        "disabled": "{busy || !client}"
+      },
+      "text": "Request verification email ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/components/AuthExperience.tsx",
+      "line": 215,
+      "component": "AuthExperience",
+      "tag": "Link",
+      "attributes": {
+        "to": "\"/login\""
+      },
+      "text": "Return to sign in",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/components/AuthExperience.tsx",
+      "line": 218,
+      "component": "AuthExperience",
+      "tag": "form",
+      "attributes": {
+        "className": "\"form-stack\"",
+        "onSubmit": "{async (e) => {\n            e.preventDefault();\n            if (!client || busy) return;\n            const f = new FormData(e.currentTarget),\n              email = String(f.get(\"email\") ?? \"\"),\n              password = String(f.get(\"password\") ?? \"\");\n            setError(\"\");\n            setMessage(\"\");\n            if (\n              (signup || reset) &&\n              (passwordIssues(password) || password !== f.get(\"confirm\"))\n            ) {\n              setError(passwordIssues(password) || \"Passwords must match.\");\n              return;\n            }\n            if (signup && !String(f.get(\"name\") ?? \"\").trim()) {\n              setError(\"Enter your full name.\");\n              return;\n            }\n            setBusy(true);\n            try {\n              if (forgot) {\n                await client.auth.resetPasswordForEmail(email, {\n                  redirectTo:\n                    window.location.origin +\n                    \"/auth/callback?next=/reset-password\",\n                });\n                setMessage(\n                  \"If this address is eligible, reset instructions have been requested. Check your inbox.\",\n                );\n              } else if (reset) {\n                if (!session)\n                  throw new Error(\n                    \"Open the password reset link from your email first.\",\n                  );\n                const r = await client.auth.updateUser({ password });\n                if (r.error) throw r.error;\n                await client.auth.signOut({ scope: \"local\" });\n                navigate(\"/login\");\n              } else if (signup) {\n                const r = await client.auth.signUp({\n                  email,\n                  password,\n                  options: {\n                    data: { full_name: String(f.get(\"name\")) },\n                    emailRedirectTo:\n                      window.location.origin +\n                      \"/auth/callback?next=\" +\n                      encodeURIComponent(next),\n                  },\n                });\n                if (r.error)\n                  throw new Error(\n                    \"Account creation could not be completed. Retry later or sign in if you already have an account.\",\n                  );\n                navigate(r.data.session ? next : \"/verify-email\");\n              } else {\n                localStorage.setItem(\"nyaveris-remember\", String(remember));\n                const r = await client.auth.signInWithPassword({\n                  email,\n                  password,\n                });\n                if (r.error)\n                  throw new Error(\n                    \"Unable to sign in with these credentials. Check your details and email verification.\",\n                  );\n                navigate(next);\n              }\n            } catch (e) {\n              setError((e as Error).message);\n            } finally {\n              setBusy(false);\n            }\n          }}"
+      },
+      "text": " {signup && ( <Field label=\"Full name\"> <input name=\"name\" autoComplete=\"name\" minLength={1} maxLength={100} required /> </Field> )} {!reset && ( <Field label=\"Email address\"> <input name=\"email\" type=\"email\" autoComplet",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/components/AuthExperience.tsx",
+      "line": 297,
+      "component": "AuthExperience",
+      "tag": "input",
+      "attributes": {
+        "name": "\"name\"",
+        "autoComplete": "\"name\"",
+        "minLength": "{1}",
+        "maxLength": "{100}",
+        "required": "true"
+      },
+      "text": "",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/components/AuthExperience.tsx",
+      "line": 308,
+      "component": "AuthExperience",
+      "tag": "input",
+      "attributes": {
+        "name": "\"email\"",
+        "type": "\"email\"",
+        "autoComplete": "\"email\"",
+        "maxLength": "{254}",
+        "required": "true"
+      },
+      "text": "",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/components/AuthExperience.tsx",
+      "line": 329,
+      "component": "AuthExperience",
+      "tag": "input",
+      "attributes": {
+        "type": "\"checkbox\"",
+        "required": "true"
+      },
+      "text": "",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/components/AuthExperience.tsx",
+      "line": 331,
+      "component": "AuthExperience",
+      "tag": "Link",
+      "attributes": {
+        "to": "\"/terms\""
+      },
+      "text": "Terms",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/components/AuthExperience.tsx",
+      "line": 332,
+      "component": "AuthExperience",
+      "tag": "Link",
+      "attributes": {
+        "to": "\"/privacy\""
+      },
+      "text": "Privacy Policy",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/components/AuthExperience.tsx",
+      "line": 339,
+      "component": "AuthExperience",
+      "tag": "input",
+      "attributes": {
+        "type": "\"checkbox\"",
+        "checked": "{remember}",
+        "onChange": "{(e) => setRemember(e.target.checked)}"
+      },
+      "text": "",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/components/AuthExperience.tsx",
+      "line": 346,
+      "component": "AuthExperience",
+      "tag": "Link",
+      "attributes": {
+        "to": "\"/forgot-password\""
+      },
+      "text": "Forgot password?",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/components/AuthExperience.tsx",
+      "line": 349,
+      "component": "AuthExperience",
+      "tag": "Button",
+      "attributes": {
+        "disabled": "{busy || !client || (reset && !session)}",
+        "type": "\"submit\""
+      },
+      "text": " {busy ? \"Please wait…\" : signup ? \"Create account\" : forgot ? \"Send reset instructions\" : reset ? \"Update password\" : \"Sign in\"} <ArrowRight size={16} /> ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/components/AuthExperience.tsx",
+      "line": 375,
+      "component": "AuthExperience",
+      "tag": "Button",
+      "attributes": {
+        "variant": "\"outline\"",
+        "disabled": "{busy || !client || !googleEnabled}",
+        "onClick": "{() => void google()}"
+      },
+      "text": "Continue with Google ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/components/AuthExperience.tsx",
+      "line": 390,
+      "component": "AuthExperience",
+      "tag": "Link",
+      "attributes": {
+        "to": "{signup ? \"/login\" : \"/signup\"}"
+      },
+      "text": " {signup ? \"Sign in\" : \"Create account\"} ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/components/AuthExperience.tsx",
+      "line": 397,
+      "component": "AuthExperience",
+      "tag": "Button",
+      "attributes": {
+        "variant": "\"outline\"",
+        "onClick": "{() => window.location.reload()}"
+      },
+      "text": "Reload authentication ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/components/AuthExperience.tsx",
+      "line": 468,
+      "component": "AuthCallback",
+      "tag": "Link",
+      "attributes": {
+        "to": "\"/login\""
+      },
+      "text": "Return to sign in",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/components/AuthExperience.tsx",
+      "line": 536,
+      "component": "LegalPage",
+      "tag": "Link",
+      "attributes": {
+        "to": "\"/signup\""
+      },
+      "text": "Back to create account",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 27,
+      "component": "inline",
+      "tag": "input",
+      "attributes": {
+        "name": "{name}",
+        "type": "{type}",
+        "required": "{required}",
+        "defaultValue": "{initial}",
+        "maxLength": "{type === \"number\" ? undefined : 200}"
+      },
+      "text": "",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 49,
+      "component": "BusinessFields",
+      "tag": "select",
+      "attributes": {
+        "name": "\"industry\"",
+        "defaultValue": "{String(initial.industry ?? \"construction\")}"
+      },
+      "text": " {[ \"construction\", \"healthcare\", \"manufacturing\", \"education\", \"other\", ].map((i) => ( <option key={i} value={i}> {i[0].toUpperCase() + i.slice(1)} </option> ))} ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 112,
+      "component": "BusinessFields",
+      "tag": "select",
+      "attributes": {
+        "name": "\"currency\""
+      },
+      "text": " <option value=\"INR\">INR · integer paise</option> ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 156,
+      "component": "Onboarding",
+      "tag": "Link",
+      "attributes": {
+        "to": "\"/signup\""
+      },
+      "text": "Create an account",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 157,
+      "component": "Onboarding",
+      "tag": "Link",
+      "attributes": {
+        "to": "\"/login\""
+      },
+      "text": "sign in",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 163,
+      "component": "Onboarding",
+      "tag": "Link",
+      "attributes": {
+        "to": "\"/app/home\""
+      },
+      "text": "Open your authorized workspace",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 164,
+      "component": "Onboarding",
+      "tag": "Button",
+      "attributes": {
+        "variant": "\"outline\"",
+        "onClick": "{() => setChoice(\"create\")}"
+      },
+      "text": "Create another business ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 175,
+      "component": "Setup",
+      "tag": "form",
+      "attributes": {
+        "className": "\"form-stack\"",
+        "onSubmit": "{submit}"
+      },
+      "text": " <ol className=\"wizard-progress\" aria-label=\"Business setup progress\"> {[\"Business details\", \"Workforce policy\", \"Owner & review\"].map( (t, i) => ( <li key={t} aria-current={step === i + 1 ? \"step\" : undefined}> {i + 1}.",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 226,
+      "component": "Setup",
+      "tag": "select",
+      "attributes": {
+        "name": "\"basis\""
+      },
+      "text": " <option value=\"hourly\">Hourly</option> <option value=\"daily\">Daily</option> ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 264,
+      "component": "Setup",
+      "tag": "input",
+      "attributes": {
+        "type": "\"checkbox\"",
+        "name": "\"authorized\"",
+        "required": "{step === 3}"
+      },
+      "text": "",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 270,
+      "component": "Setup",
+      "tag": "Button",
+      "attributes": {
+        "type": "\"button\"",
+        "variant": "\"outline\"",
+        "onClick": "{() => setStep(step - 1)}"
+      },
+      "text": "Back ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 279,
+      "component": "Setup",
+      "tag": "Button",
+      "attributes": {
+        "type": "\"button\"",
+        "onClick": "{(e) => {\n                const form = e.currentTarget.form!;\n                const controls = Array.from(\n                  form.querySelectorAll<HTMLInputElement>(\n                    `fieldset:not([hidden]) input`,\n                  ),\n                );\n                if (controls.every((c) => c.reportValidity()))\n                  setStep(step + 1);\n              }}"
+      },
+      "text": "Continue ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 295,
+      "component": "Setup",
+      "tag": "Button",
+      "attributes": {
+        "disabled": "{busy || !enabled}",
+        "type": "\"submit\""
+      },
+      "text": " {busy ? \"Creating workspace…\" : \"Create Business\"} ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 356,
+      "component": "Onboarding",
+      "tag": "Button",
+      "attributes": {
+        "onClick": "{() => setChoice(\"create\")}"
+      },
+      "text": "Create My Business ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 360,
+      "component": "Onboarding",
+      "tag": "Link",
+      "attributes": {
+        "className": "\"button button-outline\"",
+        "to": "\"/invite\""
+      },
+      "text": "Join My Workplace ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 435,
+      "component": "InvitationExperience",
+      "tag": "form",
+      "attributes": {
+        "onSubmit": "{(e) => {\n              e.preventDefault();\n              try {\n                const u = new URL(value(new FormData(e.currentTarget), \"link\"));\n                if (u.origin !== location.origin || u.pathname !== \"/invite\")\n                  throw Error();\n                const t = new URLSearchParams(u.hash.slice(1)).get(\"token\");\n                if (!t || !/^[a-f0-9]{64}$/.test(t)) throw Error();\n                sessionStorage.setItem(\"nyaveris-invitation\", t);\n                setToken(t);\n              } catch {\n                setError(\n                  \"Enter a valid invitation link from this NYAVERIS AI site.\",\n                );\n              }\n            }}"
+      },
+      "text": " <Input label=\"Invitation link\" name=\"link\" /> <Button>Open invitation</Button> ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 454,
+      "component": "InvitationExperience",
+      "tag": "Button",
+      "attributes": {},
+      "text": "Open invitation",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 463,
+      "component": "InvitationExperience",
+      "tag": "Link",
+      "attributes": {
+        "className": "\"button\"",
+        "to": "\"/signup\""
+      },
+      "text": "Sign up ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 466,
+      "component": "InvitationExperience",
+      "tag": "Link",
+      "attributes": {
+        "to": "\"/login\""
+      },
+      "text": "Sign in or continue with Google",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 480,
+      "component": "InvitationExperience",
+      "tag": "Button",
+      "attributes": {
+        "disabled": "{busy}",
+        "onClick": "{async () => {\n              setBusy(true);\n              try {\n                const r = await api<{ organization_id: string }>(\n                  \"/invitations/accept\",\n                  { token },\n                );\n                sessionStorage.removeItem(\"nyaveris-invitation\");\n                await onAccepted(r.organization_id);\n              } catch (e) {\n                setError((e as Error).message);\n              } finally {\n                setBusy(false);\n              }\n            }}"
+      },
+      "text": "Accept Invitation ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 611,
+      "component": "WorkforceManagement",
+      "tag": "Button",
+      "attributes": {
+        "variant": "\"outline\"",
+        "onClick": "{() =>\n              void (\n                navigator.clipboard?.writeText(link) ??\n                Promise.reject(new Error(\"Clipboard unavailable\"))\n              ).then(\n                () => setMessage(\"Invitation link copied.\"),\n                () =>\n                  setMessage(\n                    \"Clipboard unavailable. Select the private link below.\",\n                  ),\n              )\n            }"
+      },
+      "text": "Copy Invitation Link ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 628,
+      "component": "WorkforceManagement",
+      "tag": "input",
+      "attributes": {
+        "readOnly": "true",
+        "aria-label": "\"Private invitation link\"",
+        "value": "{link}"
+      },
+      "text": "",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 629,
+      "component": "WorkforceManagement",
+      "tag": "Button",
+      "attributes": {
+        "variant": "\"outline\"",
+        "onClick": "{() => setLink(\"\")}"
+      },
+      "text": "Hide private link ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 636,
+      "component": "WorkforceManagement",
+      "tag": "Button",
+      "attributes": {
+        "variant": "\"outline\"",
+        "disabled": "{busy}",
+        "onClick": "{() => void run(load)}"
+      },
+      "text": "Retry workforce records ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 660,
+      "component": "WorkforceManagement",
+      "tag": "form",
+      "attributes": {
+        "className": "\"card form-stack\"",
+        "onSubmit": "{(e) => {\n                  e.preventDefault();\n                  const f = new FormData(e.currentTarget);\n                  void run(async () => {\n                    const b = settingsInput.parse({\n                      ...businessFields(f),\n                      size: Number(f.get(\"size\")),\n                      working_days: value(f, \"working_days\")\n                        .split(\",\")\n                        .map(Number),\n                      departments: value(f, \"departments\")\n                        .split(\",\")\n                        .map((s) => s.trim())\n                        .filter(Boolean),\n                      work_locations: value(f, \"work_locations\")\n                        .split(\",\")\n                        .map((s) => s.trim())\n                        .filter(Boolean),\n                    });\n                    await api(\"/business-settings\", {\n                      ...b,\n                      organization_id: org.id,\n                    });\n                    setMessage(\"Business settings saved.\");\n                  });\n                }}"
+      },
+      "text": " <BusinessFields initial={{ ...cfg, name: org.name }} /> <Input label=\"Departments (comma separated)\" name=\"departments\" required={false} initial={((cfg.departments as string[]) ?? []).join(\",\")} /> <Input label=\"Work lo",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 702,
+      "component": "WorkforceManagement",
+      "tag": "Button",
+      "attributes": {
+        "disabled": "{busy}"
+      },
+      "text": "Save business settings",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 718,
+      "component": "inline",
+      "tag": "Button",
+      "attributes": {
+        "variant": "\"outline\"",
+        "disabled": "{busy || m.active === false}",
+        "onClick": "{() => {\n                          if (\n                            confirm(\n                              `Change administrator access for ${m.display_name}?`,\n                            )\n                          )\n                            void run(async () => {\n                              await api(\"/administrator-access\", {\n                                organization_id: org.id,\n                                user_id: m.user_id,\n                                admin: m.role !== \"admin\",\n                              });\n                            });\n                        }}"
+      },
+      "text": " {m.role === \"admin\" ? \"Remove admin access\" : \"Grant admin access\"} ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 745,
+      "component": "WorkforceManagement",
+      "tag": "a",
+      "attributes": {
+        "className": "\"button button-outline\"",
+        "href": "\"#business-pay-policy\""
+      },
+      "text": "Configure pay and rest policies ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 779,
+      "component": "WorkforceManagement",
+      "tag": "Button",
+      "attributes": {
+        "onClick": "{() => setEditing(null)}"
+      },
+      "text": "Add Employee",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 780,
+      "component": "WorkforceManagement",
+      "tag": "Button",
+      "attributes": {
+        "variant": "\"outline\"",
+        "onClick": "{() => {\n                setEditing(null);\n                setMessage(\n                  \"Create the employee profile below, then choose Save and invite. Employees set their own passwords.\",\n                );\n              }}"
+      },
+      "text": "Invite Employee ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 794,
+      "component": "WorkforceManagement",
+      "tag": "input",
+      "attributes": {
+        "value": "{query}",
+        "onChange": "{(e) => setQuery(e.target.value)}",
+        "type": "\"search\""
+      },
+      "text": "",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 801,
+      "component": "WorkforceManagement",
+      "tag": "select",
+      "attributes": {
+        "value": "{status}",
+        "onChange": "{(e) => setStatus(e.target.value)}"
+      },
+      "text": " <option value=\"all\">All</option> <option value=\"active\">Active</option> <option value=\"inactive\">Inactive</option> ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 808,
+      "component": "WorkforceManagement",
+      "tag": "form",
+      "attributes": {
+        "className": "\"card form-stack\"",
+        "key": "{editing?.id ?? \"new\"}",
+        "onSubmit": "{(e) => {\n                e.preventDefault();\n                const f = new FormData(e.currentTarget),\n                  send =\n                    (e.nativeEvent as SubmitEvent).submitter?.getAttribute(\n                      \"value\",\n                    ) === \"invite\";\n                void run(async () => {\n                  const data = employeeInput.parse({\n                    ...Object.fromEntries(\n                      [\n                        \"name\",\n                        \"email\",\n                        \"phone\",\n                        \"employee_code\",\n                        \"department\",\n                        \"job_title\",\n                        \"employment_type\",\n                        \"start_date\",\n                        \"status\",\n                        \"pay_basis\",\n                        \"work_location\",\n                        \"skills\",\n                      ].map((k) => [k, value(f, k)]),\n                    ),\n                    rate_paise: Number(f.get(\"rate_paise\")),\n                  });\n                  if (\n                    editing &&\n                    editing.status !== data.status &&\n                    !confirm(\n                      `Change ${data.name}'s access to ${data.status}? Payroll and audit history will be retained.`,\n                    )\n                  )\n                    return;\n                  const r = await api<{ employee_id: string }>(\"/employees\", {\n                    ...data,\n                    organization_id: org.id,\n                    ...(editing ? { employee_id: editing.id } : {}),\n                  });\n                  if (send) await invite(r.employee_id);\n                  else\n                    setMessage(\n                      \"Employee profile saved. A profile alone does not grant access.\",\n                    );\n                  setEditing(undefined);\n                });\n              }}"
+      },
+      "text": " <h2>{editing ? \"Edit employee\" : \"Add employee / invitation\"}</h2> <div className=\"saas-grid\"> {[ [\"Employee name\", \"name\"], [\"Employee email\", \"email\"], [\"Phone (optional)\", \"phone\"], [\"Employee ID\", \"employee_code\"], ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 902,
+      "component": "WorkforceManagement",
+      "tag": "select",
+      "attributes": {
+        "name": "\"pay_basis\"",
+        "defaultValue": "{\n                      editing?.pay_basis ??\n                      workspace.pay_policies[0].basis ??\n                      \"hourly\"\n                    }"
+      },
+      "text": " <option value=\"hourly\">Hourly</option> <option value=\"daily\">Daily</option> ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 915,
+      "component": "WorkforceManagement",
+      "tag": "select",
+      "attributes": {
+        "name": "\"employment_type\"",
+        "defaultValue": "{editing?.employment_type ?? \"full_time\"}"
+      },
+      "text": " <option value=\"full_time\">Full time</option> <option value=\"part_time\">Part time</option> <option value=\"contract\">Contract</option> ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 925,
+      "component": "WorkforceManagement",
+      "tag": "select",
+      "attributes": {
+        "name": "\"status\"",
+        "defaultValue": "{editing?.status ?? \"active\"}"
+      },
+      "text": " <option value=\"active\">Active</option> <option value=\"inactive\">Inactive</option> ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 939,
+      "component": "WorkforceManagement",
+      "tag": "Button",
+      "attributes": {
+        "disabled": "{busy}",
+        "type": "\"submit\""
+      },
+      "text": "Save employee ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 943,
+      "component": "WorkforceManagement",
+      "tag": "Button",
+      "attributes": {
+        "disabled": "{busy}",
+        "type": "\"submit\"",
+        "value": "\"invite\""
+      },
+      "text": "Save and invite ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 947,
+      "component": "WorkforceManagement",
+      "tag": "Button",
+      "attributes": {
+        "type": "\"button\"",
+        "variant": "\"outline\"",
+        "onClick": "{() => setEditing(undefined)}"
+      },
+      "text": "Cancel ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 988,
+      "component": "inline",
+      "tag": "Button",
+      "attributes": {
+        "variant": "\"outline\"",
+        "onClick": "{() => setEditing(e)}"
+      },
+      "text": "Edit ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 991,
+      "component": "inline",
+      "tag": "Button",
+      "attributes": {
+        "variant": "\"outline\"",
+        "onClick": "{() => setSelected(e)}"
+      },
+      "text": "View history ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 999,
+      "component": "inline",
+      "tag": "Button",
+      "attributes": {
+        "disabled": "{busy}",
+        "onClick": "{() => void run(() => invite(e.id))}"
+      },
+      "text": "Invite ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 1007,
+      "component": "inline",
+      "tag": "Button",
+      "attributes": {
+        "variant": "\"outline\"",
+        "onClick": "{() => navigate(\"/app/shifts\")}"
+      },
+      "text": "Assign shift ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 1034,
+      "component": "inline",
+      "tag": "Button",
+      "attributes": {
+        "disabled": "{busy}",
+        "variant": "\"outline\"",
+        "onClick": "{() => {\n                        if (\n                          confirm(\n                            \"Resend this invitation? The previous link will stop working.\",\n                          )\n                        )\n                          void run(async () => {\n                            const r = await api<{\n                              link: string;\n                              message: string;\n                            }>(\"/invitations/resend\", {\n                              organization_id: org.id,\n                              invitation_id: i.id,\n                            });\n                            setLink(r.link);\n                            setMessage(r.message);\n                          });\n                      }}"
+      },
+      "text": "Resend / new private link ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 1058,
+      "component": "inline",
+      "tag": "Button",
+      "attributes": {
+        "disabled": "{busy}",
+        "variant": "\"outline\"",
+        "onClick": "{() => {\n                        if (confirm(\"Revoke this invitation?\"))\n                          void run(async () => {\n                            await api(\"/invitations/revoke\", {\n                              organization_id: org.id,\n                              invitation_id: i.id,\n                            });\n                          });\n                      }}"
+      },
+      "text": "Revoke ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 1113,
+      "component": "WorkforceManagement",
+      "tag": "Link",
+      "attributes": {
+        "to": "\"/app/disputes\""
+      },
+      "text": "Open payroll reviews and ProofLoop history ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 1123,
+      "component": "WorkforceManagement",
+      "tag": "Button",
+      "attributes": {
+        "variant": "\"outline\"",
+        "onClick": "{() => setSelected(null)}"
+      },
+      "text": "Close history ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 1195,
+      "component": "BusinessOverview",
+      "tag": "Link",
+      "attributes": {
+        "to": "\"/app/settings#business-pay-policy\""
+      },
+      "text": "Configure Pay Policy ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 1203,
+      "component": "BusinessOverview",
+      "tag": "Link",
+      "attributes": {
+        "to": "\"/app/employees\""
+      },
+      "text": "Add First Employee",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 1207,
+      "component": "BusinessOverview",
+      "tag": "Link",
+      "attributes": {
+        "to": "\"/app/shifts\""
+      },
+      "text": "Create First Shift",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 1215,
+      "component": "BusinessOverview",
+      "tag": "Link",
+      "attributes": {
+        "to": "\"/app/analytics\""
+      },
+      "text": "Review Workforce Dashboard",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/components/PolicyEditor.tsx",
+      "line": 38,
+      "component": "PolicyEditor",
+      "tag": "form",
+      "attributes": {
+        "className": "\"form-stack\"",
+        "onSubmit": "{submit}"
+      },
+      "text": " <h3> {label( \"Configure pay policy\", \"ஊதியக் கொள்கையை அமைக்க\", \"वेतन नीति निर्धारित करें\", )} </h3> <p className=\"caption\"> {label( \"Verified shifts retain their original policy snapshot. Changes apply to work that has ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/components/PolicyEditor.tsx",
+      "line": 55,
+      "component": "PolicyEditor",
+      "tag": "select",
+      "attributes": {
+        "aria-label": "\"Pay basis\"",
+        "value": "{basis}",
+        "onChange": "{(e) => setBasis(e.target.value as \"hourly\" | \"daily\")}"
+      },
+      "text": " <option value=\"hourly\">Hourly</option> <option value=\"daily\">Daily · prorated</option> ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/components/PolicyEditor.tsx",
+      "line": 67,
+      "component": "PolicyEditor",
+      "tag": "input",
+      "attributes": {
+        "aria-label": "\"Hourly rate (₹)\"",
+        "name": "\"hourly\"",
+        "type": "\"number\"",
+        "step": "\"0.01\"",
+        "min": "\"0.01\"",
+        "max": "\"100000\"",
+        "required": "true",
+        "defaultValue": "{policy.hourly_paise / 100}"
+      },
+      "text": "",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/components/PolicyEditor.tsx",
+      "line": 80,
+      "component": "PolicyEditor",
+      "tag": "input",
+      "attributes": {
+        "aria-label": "\"Daily rate (₹)\"",
+        "name": "\"daily\"",
+        "type": "\"number\"",
+        "step": "\"0.01\"",
+        "min": "\"0.01\"",
+        "max": "\"1000000\"",
+        "required": "true",
+        "defaultValue": "{(policy.daily_paise || 80000) / 100}"
+      },
+      "text": "",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/components/PolicyEditor.tsx",
+      "line": 95,
+      "component": "PolicyEditor",
+      "tag": "input",
+      "attributes": {
+        "aria-label": "\"Regular hours\"",
+        "name": "\"threshold\"",
+        "type": "\"number\"",
+        "step": "\"0.5\"",
+        "min": "\"0.5\"",
+        "max": "\"24\"",
+        "required": "true",
+        "defaultValue": "{policy.regular_minutes / 60}"
+      },
+      "text": "",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/components/PolicyEditor.tsx",
+      "line": 108,
+      "component": "PolicyEditor",
+      "tag": "input",
+      "attributes": {
+        "aria-label": "\"Overtime multiplier\"",
+        "name": "\"multiplier\"",
+        "type": "\"number\"",
+        "step": "\"0.05\"",
+        "min": "\"1\"",
+        "max": "\"5\"",
+        "required": "true",
+        "defaultValue": "{policy.overtime_bps / 10000}"
+      },
+      "text": "",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/components/PolicyEditor.tsx",
+      "line": 123,
+      "component": "PolicyEditor",
+      "tag": "input",
+      "attributes": {
+        "aria-label": "\"Minimum rest (hours)\"",
+        "name": "\"rest\"",
+        "type": "\"number\"",
+        "step": "\"0.5\"",
+        "min": "\"0\"",
+        "max": "\"48\"",
+        "required": "true",
+        "defaultValue": "{policy.min_rest_minutes / 60}"
+      },
+      "text": "",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/components/PolicyEditor.tsx",
+      "line": 136,
+      "component": "PolicyEditor",
+      "tag": "input",
+      "attributes": {
+        "aria-label": "\"Maximum shift (hours)\"",
+        "name": "\"maximum\"",
+        "type": "\"number\"",
+        "step": "\"0.5\"",
+        "min": "\"1\"",
+        "max": "\"24\"",
+        "required": "true",
+        "defaultValue": "{policy.max_shift_minutes / 60}"
+      },
+      "text": "",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/components/PolicyEditor.tsx",
+      "line": 150,
+      "component": "PolicyEditor",
+      "tag": "input",
+      "attributes": {
+        "aria-label": "\"Maximum consecutive days\"",
+        "name": "\"days\"",
+        "type": "\"number\"",
+        "min": "\"1\"",
+        "max": "\"30\"",
+        "required": "true",
+        "defaultValue": "{policy.max_consecutive_days}"
+      },
+      "text": "",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/components/PolicyEditor.tsx",
+      "line": 164,
+      "component": "PolicyEditor",
+      "tag": "textarea",
+      "attributes": {
+        "name": "\"note\"",
+        "aria-label": "\"Reason for policy change\"",
+        "required": "true",
+        "minLength": "{10}",
+        "maxLength": "{2000}",
+        "rows": "{3}"
+      },
+      "text": "",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/components/PolicyEditor.tsx",
+      "line": 173,
+      "component": "PolicyEditor",
+      "tag": "Button",
+      "attributes": {
+        "type": "\"submit\"",
+        "disabled": "{busy}"
+      },
+      "text": " {label( \"Save policy version\", \"கொள்கைப் பதிப்பைச் சேமி\", \"नीति संस्करण सहेजें\", )} ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/components/ShiftCalendar.tsx",
+      "line": 42,
+      "component": "ShiftCalendar",
+      "tag": "Button",
+      "attributes": {
+        "variant": "\"outline\"",
+        "aria-label": "\"Previous month\"",
+        "onClick": "{() => change(-1)}"
+      },
+      "text": "← ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/components/ShiftCalendar.tsx",
+      "line": 49,
+      "component": "ShiftCalendar",
+      "tag": "Button",
+      "attributes": {
+        "variant": "\"outline\"",
+        "aria-label": "\"Next month\"",
+        "onClick": "{() => change(1)}"
+      },
+      "text": "→ ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/components/ShiftCalendar.tsx",
+      "line": 73,
+      "component": "inline",
+      "tag": "button",
+      "attributes": {
+        "key": "{day}",
+        "type": "\"button\"",
+        "className": "{count ? \"has-shifts\" : \"\"}",
+        "aria-label": "{`${day}, ${count} shifts`}",
+        "onClick": "{() => onSelect(day)}"
+      },
+      "text": " <strong>{i + 1}</strong> <small>{count ? `${count} shifts` : \"—\"}</small> ",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/components/ui/button.tsx",
+      "line": 22,
+      "component": "Button",
+      "tag": "button",
+      "attributes": {
+        "className": "{twMerge(clsx(styles({ variant }), className))}"
+      },
+      "text": "",
+      "evidence": "static inventory; execution status is reported separately"
+    },
+    {
+      "file": "src/main.tsx",
+      "line": 19,
+      "component": "inline",
+      "tag": "button",
+      "attributes": {
+        "onClick": "{() => location.reload()}"
+      },
+      "text": "Reload NYAVERIS AI",
+      "evidence": "static inventory; execution status is reported separately"
+    }
+  ]
+}

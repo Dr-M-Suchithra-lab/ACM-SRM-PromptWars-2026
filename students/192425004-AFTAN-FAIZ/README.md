@@ -3,9 +3,7 @@
 **Fairness You Can Trace. Trust You Can Prove.**
 
 PromptWars × ACM SRM Student Chapter 2026  
-Participant: **AFTAN FAIZ** · Registration Number: **192425004**  
-Website : https://nyaveris-ai.vercel.app/
-
+Participant: **AFTAN FAIZ** · Registration: **192425004**  
 Submission name: **192425004 - AFTAN FAIZ**  
 Submission branch: `192425004-AFTAN-FAIZ`  
 Organizer repository: [ACM-SRM-PromptWars-2026](https://github.com/Dr-M-Suchithra-lab/ACM-SRM-PromptWars-2026)  
@@ -13,7 +11,7 @@ Organizer repository: [ACM-SRM-PromptWars-2026](https://github.com/Dr-M-Suchithr
 
 ## 1. Problem Statement
 
-**NYAVERIS AI** is the original hackathon problem-statement title supplied by the participant. NYAVERIS AI addresses opaque wages, unsafe working conditions and insufficient rest through worker and employer workflows for construction and healthcare.
+**FairShift — Decent Work Platform** is the original hackathon problem-statement title supplied by the participant. NYAVERIS AI addresses opaque wages, unsafe working conditions and insufficient rest through worker and employer workflows for construction and healthcare.
 
 This supports **UN SDG 8 — Decent Work and Economic Growth**, particularly transparent remuneration, safer workplaces and worker participation in resolving concerns.
 
@@ -31,7 +29,7 @@ Implemented features include shifts, workforce/payroll views, policy versions, h
 
 ## 3. Tools Used
 
-- Google Antigravity: development prompts recovered from the existing project chat, plus submission preparation in this chat.
+- OpenAI Codex: development prompts recovered from the existing project chat, plus submission preparation in this chat.
 - React 19, TypeScript, Vite, Tailwind CSS 4, React Router, Radix UI and Lucide.
 - Node.js, Express 5, Zod and the official Google Gen AI SDK (`@google/genai`).
 - Supabase Auth and PostgreSQL: sole application database, RLS, protected RPCs and persistent rate limiting.

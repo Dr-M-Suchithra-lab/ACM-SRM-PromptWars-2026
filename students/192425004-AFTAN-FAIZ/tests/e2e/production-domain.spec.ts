@@ -32,7 +32,10 @@ test("production domain supports sign-in, persisted sessions and both industry d
   expect((await health.json()).status).toBe("ok");
   const config = await request.get("/api/config");
   expect(config.ok()).toBeTruthy();
-  expect((await config.json()).url).toContain(".supabase.co");
+  const configuration = await config.json();
+  if (process.env.QA_ISOLATED === "true")
+    expect(new URL(configuration.url).origin).toBe(new URL(baseURL!).origin);
+  else expect(configuration.url).toContain(".supabase.co");
   expect((await request.get("/api/workspace")).status()).toBe(401);
   await page.goto("/login");
   await expect(page).toHaveTitle(/NYAVERIS AI/);
@@ -57,6 +60,11 @@ test("production domain supports sign-in, persisted sessions and both industry d
     page.getByRole("heading", { name: /Good to see you/ }),
   ).toBeVisible();
   await page.getByRole("link", { name: "My pay", exact: true }).click();
+  await expect(
+    page.getByRole("heading", { name: "Your hours. Your earnings. In sync." }),
+  ).toBeVisible();
+  await page.reload();
+  await expect(page).toHaveURL(/\/app\/pay$/);
   await expect(
     page.getByRole("heading", { name: "Your hours. Your earnings. In sync." }),
   ).toBeVisible();
