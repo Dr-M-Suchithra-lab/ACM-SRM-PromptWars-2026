@@ -10,7 +10,6 @@ PromptWars × ACM SRM Student Chapter 2026 · Vibe Coding Hackathon (solo)
 | **Source (GitHub)** | <https://github.com/amanmaskara04/fairshift.git> (also in [`src/`](src)) |
 | **Key prompts** | [`prompts.md`](prompts.md) |
 | **Screenshots** | [`screenshots/`](screenshots) |
-| **3-minute walkthrough** | [`src/docs/demo-script.md`](src/docs/demo-script.md) |
 | **Project story** | [LinkedIn post](https://www.linkedin.com/posts/amanmaskara_promptwars-acmsrmist-sdg8-share-7520755833773740032-Ts7K/) |
 
 ---
@@ -249,7 +248,6 @@ npm run lint && npm run typecheck
 
 - **Live app:** <https://fairshift-ashy.vercel.app>
 - **Demo video:** [Watch on Google Drive](https://drive.google.com/file/d/1mYvWr_FC0UfZsGwW3Y78NjM019QS_X0R/view?usp=sharing)
-- **Judge walkthrough (3 minutes):** [`src/docs/demo-script.md`](src/docs/demo-script.md)
 
 ## Key prompts
 

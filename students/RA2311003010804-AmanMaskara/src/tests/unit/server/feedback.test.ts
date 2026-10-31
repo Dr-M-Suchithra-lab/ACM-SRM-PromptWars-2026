@@ -3,7 +3,7 @@ import { getRepos } from "@/server/repos";
 import { resetMemoryStore } from "@/server/repos/memory";
 import { hasAnsweredThisWeek, submitFeedback } from "@/server/services/feedback";
 import { buildPayslip } from "@/server/services/payslip";
-import { monthKey } from "@/core/period";
+import { payFocusMonth } from "@/core/period";
 
 const NOW = new Date("2026-10-27T10:00:00+05:30");
 const base = {
@@ -48,8 +48,9 @@ describe("anonymous feedback", () => {
 describe("payslip service", () => {
   beforeEach(() => resetMemoryStore());
 
-  it("builds the current month payslip with PF on regular pay only", async () => {
-    const view = await buildPayslip(getRepos(), "w1001", monthKey(new Date()));
+  it("builds the payslip the pay screens open on, with PF on regular pay only", async () => {
+    // The focus month always has worked days; the calendar month can be empty on the 1st.
+    const view = await buildPayslip(getRepos(), "w1001", payFocusMonth(new Date()));
     expect(view).not.toBeNull();
     const { payslip } = view!;
     const regular = payslip.lines.find((l) => l.kind === "regular")!.amount;

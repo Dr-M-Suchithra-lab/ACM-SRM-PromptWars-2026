@@ -18,8 +18,9 @@
 | | |
 |---|---|
 | **Live demo** | <https://fairshift-ashy.vercel.app> (Mumbai region, MongoDB Atlas Mumbai, live Gemini) |
-| **3-minute judge walkthrough** | [`docs/demo-script.md`](docs/demo-script.md) |
+| **Demo video** | [Watch on Google Drive](https://drive.google.com/file/d/1mYvWr_FC0UfZsGwW3Y78NjM019QS_X0R/view?usp=sharing) |
 | **Pitch deck** | [`/pitch`](https://fairshift-ashy.vercel.app/pitch) in the app |
+| **Project story** | [LinkedIn post](https://www.linkedin.com/posts/amanmaskara_promptwars-acmsrmist-sdg8-share-7520755833773740032-Ts7K/) |
 | **Security model** | [`SECURITY.md`](SECURITY.md): threats, controls, code and tests |
 | **Hosting** | Live on **Vercel** (Mumbai). The organisers could not provide Google Cloud credits and allowed any host; the same build is **Cloud Run-ready** (container + one-command deploy, smoke-tested in CI). [Details](#deployment) |
 
@@ -360,7 +361,7 @@ src/
   messages/    en · hi · ta · te
 tests/         unit (Vitest: core · server · lib · ai · i18n · design) · e2e (Playwright + axe)
 scripts/       deploy-cloudrun.sh · security-probe.mjs · gen-icons.mjs
-docs/          demo-script.md · screenshots/
+docs/          screenshots/
 ```
 
 ## Roadmap

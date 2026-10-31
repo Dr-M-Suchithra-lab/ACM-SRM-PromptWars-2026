@@ -405,7 +405,6 @@ Each line names a page, a device, an action and what went wrong, and says which 
 - The README maps every judging criterion and every point of the brief to a feature and its code.
 - The architecture diagram shows both interfaces.
 - `SECURITY.md` is a threat model.
-- `docs/demo-script.md` is a 3-minute walkthrough.
 
 ---
 
