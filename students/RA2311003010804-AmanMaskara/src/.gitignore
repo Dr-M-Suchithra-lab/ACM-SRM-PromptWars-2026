@@ -29,3 +29,7 @@ public/swe-worker*
 .DS_Store
 *.pem
 *.log
+
+# agent instruction files that `next dev` writes locally
+AGENTS.md
+CLAUDE.md

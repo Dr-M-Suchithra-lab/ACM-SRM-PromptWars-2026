@@ -87,7 +87,7 @@ It runs construction sites and hospitals on the same code; *the AI understands w
 - **Workers speak up safely.** Feedback is anonymous, and issues reach management only when 5 workers sign.
 - **Attendance becomes proof.** It turns into welfare-scheme eligibility and a signed work certificate.
 
-Employers see who is on duty, fatigue, explainable quit risk and what needs attention first. The same code runs **construction sites and hospitals**, with campus and factory profiles ready. *The AI decides meaning; tested code computes every number.*
+On the employer side, quit risk comes with its reasons, fatigue is flagged before it becomes a hazard, and the overview opens on what needs attention first. Campus and factory profiles are configured too, ready for a third and fourth industry.
 
 **What the brief asked for, and what it got:**
 
@@ -100,7 +100,7 @@ Employers see who is on duty, fatigue, explainable quit risk and what needs atte
 The full mapping of every point of the brief and every judging criterion to code is in [`src/README.md`](src/README.md#the-brief-point-by-point).
 
 **Quality, in numbers:**
-- 340 unit tests and 36 end-to-end tests, all passing, with 98% line coverage gated in CI
+- 340 unit tests and 36 end-to-end tests, all passing, at 98% line coverage (CI fails below 95%)
 - 34 of 34 live security probes pass, and `npm audit` shows 0 production vulnerabilities
 - axe reports 0 accessibility violations
 - every page loads in under 400 ms on phone and desktop (typically 150–200 ms, measured on the live demo)

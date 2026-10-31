@@ -107,7 +107,7 @@ Every point of the official brief, the prompt text that drove it, and what it be
 
 > check from github and linkedin and from internet that which are the best projects that have won older prompt wars and what they have done in it to take ideas from the projects and also read my docs to get a knowledge about what we have to do to win this promptwars
 
-**What it changed:** winners are scored on code quality, security, efficiency, testing, accessibility and problem alignment, not only on features. That set the rule *tests and security from day one*.
+**What it changed:** winners are scored on code quality, security, efficiency, testing, accessibility and problem alignment, not only on features. That set the rule *tests and security from day one*. Only these lessons about judging were taken from the research. No code, design or feature list came from another project; FairShift was built from the problem statement.
 
 ## 2. Plan — docs before code
 
@@ -367,7 +367,7 @@ Each line names a page, a device, an action and what went wrong, and says which 
 - **Security:** the strict security policy was kept even where it cost Lighthouse points. A tenant-isolation test suite proves one employer can never touch another's records. The audit found an unused dependency with known vulnerabilities, and it was removed.
 - **Speed:** organisation-wide pages load in two database round trips; every page loads in under 400 ms on a phone, typically 150–200 ms.
 - **No regressions:** the code-quality refactor changed rendering only, and was checked by every test before it shipped.
-- **Testing:** 323 unit and 35 end-to-end tests pass, with coverage gated at 98% of lines, and 34 security probes run against the live site.
+- **Testing (at this stage):** 323 unit and 35 end-to-end tests passed, at 98% line coverage with a 95% gate in CI, and 34 security probes ran against the live site. The final build has 340 unit and 36 end-to-end tests.
 
 **Release gate before submission.** I asked the coding agent to help me turn my vague "is everything done?" into measurable targets, then sent this prompt and had it run:
 
@@ -381,7 +381,7 @@ Each line names a page, a device, an action and what went wrong, and says which 
 
 **What it changed:** a release decision based on evidence instead of a feeling. All six targets passed:
 - lint, typecheck and formatting clean
-- 323/323 unit and 35/35 end-to-end tests, with 98% line coverage enforced in CI
+- 323/323 unit and 35/35 end-to-end tests, at 98% line coverage with the 95% gate enforced in CI (the final build, after the payday-window work, has 340 unit and 36 end-to-end tests, all passing)
 - 0 production vulnerabilities
 - health OK, and 34/34 live security probes
 - all 36 page measurements under 400 ms (slowest 306 ms)
