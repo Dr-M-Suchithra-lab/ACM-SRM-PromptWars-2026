@@ -309,19 +309,32 @@ export async function explain(
       typeof error.status === "number"
         ? error.status
         : undefined;
+    // Inspect provider text only in memory. Emit a closed diagnostic category,
+    // never the message (which may contain credentials or request details).
+    const providerMessage = error instanceof Error ? error.message : "";
     const reason =
-      status === 429
-        ? "quota_or_rate_limit"
-        : status === 401 || status === 403
-          ? "provider_credentials"
-          : status === 404
-            ? "model_unavailable"
-            : error instanceof z.ZodError || error instanceof SyntaxError
-              ? "invalid_output"
-              : error instanceof Error &&
-                  ["TimeoutError", "AbortError"].includes(error.name)
-                ? "provider_timeout"
-                : "provider_error";
+      status === 400 &&
+      /API_KEY_INVALID|API key not valid|API key expired|API_KEY_SERVICE_BLOCKED/i.test(
+        providerMessage,
+      )
+        ? "provider_credentials"
+        : status === 400 &&
+            /response.?schema|additionalProperties|temperature|thinking|unknown name|unsupported.*parameter/i.test(
+              providerMessage,
+            )
+          ? "provider_parameters"
+          : status === 429
+            ? "quota_or_rate_limit"
+            : status === 401 || status === 403
+              ? "provider_credentials"
+              : status === 404
+                ? "model_unavailable"
+                : error instanceof z.ZodError || error instanceof SyntaxError
+                  ? "invalid_output"
+                  : error instanceof Error &&
+                      ["TimeoutError", "AbortError"].includes(error.name)
+                    ? "provider_timeout"
+                    : "provider_error";
     diagnostic(topic, language, reason, status);
     return fallback;
   } finally {

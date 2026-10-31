@@ -7,6 +7,23 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 describe("Saarthi explanations", () => {
+  it.each([
+    [
+      "API_KEY_INVALID: API key not valid. private credential",
+      "provider_credentials",
+    ],
+    ["Unknown name response_schema: private prompt", "provider_parameters"],
+  ])(
+    "classifies bad provider requests without logging diagnostics: %s",
+    async (message, reason) => {
+      const log = vi.spyOn(console, "warn").mockImplementation(() => {});
+      await explain("pay", "en", {}, async () => {
+        throw Object.assign(new Error(message), { status: 400 });
+      });
+      expect(JSON.stringify(log.mock.calls)).toContain(reason);
+      expect(JSON.stringify(log.mock.calls)).not.toContain("private");
+    },
+  );
   it("recognizes the existing server-only production key alias without exposing its value", () => {
     vi.stubEnv("GEMINI_API_KEY", "");
     vi.stubEnv("saathi_api", "synthetic-private-key");
