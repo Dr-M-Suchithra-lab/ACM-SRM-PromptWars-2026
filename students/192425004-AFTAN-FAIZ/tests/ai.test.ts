@@ -16,6 +16,8 @@ describe("Saarthi explanations", () => {
       "synthetic-private-key",
     );
     vi.stubEnv("GEMINI_MODEL", "");
+    expect(aiConfigured()).toBe(true);
+    vi.stubEnv("saathi_api", "");
     expect(aiConfigured()).toBe(false);
   });
   it("rejects provider-invented numeric pay and retains deterministic record facts", async () => {

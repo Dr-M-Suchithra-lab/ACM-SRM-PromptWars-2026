@@ -4,7 +4,10 @@ import { z } from "zod";
 
 // Existing production secret alias; never export the value to the client.
 const apiKey = () => process.env.GEMINI_API_KEY || process.env.saathi_api;
-export const aiConfigured = () => !!(apiKey() && process.env.GEMINI_MODEL);
+// The owner explicitly selected this model. Honor an override when supplied;
+// never substitute another model silently after a provider failure.
+const model = () => process.env.GEMINI_MODEL?.trim() || "gemini-3.8-flash";
+export const aiConfigured = () => !!apiKey();
 import { money } from "../shared/engines.js";
 import type { Topic } from "./assistant.js";
 type Language = "en" | "ta" | "hi";
@@ -250,15 +253,7 @@ export async function explain(
   };
   if (safeFacts.intent === "unsupported") return fallback;
   if (!generator && !aiConfigured()) {
-    diagnostic(
-      topic,
-      language,
-      !apiKey() && !process.env.GEMINI_MODEL
-        ? "missing_key_and_model"
-        : !apiKey()
-          ? "missing_key"
-          : "missing_model",
-    );
+    diagnostic(topic, language, "missing_key");
     return fallback;
   }
   let timer: ReturnType<typeof setTimeout> | undefined;
@@ -269,7 +264,7 @@ export async function explain(
       (async (contents: string) => {
         const client = new GoogleGenAI({ apiKey: apiKey() });
         const response = await client.models.generateContent({
-          model: process.env.GEMINI_MODEL!,
+          model: model(),
           contents,
           config: {
             httpOptions: { timeout: 8000 },
