@@ -1,0 +1,29 @@
+{
+  "name": "Shiftseal",
+  "short_name": "Shiftseal",
+  "description": "Every hour counted. Every rupee explained. Proof of work for shift workers.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f6f4ef",
+  "theme_color": "#13213f",
+  "icons": [
+    {
+      "src": "/brand/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/brand/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/brand/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
