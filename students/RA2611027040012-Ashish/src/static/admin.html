@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0f766e">
+  <meta name="description" content="FairShift manager dashboard: workforce health, fatigue hotspots and safety issues for your site.">
+  <title>FairShift · Manager dashboard</title>
+  <link rel="icon" href="/img/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/css/app.css">
+  <script src="/js/common.js" defer></script>
+  <script src="/js/admin.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="/" aria-label="FairShift home">
+        <img class="brand-mark" src="/img/logo.svg" alt="" width="32" height="32">
+        <span>FairShift <span class="muted">Manager</span></span>
+      </a>
+      <span class="spacer"></span>
+      <span class="chip" id="sector-chip" hidden></span>
+      <button type="button" class="btn btn-ghost btn-sm" id="logout-btn" hidden>
+        <svg class="icon" aria-hidden="true"><use href="/img/icons.svg#logout"></use></svg>
+        Log out
+      </button>
+    </div>
+  </header>
+
+  <main id="main" tabindex="-1">
+    <div class="loading page-loading" id="page-loading" role="status">
+      <span class="spinner" aria-hidden="true"></span> Loading…
+    </div>
+
+    <!-- Login -->
+    <section id="login-view" class="card login-card" hidden aria-labelledby="login-title">
+      <h1 id="login-title">Manager login</h1>
+      <form id="login-form" novalidate>
+        <div class="field">
+          <label for="email">Work email</label>
+          <input id="email" type="email" autocomplete="username" required>
+        </div>
+        <div class="field">
+          <label for="password">Password</label>
+          <input id="password" type="password" autocomplete="current-password" required>
+        </div>
+        <button class="btn btn-primary btn-block" type="submit">Log in</button>
+        <p class="error-text" id="login-error" role="alert"></p>
+      </form>
+      <div class="demo-box">
+        <p class="muted">Trying the demo? Open a ready-made site:</p>
+        <div class="demo-buttons">
+          <button type="button" class="btn btn-block" data-demo="construction">
+            <svg class="icon" aria-hidden="true"><use href="/img/icons.svg#hardhat"></use></svg>
+            Skyline Residency (construction)
+          </button>
+          <button type="button" class="btn btn-block" data-demo="hospital">
+            <svg class="icon" aria-hidden="true"><use href="/img/icons.svg#hospital"></use></svg>
+            City General Hospital
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Dashboard -->
+    <div id="dash-view" class="dash" hidden>
+      <div class="dash-head">
+        <div>
+          <p class="eyebrow" id="site-city">Site</p>
+          <h1 id="site-name">Dashboard</h1>
+          <p class="muted small" id="updated" aria-live="polite"></p>
+        </div>
+        <p class="privacy-note">
+          <svg class="icon" aria-hidden="true"><use href="/img/icons.svg#lock"></use></svg>
+          <span id="privacy-text">Team-level data only. Anonymous reports never show who sent them.</span>
+        </p>
+      </div>
+
+      <div class="grid-top">
+        <section class="card code-card" aria-labelledby="code-title">
+          <p class="eyebrow" id="code-title">Today's check-in code</p>
+          <p class="big-code" id="site-code" aria-live="polite">----</p>
+          <div class="code-bar" aria-hidden="true"><span id="code-bar"></span></div>
+          <p class="muted small" id="code-left"></p>
+          <p class="muted small">Show this at the gate. Workers type it in the app to start a shift. No QR or camera needed.</p>
+        </section>
+
+        <section class="kpis" aria-label="Key numbers">
+          <div class="card kpi">
+            <span class="kpi-label">On shift now</span>
+            <span class="kpi-value" id="kpi-onshift">–</span>
+            <span class="kpi-note" id="kpi-onshift-note"></span>
+          </div>
+          <div class="card kpi">
+            <span class="kpi-label">Overtime, last 7 days</span>
+            <span class="kpi-value" id="kpi-ot">–</span>
+            <span class="kpi-note">hours across all teams</span>
+          </div>
+          <div class="card kpi">
+            <span class="kpi-label">Fatigue warnings</span>
+            <span class="kpi-value" id="kpi-fatigue">–</span>
+            <span class="kpi-note">workers who need rest</span>
+          </div>
+          <div class="card kpi">
+            <span class="kpi-label">Open safety reports</span>
+            <span class="kpi-value" id="kpi-reports">–</span>
+            <span class="kpi-note" id="kpi-escalated"></span>
+          </div>
+        </section>
+      </div>
+
+      <div class="section-title">
+        <h2>Team health</h2>
+        <p class="muted small" id="health-help">Score out of 100, based on overtime, fatigue, open issues and attendance.</p>
+      </div>
+      <div class="teams" id="teams"></div>
+
+      <div class="grid-bottom">
+        <section aria-labelledby="issues-title">
+          <div class="section-title">
+            <h2 id="issues-title">Safety &amp; welfare reports</h2>
+            <div class="filters" role="group" aria-label="Filter reports">
+              <button type="button" class="btn btn-sm" data-filter="open" aria-pressed="true">Open</button>
+              <button type="button" class="btn btn-sm" data-filter="all" aria-pressed="false">All</button>
+            </div>
+          </div>
+          <div class="card" id="issues" aria-live="polite"></div>
+        </section>
+
+        <div>
+          <section aria-labelledby="trend-title">
+            <div class="section-title">
+              <h2 id="trend-title">Attendance, last 14 days</h2>
+            </div>
+            <div class="card">
+              <svg class="trend-chart" id="trend" viewBox="0 0 360 170" role="img" aria-labelledby="trend-title trend-desc"></svg>
+              <p class="sr-only" id="trend-desc"></p>
+            </div>
+          </section>
+
+          <section aria-labelledby="roll-title">
+            <div class="section-title">
+              <h2 id="roll-title">Roll call</h2>
+            </div>
+            <form class="card" id="roll-form">
+              <p class="muted small">For workers without a working phone: tick who is present and start their shift.</p>
+              <label for="roll-search" class="sr-only">Search workers</label>
+              <input type="text" id="roll-search" placeholder="Search by name or team">
+              <ul class="roster" id="roster"></ul>
+              <button type="submit" class="btn btn-primary btn-block">
+                <svg class="icon" aria-hidden="true"><use href="/img/icons.svg#check"></use></svg>
+                Mark selected present
+              </button>
+            </form>
+          </section>
+        </div>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

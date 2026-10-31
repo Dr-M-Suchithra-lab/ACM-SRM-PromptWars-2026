@@ -1,0 +1,16 @@
+{
+  "id": "hospital",
+  "name": "Hospital",
+  "currency": "INR",
+  "daily_regular_hours": 12,
+  "weekly_regular_hours": 48,
+  "overtime_multiplier": 1.5,
+  "night_window": [21, 7],
+  "night_allowance_per_hour": 40,
+  "max_daily_hours": 14,
+  "min_rest_hours": 11,
+  "max_consecutive_days": 5,
+  "weekly_hours_cap": 60,
+  "hazard_categories": ["infection", "chemical", "slip", "equipment", "harassment", "wages", "other"],
+  "sla_hours": {"critical": 1, "high": 12, "medium": 48, "low": 168}
+}
