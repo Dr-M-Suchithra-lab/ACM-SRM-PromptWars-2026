@@ -7,14 +7,70 @@ PromptWars × ACM SRM Student Chapter 2026 · Arnav Mehta · RA2311056010137
 
 ## 1. Problem statement
 
-<!-- Paste the official problem statement here exactly as it was given. -->
+*As given in the event brief, PROMPT WARS 2026 × SRM ACM STUDENT CHAPTER.*
 
-**FairShift.** Construction sites, hospitals, colleges and factories still run their workforce on paper registers and
-WhatsApp groups. Shift workers can't see how their pay was worked out, are afraid to report unsafe conditions or
-complain about a manager, and lose their work history when they move to a new employer. Employers can't see who is
-overworked or about to quit until it is too late. Build a platform that tracks shifts, explains pay clearly, makes
-safety reporting and honest feedback safe, carries a worker's skills from job to job, warns about fatigue, gives
-employers a clear dashboard, and works for workers in their own languages.
+### FairShift: Decent Work Platform
+**Building fairer, safer, and more transparent workplaces for employee-intensive organisations.**
+**Theme:** UN SDG 8 — Decent Work and Economic Growth
+
+#### The Problem Context: Manual Workforce Management
+Large workforces still rely on paper registers, spreadsheets, and WhatsApp groups across key sectors:
+- **Construction:** Daily shift workers on active sites.
+- **Colleges & Schools:** Campus support and facility staff.
+- **Hospitals:** Round-the-clock care and sanitation teams.
+- **Factories:** High-volume floor and line operators.
+
+#### Worker Pain Points: Why Workers Struggle Today
+- **Opaque Pay Calculations:** Unclear salary breakdowns or uncounted overtime hours.
+- **Fear of Identification:** Hesitation to raise complaints or share honest feedback.
+- **Unreported Safety Risks:** Workplace hazards ignored until actual injuries occur.
+- **Lost Career History:** Unrecorded skills force workers to restart from zero.
+
+#### Systemic Gaps: Employer Blind Spots & User Needs
+**For Employers**
+- **Zero Workforce Visibility:** No clear view of overworked or unhappy staff.
+- **High Attrition Risk:** Unable to spot employees likely to quit early.
+- **Delayed Escalation:** Issues reach management only after becoming severe.
+
+**Accessibility Needs**
+- **Regional Languages:** Workers primarily communicate in native local tongues.
+- **Limited Literacy:** Interfaces must support voice and visual cues.
+- **Basic Smartphones:** Must run smoothly on low-end mobile devices.
+
+#### The Mission: Your Hackathon Challenge
+Make work fairer, safer, and more transparent for everyone.
+Empower workers with clarity and voice while giving employers actionable insights into workforce health.
+
+**Cross-Industry Requirement (2+ Sectors):** Your platform must work across at least two distinct industries
+(e.g., Construction Site + College).
+
+#### Example Features
+**Transparency & Safety Tools**
+1. **Shift Tracking:** QR or location check-in with automatic overtime.
+2. **Clear Payslips:** Simple salary breakdown in worker's native language.
+3. **Safety Reporting:** Voice or text hazard reports with status tracking.
+4. **Honest Feedback:** Anonymous reviews on managers and working conditions.
+
+**Growth, Wellbeing & Insights**
+
+5. **Skill Passport:** Portable digital record of training and experience.
+6. **Fatigue Alerts:** Flags excessive hours or back-to-back shifts.
+7. **Admin Dashboard:** Tracks attendance trends, complaints, and quit risks.
+8. **Voice & Local:** Multilingual voice support for low-end smartphones.
+
+#### Deliverables: What You Need to Submit
+- **3+ Working Features:** Functional prototype (custom ideas welcome).
+- **2 UIs, Dual Interfaces:** One for workers, one for employers/admins.
+- **2+ Industry Use Cases:** Short explanation of cross-sector adoption.
+
+#### Evaluation Rubric: How Projects Will Be Judged
+| Judging Criterion | Core Focus Area |
+|---|---|
+| 1. Real-World Impact | Tangible improvement to worker safety and employer visibility |
+| 2. Relevance to SDG 8 | Direct alignment with Decent Work and Economic Growth |
+| 3. Inclusivity & Ease of Use | Accessible for regional languages, low literacy, and basic phones |
+| 4. Technical Implementation | Clean code quality, security, and working dual interfaces |
+| 5. Feasibility & Scalability | Practical adoption across two or more distinct industries |
 
 ## 2. Solution
 
