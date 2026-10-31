@@ -1,0 +1,1086 @@
+@import "tailwindcss";
+
+/*
+ * FairShift design system — "Warm paper".
+ * A light, friendly palette for a ₹7,000 Android phone in bright sunlight: warm paper, deep
+ * teal for action, marigold "safety vest" highlights. One theme only (light), so contrast is
+ * tuned once and verified by tests/unit/design/contrast.test.ts.
+ *
+ * Contrast (WCAG 2.1, computed):
+ *   ink/bg 15.9 · ink-2/bg 6.8 · ink-2/surface-2 6.2 · white/primary 6.4 · primary/primary-soft 5.4
+ *   ink/accent 8.2 · white/danger 5.4 · danger/danger-soft 4.5 · white/success 5.7 · white/info 4.8
+ *   warning-ink/warning-soft 5.6 · white/warning 5.0
+ */
+:root {
+  color-scheme: light;
+
+  --bg: #fbf8f3;
+  --surface: #ffffff;
+  --surface-2: #f3eee6;
+  --line: #e6dfd3;
+  --ink: #1f1d1a;
+  --ink-2: #5c574f;
+  --primary: #0f6b5a;
+  --primary-strong: #0a4f43;
+  --primary-soft: #ddf0ea;
+  --accent: #f5a524;
+  --accent-soft: #fdf0d9;
+  --danger: #c23934;
+  --danger-soft: #fce8e6;
+  --success: #22744a;
+  --success-soft: #e3f3e9;
+  --warning: #a35f00;
+  --warning-ink: #8a5300;
+  --warning-soft: #fdf0d9;
+  --info: #2f6fdb;
+  --info-soft: #e6eefb;
+
+  --radius-card: 20px;
+  --radius-tile: 16px;
+  --shadow-card: 0 1px 2px rgb(31 29 26 / 0.04), 0 10px 28px -16px rgb(31 29 26 / 0.16);
+  --shadow-lift: 0 2px 4px rgb(31 29 26 / 0.05), 0 18px 36px -18px rgb(15 107 90 / 0.32);
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ease-spring: cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+
+@theme inline {
+  --color-paper: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-line: var(--line);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-primary: var(--primary);
+  --color-primary-strong: var(--primary-strong);
+  --color-primary-soft: var(--primary-soft);
+  --color-on-primary: #ffffff;
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-on-accent: var(--ink);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-warning: var(--warning);
+  --color-warning-ink: var(--warning-ink);
+  --color-warning-soft: var(--warning-soft);
+  --color-info: var(--info);
+  --color-info-soft: var(--info-soft);
+  --radius-card: var(--radius-card);
+  --radius-tile: var(--radius-tile);
+  --font-sans: var(--font-active), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-bricolage), var(--font-active), ui-sans-serif, sans-serif;
+}
+
+/* Worker routes: larger text for low-literacy users. Admin routes: denser. */
+.worker {
+  font-size: 18px;
+  line-height: 1.55;
+}
+
+.admin {
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+/* Indic scripts have tall ascenders/descenders */
+:lang(hi),
+:lang(ta),
+:lang(te) {
+  line-height: 1.7;
+}
+
+body {
+  background:
+    radial-gradient(1200px 500px at 85% -10%, rgb(245 165 36 / 0.08), transparent 60%),
+    radial-gradient(900px 480px at -10% 0%, rgb(15 107 90 / 0.06), transparent 60%), var(--bg);
+  background-attachment: fixed;
+  color: var(--ink);
+  min-height: 100dvh;
+  font-feature-settings: "kern", "liga";
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+.font-display {
+  /* Referenced directly: @theme inline does not emit --font-display as a runtime variable. */
+  font-family: var(--font-bricolage), var(--font-active), ui-sans-serif, sans-serif;
+  letter-spacing: -0.02em;
+}
+
+/* Money, hours and counts line up like a ledger */
+.figure {
+  font-variant-numeric: tabular-nums lining-nums;
+  letter-spacing: -0.01em;
+}
+
+:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
+  border-radius: 10px;
+  box-shadow: 0 0 0 6px rgb(245 165 36 / 0.45);
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--ink);
+}
+
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 16px;
+  z-index: 100;
+  padding: 10px 18px;
+  background: var(--primary);
+  color: #fff;
+  border-radius: 0 0 12px 12px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.skip-link:focus {
+  top: 0;
+}
+
+/* ── Surfaces ──────────────────────────────────────────────────────── */
+
+.card {
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+}
+
+/* The one key figure per screen: white card washed with soft teal */
+.hero-card {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background: linear-gradient(155deg, #ffffff 0%, #f1f8f5 55%, #e4f2ec 100%);
+  color: var(--ink);
+  border: 1px solid #d3e8e0;
+  border-radius: 24px;
+  box-shadow: var(--shadow-lift);
+}
+
+.hero-card::before {
+  content: "";
+  position: absolute;
+  inset: auto -20% -60% auto;
+  width: 70%;
+  aspect-ratio: 1;
+  border-radius: 999px;
+  background: radial-gradient(closest-side, rgb(245 165 36 / 0.16), transparent);
+  z-index: -1;
+}
+
+/* Interactive tile: lifts on hover, presses on tap */
+.tile {
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-tile);
+  box-shadow: var(--shadow-card);
+  transition:
+    transform 0.18s var(--ease-out),
+    box-shadow 0.18s ease,
+    border-color 0.18s ease;
+}
+
+a.tile:hover,
+button.tile:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--primary) 40%, var(--line));
+  box-shadow: var(--shadow-lift);
+}
+
+a.tile:active,
+button.tile:active {
+  transform: translateY(0) scale(0.985);
+  transition-duration: 0.06s;
+}
+
+.tile .nudge,
+.group:hover .nudge {
+  transition: transform 0.2s ease;
+}
+.tile:hover .nudge {
+  transform: translateX(4px);
+}
+
+/* Small uppercase label above figures */
+.eyebrow {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+
+/* Section rule with label */
+.rule-label {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.rule-label::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}
+
+/* Marigold marker under a key word */
+.mark {
+  background: linear-gradient(transparent 62%, rgb(245 165 36 / 0.55) 62%, rgb(245 165 36 / 0.55) 92%, transparent 92%);
+  padding: 0 0.08em;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+/* Perforated receipt edge for the payslip */
+.receipt {
+  position: relative;
+  background: var(--surface);
+}
+
+.receipt::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -9px;
+  height: 10px;
+  background: radial-gradient(circle at 8px 0, var(--surface) 6px, transparent 6.5px) repeat-x;
+  background-size: 16px 10px;
+}
+
+/* Thin yellow-black hazard stripe: the brand's one nod to the site */
+.hazard-tape {
+  height: 4px;
+  border-radius: 4px;
+  background: repeating-linear-gradient(-45deg, var(--accent) 0 10px, var(--ink) 10px 20px);
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Taps register immediately on phones (no double-tap-zoom wait) */
+button,
+a,
+[role="button"],
+[role="radio"],
+[role="tab"],
+[role="menuitemradio"],
+label {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button[aria-busy="true"] {
+  cursor: wait;
+}
+
+/* ── Motion ────────────────────────────────────────────────────────
+ * Only transform and opacity animate. Loops pause when the tab is hidden
+ * (html[data-hidden], set by <MotionPolicy>), and prefers-reduced-motion
+ * replaces movement with short fades (see the end of this file).
+ */
+
+html[data-hidden] *,
+html[data-hidden] *::before,
+html[data-hidden] *::after {
+  animation-play-state: paused !important;
+}
+
+/*
+ * The entry scene's loops are SVG transforms, which the browser cannot hand to the GPU, so
+ * every frame costs main-thread style and layout work. They wait (drawn, but still) until
+ * the page has loaded and the browser is idle (html[data-scene-live], set by <MotionPolicy>),
+ * so they never compete with hydration or the first tap on a low-end phone.
+ */
+html:not([data-scene-live]) .work-scene * {
+  animation-play-state: paused;
+}
+
+/*
+ * Entrances start partly visible, never from opacity 0: content is readable from the first
+ * frame, and the browser counts it as painted at once instead of after the fade (LCP).
+ */
+
+/*
+ * Skew reveal, adapted from the GSAP SplitText "AnimatedHeader" in D:/Animations
+ * (Text Animations/12) as pure CSS. Split by word, never by letter, so Hindi, Tamil
+ * and Telugu conjuncts are never broken apart.
+ */
+.reveal-word {
+  display: inline-block;
+  opacity: 0.25;
+  transform: translateY(0.35em) skewX(10deg);
+  animation: reveal-word 0.5s var(--ease-out) forwards;
+  animation-delay: calc(var(--i, 0) * 40ms + var(--d, 0ms));
+}
+
+@keyframes reveal-word {
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.rise-in {
+  animation: rise-in 0.5s var(--ease-out) both;
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0.3;
+    transform: translateY(12px);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+/* Staggered entrance for card grids */
+.stagger > * {
+  animation: rise-in 0.45s var(--ease-out) both;
+  animation-delay: calc(min(var(--n, 0), 6) * 60ms);
+}
+.stagger > *:nth-child(1) {
+  --n: 0;
+}
+.stagger > *:nth-child(2) {
+  --n: 1;
+}
+.stagger > *:nth-child(3) {
+  --n: 2;
+}
+.stagger > *:nth-child(4) {
+  --n: 3;
+}
+.stagger > *:nth-child(5) {
+  --n: 4;
+}
+.stagger > *:nth-child(6) {
+  --n: 5;
+}
+.stagger > *:nth-child(n + 7) {
+  --n: 6;
+}
+
+/* Held back while the welcome moment plays, then released together */
+[data-welcome="playing"] .stagger > * {
+  animation-play-state: paused;
+}
+
+/* Meter bars fill from the left on first paint */
+.meter-fill {
+  transform-origin: left;
+  animation: meter 0.9s 0.2s var(--ease-out) both;
+}
+
+@keyframes meter {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+.success-check-circle,
+.success-check-mark {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.success-check-circle {
+  animation: check-pop 0.45s var(--ease-spring) both;
+}
+.success-check-mark {
+  animation: check-pop 0.4s 0.25s var(--ease-spring) both;
+}
+
+@keyframes check-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+}
+
+/* Recording: two expanding rings (transform + opacity only) */
+.mic-pulse {
+  position: relative;
+}
+.mic-pulse::before,
+.mic-pulse::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--danger);
+  opacity: 0.35;
+  z-index: -1;
+  animation: ring-out 1.4s ease-out infinite;
+}
+.mic-pulse::after {
+  animation-delay: 0.7s;
+}
+
+@keyframes ring-out {
+  to {
+    transform: scale(1.7);
+    opacity: 0;
+  }
+}
+
+/* Live dot: on shift / on site */
+.live-dot {
+  position: relative;
+  display: inline-block;
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 999px;
+  background: var(--success);
+}
+
+.live-dot::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: inherit;
+  animation: live-ping 1.6s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+@keyframes live-ping {
+  75%,
+  100% {
+    transform: scale(2.6);
+    opacity: 0;
+  }
+}
+
+/* Viewfinder: corner brackets with a sweeping scan line (check-in) */
+.viewfinder {
+  position: relative;
+  overflow: hidden;
+  border-radius: 20px;
+  background:
+    linear-gradient(var(--primary), var(--primary)) top left / 26px 4px no-repeat,
+    linear-gradient(var(--primary), var(--primary)) top left / 4px 26px no-repeat,
+    linear-gradient(var(--primary), var(--primary)) top right / 26px 4px no-repeat,
+    linear-gradient(var(--primary), var(--primary)) top right / 4px 26px no-repeat,
+    linear-gradient(var(--primary), var(--primary)) bottom left / 26px 4px no-repeat,
+    linear-gradient(var(--primary), var(--primary)) bottom left / 4px 26px no-repeat,
+    linear-gradient(var(--primary), var(--primary)) bottom right / 26px 4px no-repeat,
+    linear-gradient(var(--primary), var(--primary)) bottom right / 4px 26px no-repeat,
+    var(--primary-soft);
+}
+
+.viewfinder::after {
+  content: "";
+  position: absolute;
+  left: 10%;
+  right: 10%;
+  top: 0;
+  height: 3px;
+  border-radius: 3px;
+  background: var(--accent);
+  box-shadow: 0 0 14px 3px rgb(245 165 36 / 0.5);
+  animation: scan 2.2s ease-in-out infinite alternate;
+}
+
+@keyframes scan {
+  from {
+    transform: translateY(1.2rem);
+  }
+  to {
+    transform: translateY(9.5rem);
+  }
+}
+
+/* Key press: a soft squash on the PIN keypad and big buttons */
+.press {
+  transition:
+    transform 0.12s var(--ease-out),
+    background-color 0.15s ease;
+}
+.press:active {
+  transform: scale(0.94);
+}
+
+/* ── Page transitions (React <ViewTransition> + View Transitions API) ──
+ * Mac-style window switch: the old page settles back (scale .97 + fade), the new one
+ * rises in from .98. Direction comes from nav order: moving right slides left.
+ * The header and tab bar are named so they stay put while content moves.
+ */
+
+::view-transition {
+  pointer-events: none;
+}
+
+::view-transition-old(.page) {
+  --page-shift: -24px;
+  animation: 200ms var(--ease-out) both page-out;
+}
+::view-transition-new(.page) {
+  --page-shift: 24px;
+  animation: 300ms var(--ease-out) 40ms both page-in;
+}
+/* Going back (Back button, browser back, a tab to the left): mirror the slide */
+html[data-nav-dir="back"]::view-transition-old(.page) {
+  --page-shift: 24px;
+}
+html[data-nav-dir="back"]::view-transition-new(.page) {
+  --page-shift: -24px;
+}
+
+@keyframes page-out {
+  to {
+    opacity: 0;
+    transform: translateX(var(--page-shift, 0)) scale(0.97);
+  }
+}
+
+@keyframes page-in {
+  from {
+    opacity: 0;
+    transform: translateX(var(--page-shift, 0)) scale(0.98);
+  }
+}
+
+::view-transition-group(app-header),
+::view-transition-group(tab-bar) {
+  animation: none;
+  z-index: 50;
+}
+::view-transition-old(app-header),
+::view-transition-old(tab-bar) {
+  display: none;
+}
+::view-transition-new(app-header),
+::view-transition-new(tab-bar) {
+  animation: none;
+}
+
+/* The greeting card flying into the home header (welcome moment) */
+::view-transition-group(.greeting-morph) {
+  animation-duration: 520ms;
+  animation-timing-function: var(--ease-spring);
+}
+
+/* Without View Transitions support, pages still fade in */
+@supports not (view-transition-name: none) {
+  .page-enter {
+    animation: fade-in 220ms ease-out both;
+  }
+}
+
+/* ── Reduced motion: no movement, only short fades ─────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: 160ms ease both fade-in !important;
+  }
+  ::view-transition-old(*) {
+    animation-direction: reverse !important;
+  }
+  ::view-transition-group(*) {
+    animation-duration: 0s !important;
+  }
+}
+
+/* ── Brand ─────────────────────────────────────────────────────────── */
+
+/* The marigold dot over the dotless ı in "Fair" */
+.wordmark-i {
+  position: relative;
+  display: inline-block;
+}
+.wordmark-i::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 0.02em;
+  width: 0.25em;
+  height: 0.25em;
+  border-radius: 999px;
+  background: var(--accent);
+  transform: translateX(-50%);
+}
+
+/* Landing only: the clock hands sweep from 12 o'clock into the check mark */
+.logo-animated .logo-hand {
+  transform-box: view-box;
+  transform-origin: 11px 14.6px;
+  animation: hand-sweep 0.9s 0.2s var(--ease-spring) both;
+}
+.logo-animated .logo-hand-short {
+  --from: 135deg;
+}
+.logo-animated .logo-hand-long {
+  --from: -150deg;
+  animation-duration: 1.1s;
+}
+
+@keyframes hand-sweep {
+  from {
+    transform: rotate(var(--from));
+    opacity: 0.3;
+  }
+}
+
+/* Dropdown menus: scale + fade open from their anchor corner */
+.menu-pop:not([hidden]) {
+  animation: menu-pop 160ms var(--ease-out) both;
+}
+
+@keyframes menu-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.94) translateY(-4px);
+  }
+}
+
+/* Sheets (bottom on phones, centred on laptops) */
+.sheet-backdrop {
+  animation: fade-in 180ms ease-out both;
+}
+.sheet-panel {
+  animation: sheet-up 280ms var(--ease-out) both;
+}
+
+@keyframes sheet-up {
+  from {
+    opacity: 0;
+    transform: translateY(32px);
+  }
+}
+
+/* ── Welcome moment ────────────────────────────────────────────────── */
+
+.welcome-overlay {
+  animation: fade-in 220ms ease-out both;
+}
+.welcome-morning {
+  background: linear-gradient(170deg, #fff4e3 0%, #ffe1c2 45%, #fbd0b4 100%);
+}
+.welcome-midday {
+  background: linear-gradient(170deg, #ffffff 0%, #eef8f4 50%, #dcefe8 100%);
+}
+.welcome-evening {
+  background: linear-gradient(170deg, #fff1df 0%, #fbd7b0 50%, #f2b98e 100%);
+}
+
+.welcome-letter {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(0.4em);
+  animation: rise-in-letter 420ms var(--ease-spring) forwards;
+  animation-delay: calc(120ms + var(--i, 0) * 45ms);
+}
+
+@keyframes rise-in-letter {
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.welcome-line {
+  animation: rise-in 500ms 700ms var(--ease-out) both;
+}
+
+.welcome-card-small p:first-of-type {
+  font-size: clamp(1.8rem, 6vw, 2.6rem);
+}
+
+/* ── Feedback faces (idle loops staggered by --face-delay) ─────────── */
+
+.face .face-svg,
+.face .face-eyes,
+.face .face-eyes-happy,
+.face .face-brows,
+.face .face-mouth,
+.face .face-tear,
+.face .face-sparkles {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.face .face-svg {
+  animation: face-breathe 3.6s ease-in-out infinite var(--face-delay, 0s);
+}
+.face .face-eyes {
+  animation: face-blink 4.6s infinite var(--face-delay, 0s);
+}
+.face .face-eyes-happy,
+.face .face-tear,
+.face .face-sparkles {
+  opacity: 0;
+}
+
+@keyframes face-breathe {
+  50% {
+    transform: scale(1.04);
+  }
+}
+@keyframes face-blink {
+  0%,
+  92%,
+  100% {
+    transform: scaleY(1);
+  }
+  95% {
+    transform: scaleY(0.1);
+  }
+}
+
+/* 😟 Bad: brows furrow, a wobble, a tear drops */
+.face[data-react="bad"] .face-svg {
+  animation: face-shake 0.5s ease-in-out;
+}
+.face[data-react="bad"] .face-brows {
+  animation: face-furrow 0.9s ease-out;
+}
+.face[data-react="bad"] .face-tear {
+  animation: face-tear 0.9s ease-in;
+}
+@keyframes face-shake {
+  20%,
+  60% {
+    transform: translateX(-3px) rotate(-4deg);
+  }
+  40%,
+  80% {
+    transform: translateX(3px) rotate(4deg);
+  }
+}
+@keyframes face-furrow {
+  30%,
+  80% {
+    transform: translateY(2px) scaleX(0.85);
+  }
+}
+@keyframes face-tear {
+  10% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+    transform: translateY(12px);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+}
+
+/* 😐 Okay: slow blink, head tilt, mouth shifts sideways */
+.face[data-react="okay"] .face-svg {
+  animation: face-tilt 0.9s ease-in-out;
+}
+.face[data-react="okay"] .face-eyes {
+  animation: face-slow-blink 0.9s ease-in-out;
+}
+.face[data-react="okay"] .face-mouth {
+  animation: face-mouth-shift 0.9s ease-in-out;
+}
+@keyframes face-tilt {
+  40%,
+  70% {
+    transform: rotate(-9deg);
+  }
+}
+@keyframes face-slow-blink {
+  30%,
+  55% {
+    transform: scaleY(0.12);
+  }
+}
+@keyframes face-mouth-shift {
+  40%,
+  70% {
+    transform: translateX(4px) rotate(-6deg);
+  }
+}
+
+/* 😀 Good: bounce, wider smile, happy eyes, a sparkle burst */
+.face[data-react="good"] .face-svg {
+  animation: face-bounce 0.7s var(--ease-spring);
+}
+.face[data-react="good"] .face-mouth {
+  animation: face-smile 0.9s var(--ease-spring);
+}
+.face[data-react="good"] .face-eyes {
+  animation: face-hide 0.9s;
+}
+.face[data-react="good"] .face-eyes-happy {
+  animation: face-show 0.9s;
+}
+.face[data-react="good"] .face-sparkles {
+  animation: face-sparkle 0.9s var(--ease-spring);
+}
+@keyframes face-bounce {
+  35% {
+    transform: translateY(-9px) scale(1.08);
+  }
+  65% {
+    transform: translateY(2px) scale(0.98);
+  }
+}
+@keyframes face-smile {
+  30%,
+  75% {
+    transform: scaleX(1.25) scaleY(1.15);
+  }
+}
+@keyframes face-hide {
+  10%,
+  85% {
+    opacity: 0;
+  }
+}
+@keyframes face-show {
+  10%,
+  85% {
+    opacity: 1;
+  }
+}
+@keyframes face-sparkle {
+  0% {
+    opacity: 0;
+    transform: scale(0.2);
+  }
+  40% {
+    opacity: 1;
+    transform: scale(1.15);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.4);
+  }
+}
+
+/* Benefits progress ring: the ring settles in (transform + opacity only) */
+.ring-progress {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: ring-pop 0.6s 0.15s var(--ease-spring) both;
+}
+
+@keyframes ring-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+}
+
+/* ── Entry scene (landing, language, login) ───────────────────────── */
+
+.scene-layer {
+  transform: translate(calc(var(--px, 0) * var(--depth, 0) * 1px), calc(var(--py, 0) * var(--depth, 0) * 1px));
+  transition: transform 0.6s var(--ease-out);
+}
+
+.work-scene
+  :is(
+    .scene-sun,
+    .scene-cloud,
+    .scene-load,
+    .scene-trolley,
+    .scene-mason-arm,
+    .scene-brick,
+    .scene-walker,
+    .scene-leg,
+    .scene-nurse,
+    .scene-wheel,
+    .scene-gear,
+    .scene-press,
+    .scene-smoke
+  ) {
+  transform-box: fill-box;
+}
+
+.scene-sun {
+  transform-origin: center;
+  animation: scene-sun 8s ease-in-out infinite;
+}
+@keyframes scene-sun {
+  50% {
+    transform: scale(1.06);
+  }
+}
+
+.scene-cloud {
+  animation: scene-cloud 34s ease-in-out infinite alternate;
+}
+@keyframes scene-cloud {
+  to {
+    transform: translateX(120px);
+  }
+}
+
+.scene-trolley {
+  animation: scene-trolley 16s ease-in-out infinite alternate;
+}
+@keyframes scene-trolley {
+  to {
+    transform: translateX(-150px);
+  }
+}
+
+.scene-load {
+  transform-origin: 50% 0;
+  animation: scene-swing 5s ease-in-out infinite alternate;
+}
+@keyframes scene-swing {
+  from {
+    transform: rotate(-4deg);
+  }
+  to {
+    transform: rotate(4deg);
+  }
+}
+
+.scene-mason-arm {
+  transform-origin: 50% 0;
+  animation: scene-mason 1.8s ease-in-out infinite alternate;
+}
+@keyframes scene-mason {
+  to {
+    transform: rotate(-55deg);
+  }
+}
+
+.scene-brick {
+  transform-origin: center;
+  animation: scene-brick 3.6s ease-out infinite;
+}
+@keyframes scene-brick {
+  0%,
+  40% {
+    opacity: 0;
+    transform: scale(0.4) translateY(-6px);
+  }
+  55%,
+  92% {
+    opacity: 1;
+    transform: none;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.scene-walker {
+  animation: scene-walk 42s linear infinite;
+}
+@keyframes scene-walk {
+  from {
+    transform: translateX(-120px);
+  }
+  to {
+    transform: translateX(1580px);
+  }
+}
+
+.scene-leg {
+  transform-origin: 50% 0;
+  animation: scene-leg 0.55s ease-in-out infinite alternate;
+}
+.scene-leg-b {
+  animation-direction: alternate-reverse;
+}
+@keyframes scene-leg {
+  from {
+    transform: rotate(-18deg);
+  }
+  to {
+    transform: rotate(18deg);
+  }
+}
+
+.scene-nurse {
+  animation: scene-nurse 11s ease-in-out infinite alternate;
+}
+@keyframes scene-nurse {
+  to {
+    transform: translateX(110px);
+  }
+}
+
+.scene-wheel,
+.scene-gear {
+  transform-origin: center;
+  animation: scene-spin 1.4s linear infinite;
+}
+.scene-gear {
+  animation-duration: 6s;
+}
+@keyframes scene-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.scene-press {
+  animation: scene-press 1.3s ease-in-out infinite alternate;
+}
+@keyframes scene-press {
+  to {
+    transform: translateY(12px);
+  }
+}
+
+.scene-smoke {
+  transform-origin: center;
+  animation: scene-smoke 4s ease-out infinite;
+}
+@keyframes scene-smoke {
+  from {
+    opacity: 0.7;
+    transform: translateY(0) scale(0.6);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-60px) scale(1.4);
+  }
+}
+
+/* Language card → login card: the chosen card morphs into the login panel */
+::view-transition-group(.card-morph) {
+  animation-duration: 420ms;
+  animation-timing-function: var(--ease-out);
+}
+
+/* PIN keypad keys: soft press */
+.key {
+  transition:
+    transform 0.1s var(--ease-out),
+    background-color 0.15s ease;
+}
+.key:active {
+  transform: scale(0.92);
+  background: var(--primary-soft);
+}
