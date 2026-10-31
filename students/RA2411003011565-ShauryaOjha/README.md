@@ -135,6 +135,7 @@ With no `.env.local`, the app:
 ## 5. Demo link
 
 - **Live app:** https://fairshift-brown.vercel.app, deployed on Vercel with MongoDB Atlas and Gemini.
+- **Demo video:** [`video/fairshift-demo.mp4`](video/fairshift-demo.mp4), 1 min 52 s: the worker app in Hindi and Tamil and the supervisor console, recorded from the running app.
 - **Screenshots:** in [`screenshots/`](screenshots), all taken from the current build.
 
 **A two-minute tour:**
@@ -212,6 +213,7 @@ RA2411003011565-ShauryaOjha/
 ├── README.md      this file
 ├── prompts.md     key prompts and the build briefs given to the coding agent
 ├── screenshots/   25 screenshots: worker app in Hindi, Tamil and English; console; landing
+├── video/         demo video (1 min 52 s)
 └── src/           the full project (Next.js app, tests, docs, Dockerfile, .env.example)
 ```
 
