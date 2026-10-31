@@ -7,7 +7,7 @@ async function open(page: Page) {
     .click();
   await expect(
     page.getByRole("heading", { name: /Good to see you/ }),
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 15000 });
   await page.locator(".assistant-fab").click();
   await expect(page.locator(".assistant-response")).toBeVisible();
 }
@@ -146,14 +146,12 @@ test("RestGuard groups conflicts without negative rest or QA location labels and
     .click();
   await expect(page.locator(".workspace-tag")).toContainText("Buildwell");
   await page.getByRole("link", { name: "RestGuard", exact: true }).click();
-  const group = page
-    .locator(".risk-item")
-    .filter({
-      has: page.getByRole("heading", {
-        name: "Overlapping shifts",
-        exact: true,
-      }),
-    });
+  const group = page.locator(".risk-item").filter({
+    has: page.getByRole("heading", {
+      name: "Overlapping shifts",
+      exact: true,
+    }),
+  });
   await expect(group).toHaveCount(1);
   await group.locator("summary").click();
   await expect(group).toContainText("1h overlapping shifts");

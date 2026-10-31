@@ -92,6 +92,9 @@ test("production domain supports sign-in, persisted sessions and both industry d
   ).toBeVisible();
   // The saved synthetic schedule may already have been corrected. Preview the
   // original challenge scenario without resetting or changing that schedule.
+  const shift = page.getByLabel("Shift to review", { exact: true });
+  const target = shift.locator("option").filter({ hasText: "27 Oct" });
+  await shift.selectOption((await target.getAttribute("value")) || "");
   await page.getByRole("slider", { name: "Schedule what-if" }).fill("13");
   await expect(page.locator(".whatif-card")).toContainText("6h rest window");
   await page.getByRole("button", { name: "Sign out", exact: true }).click();

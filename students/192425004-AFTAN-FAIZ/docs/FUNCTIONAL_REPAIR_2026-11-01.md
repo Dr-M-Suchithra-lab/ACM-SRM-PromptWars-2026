@@ -2,6 +2,10 @@
 
 Scope: repair the existing Saarthi/RestGuard workflows, preserve business records and the existing application, and verify all available application suites. Source and tests are synchronized with the application repository. This report distinguishes local SQL/Auth-adapter proofs from real hosted services.
 
+Update after initial publication: the owner privately added Gemini configuration. A fresh production inventory shows `GEMINI_MODEL` and a secret named `saathi_api`, rather than `GEMINI_API_KEY`. The backend now accepts that existing server-only alias, preferring the canonical name, and the public config exposes only a boolean. No secret was read or changed. The configured model remains `gemini-3.8-flash`; Google's exact model page lists structured-output support and the existing GenerateContent JSON parameters are documented. The optional temperature override was removed. A redeployment and genuine authenticated generation check are required; the historical missing-configuration observations below describe the earlier deployment.
+
+Initial live browser run: six passed and two failed (workspace load exceeded the assertion's five-second limit; the legacy RestGuard test implicitly selected the wrong stored shift). The assistant's load assertion now allows fifteen seconds, and the scheduling test explicitly selects its intended synthetic shift without mutating it. All five affected isolated browser cases pass. RestGuard now explicitly explains when no preceding shift is recorded and includes authorized employee names beside warning dates. The full dependency audit reports zero vulnerabilities. Exact final publication/live results are recorded in the handoff.
+
 ## Confirmed causes and repairs
 
 ### Saarthi AI
@@ -35,7 +39,7 @@ The refreshed [interaction inventory](INTERACTION_INVENTORY_2026-11-01.json) cov
 | Check | Result |
 | --- | --- |
 | TypeScript | PASS |
-| Unit/API/native Node suite | 177 PASS, 0 final failures, 13 files |
+| Unit/API/native Node suite | 178 PASS, 0 final failures, 13 files |
 | Native unbundled serverless entry | PASS; API health/config and unauthenticated boundary |
 | Application/submission production builds | PASS; existing upstream Zod annotation warnings only |
 | Full isolated browser suite | 38 PASS, 0 FAIL, all original cases preserved |

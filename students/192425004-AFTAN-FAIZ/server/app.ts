@@ -31,7 +31,7 @@ import {
   shiftInput,
   policyInput,
 } from "../shared/engines.js";
-import { explain } from "./ai.js";
+import { aiConfigured, explain } from "./ai.js";
 
 type Auth = Identity;
 type AuthedRequest = Request & { identity?: Auth };
@@ -76,7 +76,7 @@ export function createApp(options: { rateGuard?: RateGuard } = {}) {
       demoEnabled: process.env.ENABLE_DEMO === "true",
       saasEnabled: process.env.ENABLE_SAAS === "true",
       googleEnabled: process.env.GOOGLE_AUTH_ENABLED === "true",
-      aiConfigured: !!(process.env.GEMINI_API_KEY && process.env.GEMINI_MODEL),
+      aiConfigured: aiConfigured(),
     }),
   );
   const limit = (scope: Parameters<typeof persistentRateLimit>[0]) =>

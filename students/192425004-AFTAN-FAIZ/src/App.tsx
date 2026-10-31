@@ -1752,6 +1752,9 @@ export default function App() {
                       return (
                         <p key={`${r.type}:${r.shiftId}`}>
                           <strong>
+                            {admin &&
+                              shift &&
+                              `${workspace!.organization_members.find((m) => m.user_id === shift.worker_id)?.display_name || t.workerName} · `}
                             {shift
                               ? `${fmt(shift.starts_at)} — ${time(shift.ends_at)}`
                               : t.shifts}
@@ -1933,6 +1936,15 @@ export default function App() {
           <span>23:00</span>
         </div>
         {previewError && <p role="alert">{previewError}</p>}
+        {!prior && !previewError && (
+          <p className="caption">
+            {language === "ta"
+              ? "முந்தைய பணி பதிவு இல்லை; ஓய்வு இடைவெளியை கணக்கிட முடியாது."
+              : language === "hi"
+                ? "पिछली शिफ्ट का रिकॉर्ड उपलब्ध नहीं है; आराम का अंतराल निर्धारित नहीं किया जा सकता।"
+                : "No earlier shift is recorded; a preceding rest interval cannot be determined."}
+          </p>
+        )}
         {rest && !previewError && (
           <div
             className={`rest-result ${rest.warning ? "rest-warning" : "rest-clear"}`}

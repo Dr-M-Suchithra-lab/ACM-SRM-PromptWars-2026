@@ -40,7 +40,7 @@ it("loads the unbundled Node ESM serverless entry and preserves public/auth boun
     const env = { ...process.env };
     for (const key of Object.keys(env))
       if (
-        /SUPABASE|PASSWORD|SECRET|TOKEN|API_KEY|GEMINI|RESEND|INVITATION/.test(
+        /SUPABASE|PASSWORD|SECRET|TOKEN|API_KEY|GEMINI|RESEND|INVITATION|saathi_api/.test(
           key,
         )
       )

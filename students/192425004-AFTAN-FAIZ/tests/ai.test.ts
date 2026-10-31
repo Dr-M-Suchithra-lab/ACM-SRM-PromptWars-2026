@@ -1,5 +1,5 @@
 import { afterEach, describe, it, expect, vi } from "vitest";
-import { explain } from "../server/ai";
+import { aiConfigured, explain } from "../server/ai";
 
 afterEach(() => {
   vi.useRealTimers();
@@ -7,6 +7,17 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 describe("Saarthi explanations", () => {
+  it("recognizes the existing server-only production key alias without exposing its value", () => {
+    vi.stubEnv("GEMINI_API_KEY", "");
+    vi.stubEnv("saathi_api", "synthetic-private-key");
+    vi.stubEnv("GEMINI_MODEL", "gemini-3.8-flash");
+    expect(aiConfigured()).toBe(true);
+    expect(JSON.stringify({ aiConfigured: aiConfigured() })).not.toContain(
+      "synthetic-private-key",
+    );
+    vi.stubEnv("GEMINI_MODEL", "");
+    expect(aiConfigured()).toBe(false);
+  });
   it("rejects provider-invented numeric pay and retains deterministic record facts", async () => {
     const response = await explain(
       "pay",

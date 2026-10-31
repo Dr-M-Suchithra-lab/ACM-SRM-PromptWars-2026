@@ -1,6 +1,10 @@
 import { GoogleGenAI } from "@google/genai";
 import { aiOutput } from "../shared/contracts.js";
 import { z } from "zod";
+
+// Existing production secret alias; never export the value to the client.
+const apiKey = () => process.env.GEMINI_API_KEY || process.env.saathi_api;
+export const aiConfigured = () => !!(apiKey() && process.env.GEMINI_MODEL);
 import { money } from "../shared/engines.js";
 import type { Topic } from "./assistant.js";
 type Language = "en" | "ta" | "hi";
@@ -245,16 +249,13 @@ export async function explain(
     source: "fallback" as const,
   };
   if (safeFacts.intent === "unsupported") return fallback;
-  if (
-    !generator &&
-    (!process.env.GEMINI_API_KEY || !process.env.GEMINI_MODEL)
-  ) {
+  if (!generator && !aiConfigured()) {
     diagnostic(
       topic,
       language,
-      !process.env.GEMINI_API_KEY && !process.env.GEMINI_MODEL
+      !apiKey() && !process.env.GEMINI_MODEL
         ? "missing_key_and_model"
-        : !process.env.GEMINI_API_KEY
+        : !apiKey()
           ? "missing_key"
           : "missing_model",
     );
@@ -266,7 +267,7 @@ export async function explain(
     const run =
       generator ??
       (async (contents: string) => {
-        const client = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+        const client = new GoogleGenAI({ apiKey: apiKey() });
         const response = await client.models.generateContent({
           model: process.env.GEMINI_MODEL!,
           contents,
@@ -282,7 +283,6 @@ export async function explain(
               required: ["explanation", "nextAction"],
               additionalProperties: false,
             },
-            temperature: 0.2,
           },
         });
         return response.text ?? "";
