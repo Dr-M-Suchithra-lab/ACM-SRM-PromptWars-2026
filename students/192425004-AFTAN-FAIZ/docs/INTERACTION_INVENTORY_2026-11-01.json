@@ -1,0 +1,2096 @@
+{
+  "date": "2026-11-01",
+  "note": "Source inventory; runtime permutations are separately tested.",
+  "counts": {
+    "Link": 25,
+    "select": 17,
+    "button": 17,
+    "Button": 75,
+    "input": 27,
+    "form": 15,
+    "textarea": 7,
+    "a": 4,
+    "Route": 27,
+    "NavLink": 3,
+    "Modal": 3
+  },
+  "records": [
+    {
+      "file": "src/App.tsx",
+      "line": 135,
+      "tag": "Link",
+      "attributes": {
+        "className": "{`brand ${light ? \"brand-light\" : \"\"}`}",
+        "to": "\"/\"",
+        "aria-label": "\"NYAVERIS AI home\""
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 519,
+      "tag": "select",
+      "attributes": {
+        "aria-label": "{t.language}",
+        "value": "{language}",
+        "onChange": "{(e) => setLanguage(e.target.value as Language)}"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 534,
+      "tag": "button",
+      "attributes": {
+        "onClick": "{() => setError(\"\")}",
+        "aria-label": "\"Dismiss error\""
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 603,
+      "tag": "Button",
+      "attributes": {
+        "variant": "\"outline\"",
+        "onClick": "{() => setModal({ type: \"replay\", id: s.id })}"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 615,
+      "tag": "Button",
+      "attributes": {
+        "onClick": "{() => openReview(s)}"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 622,
+      "tag": "Button",
+      "attributes": {
+        "disabled": "{busy}",
+        "onClick": "{() =>\n                void run(() => mutate(\"/shifts/confirm\", { shift_id: s.id }))\n              }"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 671,
+      "tag": "Button",
+      "attributes": {
+        "variant": "\"outline\"",
+        "onClick": "{() => void reload()}",
+        "disabled": "{loading}"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 687,
+      "tag": "Button",
+      "attributes": {
+        "variant": "\"accent\"",
+        "onClick": "{() => navigate(\"/app/\" + (admin ? \"disputes\" : \"pay\"))}"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 847,
+      "tag": "Button",
+      "attributes": {
+        "variant": "\"ghost\"",
+        "onClick": "{() =>\n                      setModal({ type: \"replay\", id: focusShift.id })\n                    }"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 894,
+      "tag": "Button",
+      "attributes": {
+        "variant": "\"outline\"",
+        "onClick": "{() => navigate(\"/app/shifts\")}"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 916,
+      "tag": "button",
+      "attributes": {
+        "onClick": "{() => void ask(\"pay\")}"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 929,
+      "tag": "Link",
+      "attributes": {
+        "to": "\"/app/cases\""
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 961,
+      "tag": "Button",
+      "attributes": {
+        "variant": "\"outline\"",
+        "onClick": "{() => navigate(\"/app/report\")}"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 1023,
+      "tag": "Button",
+      "attributes": {
+        "variant": "\"outline\"",
+        "onClick": "{() => void ask(\"pay\")}"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 1056,
+      "tag": "Button",
+      "attributes": {
+        "onClick": "{() => setModal({ type: \"shift\" })}"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 1067,
+      "tag": "input",
+      "attributes": {
+        "type": "\"search\"",
+        "value": "{shiftSearch}",
+        "onChange": "{(e) => setShiftSearch(e.target.value)}"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 1122,
+      "tag": "Button",
+      "attributes": {
+        "variant": "\"ghost\"",
+        "onClick": "{() =>\n                              setModal({ type: \"replay\", id: s.id })\n                            }"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 1137,
+      "tag": "Button",
+      "attributes": {
+        "variant": "\"ghost\"",
+        "disabled": "{busy}",
+        "onClick": "{() => {\n                                  if (\n                                    confirm(\n                                      \"Cancel this unconfirmed shift? Its audit history will be retained.\",\n                                    )\n                                  )\n                         "
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 1159,
+      "tag": "Button",
+      "attributes": {
+        "disabled": "{busy}",
+        "onClick": "{() =>\n                                void run(() =>\n                                  mutate(\"/shifts/confirm\", { shift_id: s.id }),\n                                )\n                              }"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 1175,
+      "tag": "Button",
+      "attributes": {
+        "variant": "\"outline\"",
+        "onClick": "{() =>\n                                  setModal({ type: \"shift\", id: s.id })\n                                }"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 1188,
+      "tag": "Button",
+      "attributes": {
+        "variant": "\"outline\"",
+        "onClick": "{() => void recordPayroll(s)}"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 1223,
+      "tag": "button",
+      "attributes": {
+        "key": "{f}",
+        "className": "{filter === f ? \"active\" : \"\"}",
+        "onClick": "{() => setFilter(f)}"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 1273,
+      "tag": "Button",
+      "attributes": {
+        "variant": "\"outline\"",
+        "onClick": "{() =>\n                        setModal({ type: \"replay\", id: d.shift_id })\n                      }"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 1283,
+      "tag": "Button",
+      "attributes": {
+        "onClick": "{() => setModal({ type: \"resolve\", id: d.id })}"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 1291,
+      "tag": "Button",
+      "attributes": {
+        "variant": "\"outline\"",
+        "onClick": "{() => setModal({ type: \"clarify\", id: d.id })}"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 1303,
+      "tag": "Button",
+      "attributes": {
+        "disabled": "{busy}",
+        "onClick": "{() =>\n                          void run(() =>\n                            mutate(\"/reviews/confirm\", { dispute_id: d.id }),\n                          )\n                        }"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 1366,
+      "tag": "button",
+      "attributes": {
+        "className": "{tab === \"submit\" ? \"active\" : \"\"}",
+        "onClick": "{() => setTab(\"submit\")}"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 1373,
+      "tag": "button",
+      "attributes": {
+        "className": "{tab === \"track\" ? \"active\" : \"\"}",
+        "onClick": "{() => setTab(\"track\")}"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 1396,
+      "tag": "Button",
+      "attributes": {
+        "onClick": "{() =>\n                        void run(async () => {\n                          await navigator.clipboard.writeText(\n                            `${credentials.reference}\\n${credentials.token}`,\n                          );\n                        }, t.copied)\n                      }"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 1407,
+      "tag": "Button",
+      "attributes": {
+        "variant": "\"outline\"",
+        "onClick": "{() => {\n                        setTab(\"track\");\n                      }}"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 1419,
+      "tag": "form",
+      "attributes": {
+        "onSubmit": "{(e) => void submit(e)}",
+        "className": "\"form-stack\""
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 1421,
+      "tag": "select",
+      "attributes": {
+        "name": "\"organization_id\"",
+        "defaultValue": "{org?.id}"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 1442,
+      "tag": "select",
+      "attributes": {
+        "name": "\"category\""
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 1460,
+      "tag": "select",
+      "attributes": {
+        "name": "\"priority\""
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 1479,
+      "tag": "textarea",
+      "attributes": {
+        "name": "\"description\"",
+        "minLength": "{20}",
+        "maxLength": "{4000}",
+        "rows": "{5}",
+        "placeholder": "{\n                        language === \"en\"\n                          ? \"Describe the concern and where action is needed. Avoid identifying yourself.\"\n                          : t.description\n                      }"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 1496,
+      "tag": "Button",
+      "attributes": {
+        "disabled": "{busy}",
+        "type": "\"submit\""
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 1505,
+      "tag": "form",
+      "attributes": {
+        "className": "\"form-stack\"",
+        "onSubmit": "{(e) => void track(e)}"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 1507,
+      "tag": "input",
+      "attributes": {
+        "name": "\"reference\"",
+        "defaultValue": "{credentials?.reference}",
+        "placeholder": "\"FS-0123456789ABCDEF\"",
+        "pattern": "\"FS-[A-F0-9]{16}\"",
+        "autoComplete": "\"off\""
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 1517,
+      "tag": "input",
+      "attributes": {
+        "name": "\"token\"",
+        "defaultValue": "{credentials?.token}",
+        "type": "\"password\"",
+        "pattern": "\"[a-f0-9]{64}\"",
+        "autoComplete": "\"off\""
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 1526,
+      "tag": "Button",
+      "attributes": {
+        "type": "\"submit\"",
+        "disabled": "{busy}"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 1633,
+      "tag": "button",
+      "attributes": {
+        "className": "{filter === f ? \"active\" : \"\"}",
+        "onClick": "{() => setFilter(f)}",
+        "key": "{f}"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 1666,
+      "tag": "Button",
+      "attributes": {
+        "onClick": "{() => setModal({ type: \"safety\", id: r.id })}"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 1769,
+      "tag": "Button",
+      "attributes": {
+        "variant": "\"outline\"",
+        "onClick": "{() => {\n                      setMobile(false);\n                      navigate(\"/app/shifts\");\n                    }}"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 1792,
+      "tag": "select",
+      "attributes": {
+        "aria-label": "{copy.choose}",
+        "value": "{next.id}",
+        "onChange": "{(event) => {\n                    setRestShiftId(event.target.value);\n                    setWhatif(null);\n                  }}"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 1920,
+      "tag": "input",
+      "attributes": {
+        "aria-label": "{t.whatif}",
+        "type": "\"range\"",
+        "min": "{0}",
+        "max": "{23}",
+        "step": "{1}",
+        "value": "{hour}",
+        "onChange": "{(e) => setHour(Number(e.target.value))}"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 1978,
+      "tag": "Button",
+      "attributes": {
+        "disabled": "{busy || hour === original || !!previewError}",
+        "onClick": "{() =>\n              void run(\n                () =>\n                  mutate(\"/shifts\", {\n                    id: shift.id,\n                    organization_id: shift.organization_id,\n                    worker_id: shift.worker_id,\n                    starts_at: start,\n                    ends_at: "
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 2079,
+      "tag": "Button",
+      "attributes": {
+        "disabled": "{\n              busy ||\n              workspace!.business_events?.some(\n                (e) => e.event_type === \"workforce_dashboard_reviewed\",\n              )\n            }",
+        "onClick": "{() =>\n              void run(\n                () =>\n                  mutate(\"/businesses/review\", { organization_id: org!.id }),\n                \"Dashboard review recorded.\",\n              )\n            }"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 2201,
+      "tag": "Button",
+      "attributes": {
+        "variant": "\"outline\"",
+        "onClick": "{() => {\n                sessionStorage.removeItem(\"nyaveris-invitation\");\n                void client?.auth.signOut();\n              }}"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 2363,
+      "tag": "form",
+      "attributes": {
+        "className": "\"form-stack\"",
+        "onSubmit": "{(e) => {\n          e.preventDefault();\n          const f = new FormData(e.currentTarget);\n          void run(() =>\n            mutate(\n              modal?.type === \"clarify\" ? \"/reviews/reopen\" : \"/reviews\",\n              modal?.type === \"clarify\"\n                ? {\n                    dispute_id"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 2387,
+      "tag": "textarea",
+      "attributes": {
+        "name": "\"reason\"",
+        "minLength": "{10}",
+        "maxLength": "{1000}",
+        "rows": "{4}",
+        "defaultValue": "{\n              language === \"ta\"\n                ? \"எனது உறுதிப்படுத்திய வேலை நேரத்தின் கூடுதல் நேர ஊதியத்தை மறுஆய்வு செய்யவும்.\"\n                : language === \"hi\"\n                  ? \"कृपया मेरी पुष्टि की गई शिफ्ट के अतिरिक्त समय के वेतन की समीक्षा करें।\"\n                  : \"Please review the o"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 2402,
+      "tag": "Button",
+      "attributes": {
+        "type": "\"submit\"",
+        "disabled": "{busy}"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 2414,
+      "tag": "form",
+      "attributes": {
+        "className": "\"form-stack\"",
+        "onSubmit": "{(e) => {\n          e.preventDefault();\n          const f = new FormData(e.currentTarget);\n          void run(() =>\n            mutate(\"/reviews/resolve\", {\n              dispute_id: modal?.id,\n              corrected_paise: Math.round(Number(f.get(\"amount\")) * 100),\n              explanation: f.get"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 2433,
+      "tag": "input",
+      "attributes": {
+        "name": "\"amount\"",
+        "type": "\"number\"",
+        "min": "\"0\"",
+        "max": "\"1000000\"",
+        "step": "\"0.01\"",
+        "defaultValue": "{(p?.expectedPaise || 0) / 100}"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 2444,
+      "tag": "textarea",
+      "attributes": {
+        "name": "\"note\"",
+        "rows": "{4}",
+        "minLength": "{10}",
+        "maxLength": "{2000}",
+        "placeholder": "\"Explain the correction or why the recorded amount is appropriate.\""
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 2456,
+      "tag": "Button",
+      "attributes": {
+        "type": "\"submit\"",
+        "disabled": "{busy}"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 2468,
+      "tag": "form",
+      "attributes": {
+        "className": "\"form-stack\"",
+        "onSubmit": "{(e) => {\n            e.preventDefault();\n            const f = new FormData(e.currentTarget);\n            void run(() =>\n              mutate(\"/safety/update\", {\n                report_id: modal?.id,\n                status: f.get(\"status\"),\n                note: f.get(\"note\"),\n              }),\n   "
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 2483,
+      "tag": "select",
+      "attributes": {
+        "name": "\"status\""
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 2490,
+      "tag": "textarea",
+      "attributes": {
+        "name": "\"note\"",
+        "minLength": "{10}",
+        "maxLength": "{2000}",
+        "rows": "{4}"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 2498,
+      "tag": "Button",
+      "attributes": {
+        "disabled": "{busy}",
+        "type": "\"submit\""
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 2523,
+      "tag": "form",
+      "attributes": {
+        "className": "\"form-stack\"",
+        "onSubmit": "{(e) => {\n          e.preventDefault();\n          const f = new FormData(e.currentTarget);\n          void run(\n            () =>\n              mutate(\"/shifts\", {\n                id: s?.id || null,\n                organization_id: org!.id,\n                worker_id: f.get(\"worker_id\"),\n             "
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 2554,
+      "tag": "select",
+      "attributes": {
+        "name": "\"worker_id\"",
+        "defaultValue": "{s?.worker_id}"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 2566,
+      "tag": "input",
+      "attributes": {
+        "name": "\"starts_at\"",
+        "type": "\"datetime-local\"",
+        "defaultValue": "{local(s?.starts_at)}"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 2574,
+      "tag": "input",
+      "attributes": {
+        "name": "\"ends_at\"",
+        "type": "\"datetime-local\"",
+        "defaultValue": "{local(s?.ends_at)}"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 2583,
+      "tag": "input",
+      "attributes": {
+        "name": "\"break_minutes\"",
+        "type": "\"number\"",
+        "min": "\"0\"",
+        "max": "\"1440\"",
+        "defaultValue": "{s?.break_minutes ?? 30}"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 2593,
+      "tag": "input",
+      "attributes": {
+        "name": "\"location\"",
+        "minLength": "{2}",
+        "maxLength": "{100}",
+        "defaultValue": "{s?.location || \"\"}"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 2601,
+      "tag": "Button",
+      "attributes": {
+        "disabled": "{busy}",
+        "type": "\"submit\""
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 2623,
+      "tag": "Button",
+      "attributes": {
+        "variant": "\"outline\"",
+        "disabled": "{busy || !client}",
+        "onClick": "{() => void demo(\"worker\")}"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 2630,
+      "tag": "Button",
+      "attributes": {
+        "variant": "\"outline\"",
+        "disabled": "{busy || !client}",
+        "onClick": "{() => void demo(\"admin\")}"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 2649,
+      "tag": "a",
+      "attributes": {
+        "href": "\"#engine\""
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 2650,
+      "tag": "a",
+      "attributes": {
+        "href": "\"#industries\""
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 2654,
+      "tag": "Link",
+      "attributes": {
+        "className": "\"button\"",
+        "to": "\"/signup\""
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 2657,
+      "tag": "Link",
+      "attributes": {
+        "className": "\"button button-outline\"",
+        "to": "\"/login\""
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 2681,
+      "tag": "Button",
+      "attributes": {
+        "disabled": "{busy || !config?.demoEnabled}",
+        "onClick": "{() => void demo(\"worker\")}"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 2688,
+      "tag": "Button",
+      "attributes": {
+        "variant": "\"outline\"",
+        "disabled": "{busy || !config?.demoEnabled}",
+        "onClick": "{() => void demo(\"admin\")}"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 2844,
+      "tag": "Link",
+      "attributes": {
+        "to": "\"/safety\""
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 2868,
+      "tag": "Route",
+      "attributes": {
+        "path": "\"/\"",
+        "element": "{Landing()}"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 2869,
+      "tag": "Route",
+      "attributes": {
+        "path": "\"/signup\"",
+        "element": "{\n            <AuthExperience\n              key=\"signup\"\n              client={client}\n              session={session}\n              googleEnabled={!!config?.googleEnabled}\n            />\n          }"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 2881,
+      "tag": "Route",
+      "attributes": {
+        "key": "{path}",
+        "path": "{\"/\" + path}",
+        "element": "{\n              <AuthExperience\n                key={path}\n                client={client}\n                session={session}\n                googleEnabled={!!config?.googleEnabled}\n              />\n            }"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 2894,
+      "tag": "Route",
+      "attributes": {
+        "path": "\"/auth/callback\"",
+        "element": "{<AuthCallback client={client} />}"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 2898,
+      "tag": "Route",
+      "attributes": {
+        "path": "\"/terms\"",
+        "element": "{<LegalPage />}"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 2899,
+      "tag": "Route",
+      "attributes": {
+        "path": "\"/privacy\"",
+        "element": "{<LegalPage privacy />}"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 2900,
+      "tag": "Route",
+      "attributes": {
+        "path": "\"/onboarding\"",
+        "element": "{\n            <Onboarding\n              api={api}\n              session={session}\n              enabled={!!config?.saasEnabled}\n              hasMembership={!!workspace}\n              onCreated={(id) =>\n                openBusiness(id, \"Your business is ready. Let's add your team.\")\n              }\n"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 2914,
+      "tag": "Route",
+      "attributes": {
+        "path": "\"/invite\"",
+        "element": "{\n            <InvitationExperience\n              pendingInvitations={pendingInvitations}\n              api={api}\n              session={session}\n              onAccepted={(id) =>\n                openBusiness(id, \"Welcome to your workplace.\")\n              }\n            />\n          }"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 2928,
+      "tag": "Route",
+      "attributes": {
+        "path": "\"/login\"",
+        "element": "{session ? <Navigate to=\"/app/home\" replace /> : Login()}"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 2932,
+      "tag": "Route",
+      "attributes": {
+        "path": "\"/safety\"",
+        "element": "{\n            <div className=\"standalone-safety\">\n              <div className=\"standalone-nav\">\n                <Brand />\n                <LanguageSelect />\n              </div>\n              {notifyError}\n              {SafetyPage()}\n            </div>\n          }"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 2945,
+      "tag": "Route",
+      "attributes": {
+        "path": "\"/app/*\"",
+        "element": "{\n            !config || !authReady ? (\n              <div className=\"loading-screen\">{t.loading}</div>\n            ) : !session ? (\n              <Navigate to=\"/login\" replace />\n            ) : needsOnboarding ? (\n              <Navigate\n                to={pendingInvitations.length ? \"/invite\" : "
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 2959,
+      "tag": "a",
+      "attributes": {
+        "className": "\"skip-link\"",
+        "href": "\"#main-content\""
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 2963,
+      "tag": "button",
+      "attributes": {
+        "aria-label": "\"Close navigation\"",
+        "className": "\"nav-backdrop\"",
+        "onClick": "{() => setMobile(false)}"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 2988,
+      "tag": "select",
+      "attributes": {
+        "aria-label": "\"Authorized workspace\"",
+        "value": "{org?.id ?? \"\"}",
+        "onChange": "{(e) => {\n                          setSelectedOrg(e.target.value);\n                          setWorkspace(null);\n                        }}"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 3014,
+      "tag": "NavLink",
+      "attributes": {
+        "className": "\"nav-link\"",
+        "to": "\"/app/employees\"",
+        "onClick": "{() => setMobile(false)}"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 3024,
+      "tag": "NavLink",
+      "attributes": {
+        "className": "\"nav-link\"",
+        "to": "\"/onboarding\""
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 3031,
+      "tag": "NavLink",
+      "attributes": {
+        "key": "{key}",
+        "className": "{({ isActive }) =>\n                            isActive ? \"nav-link active\" : \"nav-link\"\n                          }",
+        "to": "{`/app/${key}`}",
+        "onClick": "{() => setMobile(false)}"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 3085,
+      "tag": "button",
+      "attributes": {
+        "className": "\"sidebar-user\"",
+        "onClick": "{() => navigate(\"/app/profile\")}"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 3111,
+      "tag": "button",
+      "attributes": {
+        "className": "\"mobile-menu\"",
+        "aria-label": "\"Open navigation\"",
+        "onClick": "{() => setMobile(true)}"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 3134,
+      "tag": "button",
+      "attributes": {
+        "className": "\"icon-button\"",
+        "aria-label": "{t.logout}",
+        "onClick": "{() => {\n                          sessionStorage.removeItem(\"nyaveris-invitation\");\n                          void client?.auth.signOut();\n                        }}"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 3152,
+      "tag": "select",
+      "attributes": {
+        "aria-label": "\"Demo industry\"",
+        "value": "{org?.sector_id || \"construction\"}",
+        "disabled": "{busy}",
+        "onChange": "{(e) =>\n                            void demo(\n                              admin ? \"admin\" : \"worker\",\n                              e.target.value as \"construction\" | \"healthcare\",\n                            )\n                          }"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 3166,
+      "tag": "button",
+      "attributes": {
+        "disabled": "{busy}",
+        "onClick": "{() =>\n                            void demo(\n                              admin ? \"worker\" : \"admin\",\n                              org?.sector_id === \"healthcare\"\n                                ? \"healthcare\"\n                                : \"construction\",\n                            )\n       "
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 3194,
+      "tag": "Button",
+      "attributes": {
+        "onClick": "{() => void reload()}"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 3201,
+      "tag": "Route",
+      "attributes": {
+        "path": "\"home\"",
+        "element": "{\n                            admin && !org?.is_demo ? (\n                              <BusinessOverview workspace={workspace} />\n                            ) : (\n                              Home()\n                            )\n                          }"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 3211,
+      "tag": "Route",
+      "attributes": {
+        "path": "\"shifts\"",
+        "element": "{ShiftsPage()}"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 3212,
+      "tag": "Route",
+      "attributes": {
+        "path": "\"pay\"",
+        "element": "{PayPage()}"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 3213,
+      "tag": "Route",
+      "attributes": {
+        "path": "\"payroll\"",
+        "element": "{\n                            admin ? PayPage() : <Navigate to=\"/app/pay\" />\n                          }"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 3219,
+      "tag": "Route",
+      "attributes": {
+        "path": "\"cases\"",
+        "element": "{CasesPage()}"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 3220,
+      "tag": "Route",
+      "attributes": {
+        "path": "\"disputes\"",
+        "element": "{\n                            admin ? CasesPage() : <Navigate to=\"/app/cases\" />\n                          }"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 3226,
+      "tag": "Route",
+      "attributes": {
+        "path": "\"report\"",
+        "element": "{SafetyPage()}"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 3227,
+      "tag": "Route",
+      "attributes": {
+        "path": "\"safety\"",
+        "element": "{admin ? AdminSafety() : SafetyPage()}"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 3231,
+      "tag": "Route",
+      "attributes": {
+        "path": "\"rest\"",
+        "element": "{RestPage()}"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 3232,
+      "tag": "Route",
+      "attributes": {
+        "path": "\"workforce\"",
+        "element": "{\n                            admin ? Workforce() : <Navigate to=\"/app/home\" />\n                          }"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 3238,
+      "tag": "Route",
+      "attributes": {
+        "path": "\"analytics\"",
+        "element": "{\n                            admin ? Insights() : <Navigate to=\"/app/home\" />\n                          }"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 3244,
+      "tag": "Route",
+      "attributes": {
+        "path": "\"profile\"",
+        "element": "{Profile()}"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 3245,
+      "tag": "Route",
+      "attributes": {
+        "path": "\"employees\"",
+        "element": "{\n                            admin && config.saasEnabled && !org?.is_demo ? (\n                              <WorkforceManagement\n                                api={api}\n                                workspace={workspace}\n                                reload={reload}\n                          "
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 3259,
+      "tag": "Route",
+      "attributes": {
+        "path": "\"settings\"",
+        "element": "{\n                            admin && config.saasEnabled && !org?.is_demo ? (\n                              <WorkforceManagement\n                                api={api}\n                                workspace={workspace}\n                                reload={reload}\n                          "
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 3274,
+      "tag": "Route",
+      "attributes": {
+        "path": "\"*\"",
+        "element": "{<Navigate to=\"home\" replace />}"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 3289,
+      "tag": "button",
+      "attributes": {
+        "className": "\"assistant-fab\"",
+        "onClick": "{() => void ask(\"pay\")}"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 3300,
+      "tag": "Route",
+      "attributes": {
+        "path": "\"*\"",
+        "element": "{<Navigate to=\"/\" />}"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 3302,
+      "tag": "Modal",
+      "attributes": {
+        "open": "{!!modal}",
+        "onOpenChange": "{(open) => {\n          if (!open) setModal(null);\n        }}",
+        "title": "{\n          modal?.type === \"replay\"\n            ? t.replay\n            : modal?.type === \"review\" || modal?.type === \"clarify\"\n              ? t.request\n              : modal?.type === \"resolve\"\n                ? t.resolve\n                : modal?.type === \"safety\"\n                  ? t.acknowledge",
+        "description": "{modal?.type === \"replay\" ? t.proofSub : undefined}"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 3337,
+      "tag": "Modal",
+      "attributes": {
+        "open": "{!!payrollShift}",
+        "onOpenChange": "{(open) => {\n          if (!open) setPayrollShift(null);\n        }}",
+        "title": "{t.payroll}"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 3344,
+      "tag": "form",
+      "attributes": {
+        "className": "\"form-stack\"",
+        "onSubmit": "{(e) => {\n            e.preventDefault();\n            const f = new FormData(e.currentTarget);\n            void run(async () => {\n              await mutate(\"/payroll\", {\n                shift_id: payrollShift!.id,\n                gross_paise: Math.round(Number(f.get(\"amount\")) * 100),\n             "
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 3360,
+      "tag": "input",
+      "attributes": {
+        "name": "\"amount\"",
+        "type": "\"number\"",
+        "min": "\"0\"",
+        "max": "\"1000000\"",
+        "step": "\"0.01\""
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 3370,
+      "tag": "textarea",
+      "attributes": {
+        "name": "\"note\"",
+        "minLength": "{10}",
+        "maxLength": "{2000}",
+        "rows": "{3}"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 3378,
+      "tag": "Button",
+      "attributes": {
+        "type": "\"submit\"",
+        "disabled": "{busy}"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 3383,
+      "tag": "Modal",
+      "attributes": {
+        "open": "{assistantOpen}",
+        "onOpenChange": "{(open) => {\n          setAssistantOpen(open);\n          if (!open) {\n            assistantGeneration.current++;\n            setAssistantBusy(false);\n          }\n        }}",
+        "title": "{t.assistant}",
+        "description": "{t.assistSub}"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 3397,
+      "tag": "Button",
+      "attributes": {
+        "variant": "\"outline\"",
+        "disabled": "{assistantBusy}",
+        "key": "{topic}",
+        "onClick": "{() => void ask(topic)}"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 3421,
+      "tag": "Button",
+      "attributes": {
+        "variant": "\"outline\"",
+        "onClick": "{() =>\n                void ask(\n                  lastAssistantRequest.current.topic,\n                  lastAssistantRequest.current.question,\n                )\n              }"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 3441,
+      "tag": "Button",
+      "attributes": {
+        "variant": "\"outline\"",
+        "onClick": "{() => {\n                const paths = {\n                  pay: \"/app/pay\",\n                  rest: \"/app/rest\",\n                  safety: \"/app/report\",\n                  cases: \"/app/cases\",\n                };\n                setAssistantOpen(false);\n                setMobile(false);\n             "
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 3471,
+      "tag": "form",
+      "attributes": {
+        "className": "\"assistant-question\"",
+        "onSubmit": "{(event) => {\n            event.preventDefault();\n            if (assistantQuestion.trim() && !assistantBusy)\n              void ask(assistantTopic, assistantQuestion.trim());\n          }}"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 3483,
+      "tag": "textarea",
+      "attributes": {
+        "value": "{assistantQuestion}",
+        "onChange": "{(event) => setAssistantQuestion(event.target.value)}",
+        "maxLength": "{600}",
+        "rows": "{2}",
+        "placeholder": "{assistanceCopy[language].placeholder}"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 3492,
+      "tag": "Button",
+      "attributes": {
+        "type": "\"submit\"",
+        "disabled": "{assistantBusy || !assistantQuestion.trim()}"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 3498,
+      "tag": "Button",
+      "attributes": {
+        "type": "\"button\"",
+        "variant": "\"outline\"",
+        "onClick": "{() => {\n                assistantGeneration.current++;\n                setAssistant(null);\n                setAssistantHistory([]);\n                setAssistantQuestion(\"\");\n                setAssistantError(\"\");\n                setAssistantBusy(false);\n              }}"
+      }
+    },
+    {
+      "file": "src/App.tsx",
+      "line": 3519,
+      "tag": "button",
+      "attributes": {
+        "aria-label": "\"Dismiss notification\"",
+        "onClick": "{() => setToast(\"\")}"
+      }
+    },
+    {
+      "file": "src/main.tsx",
+      "line": 19,
+      "tag": "button",
+      "attributes": {
+        "onClick": "{() => location.reload()}"
+      }
+    },
+    {
+      "file": "src/components/AuthExperience.tsx",
+      "line": 33,
+      "tag": "input",
+      "attributes": {
+        "name": "{confirm ? \"confirm\" : \"password\"}",
+        "type": "{show ? \"text\" : \"password\"}",
+        "autoComplete": "{confirm ? \"new-password\" : \"current-password\"}",
+        "minLength": "{confirm ? 12 : undefined}",
+        "maxLength": "{128}"
+      }
+    },
+    {
+      "file": "src/components/AuthExperience.tsx",
+      "line": 42,
+      "tag": "button",
+      "attributes": {
+        "type": "\"button\"",
+        "aria-label": "{\n          show ? `Hide ${label.toLowerCase()}` : `Show ${label.toLowerCase()}`\n        }",
+        "aria-pressed": "{show}",
+        "onClick": "{() => setShow(!show)}"
+      }
+    },
+    {
+      "file": "src/components/AuthExperience.tsx",
+      "line": 67,
+      "tag": "Link",
+      "attributes": {
+        "className": "\"brand\"",
+        "to": "\"/\"",
+        "aria-label": "\"NYAVERIS AI home\""
+      }
+    },
+    {
+      "file": "src/components/AuthExperience.tsx",
+      "line": 88,
+      "tag": "Link",
+      "attributes": {
+        "className": "\"auth-mobile-brand\"",
+        "to": "\"/\"",
+        "aria-label": "\"NYAVERIS AI home\""
+      }
+    },
+    {
+      "file": "src/components/AuthExperience.tsx",
+      "line": 185,
+      "tag": "form",
+      "attributes": {
+        "className": "\"form-stack\"",
+        "onSubmit": "{async (e) => {\n              e.preventDefault();\n              if (!client || busy) return;\n              const email = String(new FormData(e.currentTarget).get(\"email\"));\n              setBusy(true);\n              try {\n                await client.auth.resend({\n                  type: \"signup\",\n "
+      }
+    },
+    {
+      "file": "src/components/AuthExperience.tsx",
+      "line": 209,
+      "tag": "input",
+      "attributes": {
+        "name": "\"email\"",
+        "type": "\"email\"",
+        "autoComplete": "\"email\""
+      }
+    },
+    {
+      "file": "src/components/AuthExperience.tsx",
+      "line": 211,
+      "tag": "Button",
+      "attributes": {
+        "disabled": "{busy || !client}"
+      }
+    },
+    {
+      "file": "src/components/AuthExperience.tsx",
+      "line": 215,
+      "tag": "Link",
+      "attributes": {
+        "to": "\"/login\""
+      }
+    },
+    {
+      "file": "src/components/AuthExperience.tsx",
+      "line": 218,
+      "tag": "form",
+      "attributes": {
+        "className": "\"form-stack\"",
+        "onSubmit": "{async (e) => {\n            e.preventDefault();\n            if (!client || busy) return;\n            const f = new FormData(e.currentTarget),\n              email = String(f.get(\"email\") ?? \"\"),\n              password = String(f.get(\"password\") ?? \"\");\n            setError(\"\");\n            setMessage"
+      }
+    },
+    {
+      "file": "src/components/AuthExperience.tsx",
+      "line": 297,
+      "tag": "input",
+      "attributes": {
+        "name": "\"name\"",
+        "autoComplete": "\"name\"",
+        "minLength": "{1}",
+        "maxLength": "{100}"
+      }
+    },
+    {
+      "file": "src/components/AuthExperience.tsx",
+      "line": 308,
+      "tag": "input",
+      "attributes": {
+        "name": "\"email\"",
+        "type": "\"email\"",
+        "autoComplete": "\"email\"",
+        "maxLength": "{254}"
+      }
+    },
+    {
+      "file": "src/components/AuthExperience.tsx",
+      "line": 329,
+      "tag": "input",
+      "attributes": {
+        "type": "\"checkbox\""
+      }
+    },
+    {
+      "file": "src/components/AuthExperience.tsx",
+      "line": 331,
+      "tag": "Link",
+      "attributes": {
+        "to": "\"/terms\""
+      }
+    },
+    {
+      "file": "src/components/AuthExperience.tsx",
+      "line": 332,
+      "tag": "Link",
+      "attributes": {
+        "to": "\"/privacy\""
+      }
+    },
+    {
+      "file": "src/components/AuthExperience.tsx",
+      "line": 339,
+      "tag": "input",
+      "attributes": {
+        "type": "\"checkbox\"",
+        "checked": "{remember}",
+        "onChange": "{(e) => setRemember(e.target.checked)}"
+      }
+    },
+    {
+      "file": "src/components/AuthExperience.tsx",
+      "line": 346,
+      "tag": "Link",
+      "attributes": {
+        "to": "\"/forgot-password\""
+      }
+    },
+    {
+      "file": "src/components/AuthExperience.tsx",
+      "line": 349,
+      "tag": "Button",
+      "attributes": {
+        "disabled": "{busy || !client || (reset && !session)}",
+        "type": "\"submit\""
+      }
+    },
+    {
+      "file": "src/components/AuthExperience.tsx",
+      "line": 375,
+      "tag": "Button",
+      "attributes": {
+        "variant": "\"outline\"",
+        "disabled": "{busy || !client || !googleEnabled}",
+        "onClick": "{() => void google()}"
+      }
+    },
+    {
+      "file": "src/components/AuthExperience.tsx",
+      "line": 390,
+      "tag": "Link",
+      "attributes": {
+        "to": "{signup ? \"/login\" : \"/signup\"}"
+      }
+    },
+    {
+      "file": "src/components/AuthExperience.tsx",
+      "line": 397,
+      "tag": "Button",
+      "attributes": {
+        "variant": "\"outline\"",
+        "onClick": "{() => window.location.reload()}"
+      }
+    },
+    {
+      "file": "src/components/AuthExperience.tsx",
+      "line": 468,
+      "tag": "Link",
+      "attributes": {
+        "to": "\"/login\""
+      }
+    },
+    {
+      "file": "src/components/AuthExperience.tsx",
+      "line": 536,
+      "tag": "Link",
+      "attributes": {
+        "to": "\"/signup\""
+      }
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 27,
+      "tag": "input",
+      "attributes": {
+        "name": "{name}",
+        "type": "{type}",
+        "required": "{required}",
+        "defaultValue": "{initial}",
+        "maxLength": "{type === \"number\" ? undefined : 200}"
+      }
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 49,
+      "tag": "select",
+      "attributes": {
+        "name": "\"industry\"",
+        "defaultValue": "{String(initial.industry ?? \"construction\")}"
+      }
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 112,
+      "tag": "select",
+      "attributes": {
+        "name": "\"currency\""
+      }
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 156,
+      "tag": "Link",
+      "attributes": {
+        "to": "\"/signup\""
+      }
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 157,
+      "tag": "Link",
+      "attributes": {
+        "to": "\"/login\""
+      }
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 163,
+      "tag": "Link",
+      "attributes": {
+        "to": "\"/app/home\""
+      }
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 164,
+      "tag": "Button",
+      "attributes": {
+        "variant": "\"outline\"",
+        "onClick": "{() => setChoice(\"create\")}"
+      }
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 175,
+      "tag": "form",
+      "attributes": {
+        "className": "\"form-stack\"",
+        "onSubmit": "{submit}"
+      }
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 226,
+      "tag": "select",
+      "attributes": {
+        "name": "\"basis\""
+      }
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 264,
+      "tag": "input",
+      "attributes": {
+        "type": "\"checkbox\"",
+        "name": "\"authorized\"",
+        "required": "{step === 3}"
+      }
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 270,
+      "tag": "Button",
+      "attributes": {
+        "type": "\"button\"",
+        "variant": "\"outline\"",
+        "onClick": "{() => setStep(step - 1)}"
+      }
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 279,
+      "tag": "Button",
+      "attributes": {
+        "type": "\"button\"",
+        "onClick": "{(e) => {\n                const form = e.currentTarget.form!;\n                const controls = Array.from(\n                  form.querySelectorAll<HTMLInputElement>(\n                    `fieldset:not([hidden]) input`,\n                  ),\n                );\n                if (controls.every((c) => "
+      }
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 295,
+      "tag": "Button",
+      "attributes": {
+        "disabled": "{busy || !enabled}",
+        "type": "\"submit\""
+      }
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 356,
+      "tag": "Button",
+      "attributes": {
+        "onClick": "{() => setChoice(\"create\")}"
+      }
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 360,
+      "tag": "Link",
+      "attributes": {
+        "className": "\"button button-outline\"",
+        "to": "\"/invite\""
+      }
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 435,
+      "tag": "form",
+      "attributes": {
+        "onSubmit": "{(e) => {\n              e.preventDefault();\n              try {\n                const u = new URL(value(new FormData(e.currentTarget), \"link\"));\n                if (u.origin !== location.origin || u.pathname !== \"/invite\")\n                  throw Error();\n                const t = new URLSearchParam"
+      }
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 454,
+      "tag": "Button",
+      "attributes": {}
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 463,
+      "tag": "Link",
+      "attributes": {
+        "className": "\"button\"",
+        "to": "\"/signup\""
+      }
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 466,
+      "tag": "Link",
+      "attributes": {
+        "to": "\"/login\""
+      }
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 480,
+      "tag": "Button",
+      "attributes": {
+        "disabled": "{busy}",
+        "onClick": "{async () => {\n              setBusy(true);\n              try {\n                const r = await api<{ organization_id: string }>(\n                  \"/invitations/accept\",\n                  { token },\n                );\n                sessionStorage.removeItem(\"nyaveris-invitation\");\n               "
+      }
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 611,
+      "tag": "Button",
+      "attributes": {
+        "variant": "\"outline\"",
+        "onClick": "{() =>\n              void (\n                navigator.clipboard?.writeText(link) ??\n                Promise.reject(new Error(\"Clipboard unavailable\"))\n              ).then(\n                () => setMessage(\"Invitation link copied.\"),\n                () =>\n                  setMessage(\n              "
+      }
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 628,
+      "tag": "input",
+      "attributes": {
+        "aria-label": "\"Private invitation link\"",
+        "value": "{link}"
+      }
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 629,
+      "tag": "Button",
+      "attributes": {
+        "variant": "\"outline\"",
+        "onClick": "{() => setLink(\"\")}"
+      }
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 636,
+      "tag": "Button",
+      "attributes": {
+        "variant": "\"outline\"",
+        "disabled": "{busy}",
+        "onClick": "{() => void run(load)}"
+      }
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 660,
+      "tag": "form",
+      "attributes": {
+        "className": "\"card form-stack\"",
+        "onSubmit": "{(e) => {\n                  e.preventDefault();\n                  const f = new FormData(e.currentTarget);\n                  void run(async () => {\n                    const b = settingsInput.parse({\n                      ...businessFields(f),\n                      size: Number(f.get(\"size\")),\n     "
+      }
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 702,
+      "tag": "Button",
+      "attributes": {
+        "disabled": "{busy}"
+      }
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 718,
+      "tag": "Button",
+      "attributes": {
+        "variant": "\"outline\"",
+        "disabled": "{busy || m.active === false}",
+        "onClick": "{() => {\n                          if (\n                            confirm(\n                              `Change administrator access for ${m.display_name}?`,\n                            )\n                          )\n                            void run(async () => {\n                              "
+      }
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 745,
+      "tag": "a",
+      "attributes": {
+        "className": "\"button button-outline\"",
+        "href": "\"#business-pay-policy\""
+      }
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 779,
+      "tag": "Button",
+      "attributes": {
+        "onClick": "{() => setEditing(null)}"
+      }
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 780,
+      "tag": "Button",
+      "attributes": {
+        "variant": "\"outline\"",
+        "onClick": "{() => {\n                setEditing(null);\n                setMessage(\n                  \"Create the employee profile below, then choose Save and invite. Employees set their own passwords.\",\n                );\n              }}"
+      }
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 794,
+      "tag": "input",
+      "attributes": {
+        "value": "{query}",
+        "onChange": "{(e) => setQuery(e.target.value)}",
+        "type": "\"search\""
+      }
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 801,
+      "tag": "select",
+      "attributes": {
+        "value": "{status}",
+        "onChange": "{(e) => setStatus(e.target.value)}"
+      }
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 808,
+      "tag": "form",
+      "attributes": {
+        "className": "\"card form-stack\"",
+        "key": "{editing?.id ?? \"new\"}",
+        "onSubmit": "{(e) => {\n                e.preventDefault();\n                const f = new FormData(e.currentTarget),\n                  send =\n                    (e.nativeEvent as SubmitEvent).submitter?.getAttribute(\n                      \"value\",\n                    ) === \"invite\";\n                void run(asyn"
+      }
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 902,
+      "tag": "select",
+      "attributes": {
+        "name": "\"pay_basis\"",
+        "defaultValue": "{\n                      editing?.pay_basis ??\n                      workspace.pay_policies[0].basis ??\n                      \"hourly\"\n                    }"
+      }
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 915,
+      "tag": "select",
+      "attributes": {
+        "name": "\"employment_type\"",
+        "defaultValue": "{editing?.employment_type ?? \"full_time\"}"
+      }
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 925,
+      "tag": "select",
+      "attributes": {
+        "name": "\"status\"",
+        "defaultValue": "{editing?.status ?? \"active\"}"
+      }
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 939,
+      "tag": "Button",
+      "attributes": {
+        "disabled": "{busy}",
+        "type": "\"submit\""
+      }
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 943,
+      "tag": "Button",
+      "attributes": {
+        "disabled": "{busy}",
+        "type": "\"submit\"",
+        "value": "\"invite\""
+      }
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 947,
+      "tag": "Button",
+      "attributes": {
+        "type": "\"button\"",
+        "variant": "\"outline\"",
+        "onClick": "{() => setEditing(undefined)}"
+      }
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 988,
+      "tag": "Button",
+      "attributes": {
+        "variant": "\"outline\"",
+        "onClick": "{() => setEditing(e)}"
+      }
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 991,
+      "tag": "Button",
+      "attributes": {
+        "variant": "\"outline\"",
+        "onClick": "{() => setSelected(e)}"
+      }
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 999,
+      "tag": "Button",
+      "attributes": {
+        "disabled": "{busy}",
+        "onClick": "{() => void run(() => invite(e.id))}"
+      }
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 1007,
+      "tag": "Button",
+      "attributes": {
+        "variant": "\"outline\"",
+        "onClick": "{() => navigate(\"/app/shifts\")}"
+      }
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 1034,
+      "tag": "Button",
+      "attributes": {
+        "disabled": "{busy}",
+        "variant": "\"outline\"",
+        "onClick": "{() => {\n                        if (\n                          confirm(\n                            \"Resend this invitation? The previous link will stop working.\",\n                          )\n                        )\n                          void run(async () => {\n                            cons"
+      }
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 1058,
+      "tag": "Button",
+      "attributes": {
+        "disabled": "{busy}",
+        "variant": "\"outline\"",
+        "onClick": "{() => {\n                        if (confirm(\"Revoke this invitation?\"))\n                          void run(async () => {\n                            await api(\"/invitations/revoke\", {\n                              organization_id: org.id,\n                              invitation_id: i.id,\n         "
+      }
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 1113,
+      "tag": "Link",
+      "attributes": {
+        "to": "\"/app/disputes\""
+      }
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 1123,
+      "tag": "Button",
+      "attributes": {
+        "variant": "\"outline\"",
+        "onClick": "{() => setSelected(null)}"
+      }
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 1195,
+      "tag": "Link",
+      "attributes": {
+        "to": "\"/app/settings#business-pay-policy\""
+      }
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 1203,
+      "tag": "Link",
+      "attributes": {
+        "to": "\"/app/employees\""
+      }
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 1207,
+      "tag": "Link",
+      "attributes": {
+        "to": "\"/app/shifts\""
+      }
+    },
+    {
+      "file": "src/components/BusinessExperience.tsx",
+      "line": 1215,
+      "tag": "Link",
+      "attributes": {
+        "to": "\"/app/analytics\""
+      }
+    },
+    {
+      "file": "src/components/PolicyEditor.tsx",
+      "line": 38,
+      "tag": "form",
+      "attributes": {
+        "className": "\"form-stack\"",
+        "onSubmit": "{submit}"
+      }
+    },
+    {
+      "file": "src/components/PolicyEditor.tsx",
+      "line": 55,
+      "tag": "select",
+      "attributes": {
+        "aria-label": "\"Pay basis\"",
+        "value": "{basis}",
+        "onChange": "{(e) => setBasis(e.target.value as \"hourly\" | \"daily\")}"
+      }
+    },
+    {
+      "file": "src/components/PolicyEditor.tsx",
+      "line": 67,
+      "tag": "input",
+      "attributes": {
+        "aria-label": "\"Hourly rate (₹)\"",
+        "name": "\"hourly\"",
+        "type": "\"number\"",
+        "step": "\"0.01\"",
+        "min": "\"0.01\"",
+        "max": "\"100000\"",
+        "defaultValue": "{policy.hourly_paise / 100}"
+      }
+    },
+    {
+      "file": "src/components/PolicyEditor.tsx",
+      "line": 80,
+      "tag": "input",
+      "attributes": {
+        "aria-label": "\"Daily rate (₹)\"",
+        "name": "\"daily\"",
+        "type": "\"number\"",
+        "step": "\"0.01\"",
+        "min": "\"0.01\"",
+        "max": "\"1000000\"",
+        "defaultValue": "{(policy.daily_paise || 80000) / 100}"
+      }
+    },
+    {
+      "file": "src/components/PolicyEditor.tsx",
+      "line": 95,
+      "tag": "input",
+      "attributes": {
+        "aria-label": "\"Regular hours\"",
+        "name": "\"threshold\"",
+        "type": "\"number\"",
+        "step": "\"0.5\"",
+        "min": "\"0.5\"",
+        "max": "\"24\"",
+        "defaultValue": "{policy.regular_minutes / 60}"
+      }
+    },
+    {
+      "file": "src/components/PolicyEditor.tsx",
+      "line": 108,
+      "tag": "input",
+      "attributes": {
+        "aria-label": "\"Overtime multiplier\"",
+        "name": "\"multiplier\"",
+        "type": "\"number\"",
+        "step": "\"0.05\"",
+        "min": "\"1\"",
+        "max": "\"5\"",
+        "defaultValue": "{policy.overtime_bps / 10000}"
+      }
+    },
+    {
+      "file": "src/components/PolicyEditor.tsx",
+      "line": 123,
+      "tag": "input",
+      "attributes": {
+        "aria-label": "\"Minimum rest (hours)\"",
+        "name": "\"rest\"",
+        "type": "\"number\"",
+        "step": "\"0.5\"",
+        "min": "\"0\"",
+        "max": "\"48\"",
+        "defaultValue": "{policy.min_rest_minutes / 60}"
+      }
+    },
+    {
+      "file": "src/components/PolicyEditor.tsx",
+      "line": 136,
+      "tag": "input",
+      "attributes": {
+        "aria-label": "\"Maximum shift (hours)\"",
+        "name": "\"maximum\"",
+        "type": "\"number\"",
+        "step": "\"0.5\"",
+        "min": "\"1\"",
+        "max": "\"24\"",
+        "defaultValue": "{policy.max_shift_minutes / 60}"
+      }
+    },
+    {
+      "file": "src/components/PolicyEditor.tsx",
+      "line": 150,
+      "tag": "input",
+      "attributes": {
+        "aria-label": "\"Maximum consecutive days\"",
+        "name": "\"days\"",
+        "type": "\"number\"",
+        "min": "\"1\"",
+        "max": "\"30\"",
+        "defaultValue": "{policy.max_consecutive_days}"
+      }
+    },
+    {
+      "file": "src/components/PolicyEditor.tsx",
+      "line": 164,
+      "tag": "textarea",
+      "attributes": {
+        "name": "\"note\"",
+        "aria-label": "\"Reason for policy change\"",
+        "minLength": "{10}",
+        "maxLength": "{2000}",
+        "rows": "{3}"
+      }
+    },
+    {
+      "file": "src/components/PolicyEditor.tsx",
+      "line": 173,
+      "tag": "Button",
+      "attributes": {
+        "type": "\"submit\"",
+        "disabled": "{busy}"
+      }
+    },
+    {
+      "file": "src/components/ReadAloud.tsx",
+      "line": 167,
+      "tag": "Button",
+      "attributes": {
+        "variant": "\"outline\"",
+        "onClick": "{playing ? stop : play}"
+      }
+    },
+    {
+      "file": "src/components/ShiftCalendar.tsx",
+      "line": 42,
+      "tag": "Button",
+      "attributes": {
+        "variant": "\"outline\"",
+        "aria-label": "\"Previous month\"",
+        "onClick": "{() => change(-1)}"
+      }
+    },
+    {
+      "file": "src/components/ShiftCalendar.tsx",
+      "line": 49,
+      "tag": "Button",
+      "attributes": {
+        "variant": "\"outline\"",
+        "aria-label": "\"Next month\"",
+        "onClick": "{() => change(1)}"
+      }
+    },
+    {
+      "file": "src/components/ShiftCalendar.tsx",
+      "line": 73,
+      "tag": "button",
+      "attributes": {
+        "key": "{day}",
+        "type": "\"button\"",
+        "className": "{count ? \"has-shifts\" : \"\"}",
+        "aria-label": "{`${day}, ${count} shifts`}",
+        "onClick": "{() => onSelect(day)}"
+      }
+    },
+    {
+      "file": "src/components/ui/button.tsx",
+      "line": 22,
+      "tag": "button",
+      "attributes": {
+        "className": "{twMerge(clsx(styles({ variant }), className))}"
+      }
+    }
+  ]
+}

@@ -4,8 +4,98 @@ import { explain } from "../server/ai";
 afterEach(() => {
   vi.useRealTimers();
   vi.unstubAllEnvs();
+  vi.restoreAllMocks();
 });
 describe("Saarthi explanations", () => {
+  it("rejects provider-invented numeric pay and retains deterministic record facts", async () => {
+    const response = await explain(
+      "pay",
+      "en",
+      {
+        intent: "overview",
+        shifts: [
+          {
+            date: "2026-10-26T08:00:00+05:30",
+            confirmed: true,
+            payableMinutes: 600,
+            overtimeMinutes: 120,
+            expectedPaise: 110000,
+            recordedPaise: 95000,
+            discrepancyPaise: 15000,
+          },
+        ],
+      },
+      async () =>
+        JSON.stringify({
+          explanation: "You are owed ₹999999.",
+          nextAction: "Pay it.",
+        }),
+    );
+    expect(response.source).toBe("fallback");
+    expect(response.explanation).toContain("₹150");
+    expect(response.explanation).not.toContain("999999");
+  });
+  it("projects facts and never forwards raw questions, identifiers or tracking secrets", async () => {
+    const generator = vi.fn(async (_prompt: string) =>
+      JSON.stringify({
+        explanation: "Review the recorded amounts.",
+        nextAction: "Open pay.",
+      }),
+    );
+    await explain(
+      "pay",
+      "en",
+      {
+        intent: "overview",
+        user_id: "private-user",
+        question: "private-question",
+        token: "private-tracking-token",
+        description: "private report",
+      },
+      generator,
+    );
+    const prompt = generator.mock.calls[0]?.[0];
+    // The injection function is typed by explain's provider boundary.
+    expect(String(prompt)).not.toMatch(
+      /private-user|private-question|private-tracking-token|private report/,
+    );
+  });
+  it("includes verified numbers in fallback instead of pretending missing payroll is zero", async () => {
+    vi.stubEnv("GEMINI_API_KEY", "");
+    const response = await explain("pay", "en", {
+      intent: "overtime",
+      timezone: "Asia/Kolkata",
+      shifts: [
+        {
+          date: "2026-10-26T08:00:00+05:30",
+          confirmed: true,
+          payableMinutes: 600,
+          overtimeMinutes: 120,
+          expectedPaise: 110000,
+          recordedPaise: null,
+          discrepancyPaise: null,
+        },
+      ],
+    });
+    expect(response.explanation).toContain("₹1,100");
+    expect(response.explanation).toContain("Overtime hours 2");
+    expect(response.explanation).toContain("No payroll entry recorded");
+    expect(response.explanation).not.toContain("Potential difference");
+  });
+  it("logs only sanitized provider failure categories", async () => {
+    const log = vi.spyOn(console, "warn").mockImplementation(() => {});
+    await explain("pay", "en", {}, async () => {
+      throw Object.assign(new Error("secret provider response"), {
+        status: 429,
+      });
+    });
+    expect(log).toHaveBeenCalledWith(
+      expect.stringContaining('"reason":"quota_or_rate_limit"'),
+    );
+    expect(JSON.stringify(log.mock.calls)).not.toContain(
+      "secret provider response",
+    );
+  });
   it.each(["en", "ta", "hi"] as const)(
     "provides a text fallback in %s",
     async (language) => {

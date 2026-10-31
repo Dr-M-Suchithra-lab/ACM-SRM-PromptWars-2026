@@ -376,6 +376,127 @@ describe("authenticated API orchestration (isolated adapter)", () => {
     expect(db.eq).toHaveBeenCalledWith("shifts", "id", shift);
     expect(response.text).not.toContain(db.user);
   });
+  it("denies a foreign assistant organization before reading records", async () => {
+    const response = await authenticated("/assistant").send({
+      topic: "pay",
+      language: "en",
+      organization_id: otherOrg,
+      question: "Explain my pay",
+    });
+    expect(response.status).toBe(403);
+    expect(
+      db.eq.mock.calls.filter(([table]) => table !== "organization_members"),
+    ).toEqual([]);
+  });
+  it("does not let a worker use a known other-worker shift identifier", async () => {
+    db.tables.shifts[0].worker_id = "20000000-0000-4000-8000-000000000099";
+    const response = await authenticated("/assistant").send({
+      topic: "pay",
+      language: "en",
+      shift_id: shift,
+    });
+    expect(response.status).toBe(403);
+  });
+  it("provides private case status counts without exposing reasons, people or other workers", async () => {
+    vi.stubEnv("GEMINI_API_KEY", "");
+    db.tables.pay_disputes = [
+      {
+        organization_id: org,
+        worker_id: db.user,
+        status: "responded",
+        reason: "private reason",
+      },
+      {
+        organization_id: org,
+        worker_id: "another-person",
+        status: "requested",
+        reason: "another private reason",
+      },
+    ];
+    const response = await authenticated("/assistant").send({
+      topic: "pay",
+      language: "en",
+      question: "What happened to my payroll dispute?",
+    });
+    expect(response.status).toBe(200);
+    expect(response.body.topic).toBe("cases");
+    expect(response.body.actionPath).toBe("/app/cases");
+    expect(response.body.explanation).toContain(
+      "Awaiting your confirmation: 1",
+    );
+    expect(response.body.explanation).toContain(
+      "Awaiting employer response: 0",
+    );
+    expect(response.text).not.toMatch(/private reason|another-person/);
+  });
+  it("returns actionable safety instructions without reading anonymous report contents", async () => {
+    const response = await authenticated("/assistant").send({
+      topic: "safety",
+      language: "en",
+      question: "How do I report an unsafe workplace?",
+    });
+    expect(response.status).toBe(200);
+    expect(response.body.actionPath).toBe("/app/report");
+    expect(response.body.nextAction).toBe("Submit safety concern");
+    expect(
+      db.eq.mock.calls.filter(([table]) => table === "safety_reports"),
+    ).toEqual([]);
+  });
+  it("gives a protected administrator organization-wide rest context without leaking worker identities", async () => {
+    vi.stubEnv("GEMINI_API_KEY", "");
+    vi.stubEnv("ENABLE_SAAS", "false");
+    db.tables.organization_members[0].role = "admin";
+    db.tables.shifts.push({
+      ...db.tables.shifts[0],
+      id: "30000000-0000-4000-8000-000000000099",
+      worker_id: "another-private-worker",
+      starts_at: "2026-10-26T09:00:00+05:30",
+      ends_at: "2026-10-26T10:00:00+05:30",
+      break_minutes: 0,
+    });
+    db.tables.shifts.push({
+      ...db.tables.shifts[0],
+      id: "foreign-shift",
+      organization_id: otherOrg,
+    });
+    const response = await authenticated("/assistant").send({
+      topic: "rest",
+      language: "en",
+    });
+    expect(response.status).toBe(200);
+    expect(response.body.explanation).toContain("Workplace scheduling signals");
+    // Different workers are never compared, even in the administrator view.
+    expect(response.body.explanation).toContain("Overlapping shifts: 0");
+    expect(response.text).not.toMatch(/another-private-worker|foreign-shift/);
+    expect(
+      db.eq.mock.calls.filter(
+        ([table, field]) => table === "shifts" && field === "worker_id",
+      ),
+    ).toEqual([]);
+  });
+  it("does not describe future scheduled overtime as hours already worked", async () => {
+    vi.stubEnv("GEMINI_API_KEY", "");
+    db.tables.shifts.push({
+      ...db.tables.shifts[0],
+      id: "30000000-0000-4000-8000-000000000098",
+      starts_at: "2999-02-02T08:00:00+05:30",
+      ends_at: "2999-02-02T20:00:00+05:30",
+      confirmed: false,
+    });
+    for (const question of [
+      "How much overtime did I work?",
+      "Explain my last five shifts.",
+    ]) {
+      const response = await authenticated("/assistant").send({
+        topic: "pay",
+        language: "en",
+        question,
+      });
+      expect(response.status).toBe(200);
+      expect(response.body.explanation).not.toContain("2999");
+      expect(response.body.explanation).toContain("Shifts considered: 1");
+    }
+  });
   it("verifies bearer identity and protected membership rather than metadata roles", async () => {
     const response = await request(app)
       .get("/api/workspace")

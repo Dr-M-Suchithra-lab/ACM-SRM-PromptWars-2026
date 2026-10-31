@@ -50,6 +50,8 @@ export const assistantInput = z
     topic: z.enum(["pay", "safety", "rest", "cases"]),
     language: z.enum(["en", "ta", "hi"]),
     shift_id: uuid.optional(),
+    organization_id: uuid.optional(),
+    question: z.string().trim().min(1).max(600).optional(),
   })
   .strict();
 export const aiOutput = z

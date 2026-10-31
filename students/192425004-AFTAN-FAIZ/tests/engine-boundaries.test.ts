@@ -145,8 +145,47 @@ describe("financial and scheduling boundaries", () => {
     expect(risks).toContainEqual({
       type: "short_rest",
       shiftId: "next",
+      minutes: 600,
+      requiredMinutes: 660,
       detail: "10h rest; configured minimum 11h",
     });
+  });
+  it("labels overlap separately and measures the actual shared interval", () => {
+    const risks = schedulingRisks(
+      [
+        {
+          ...shift,
+          id: "long",
+          worker_id: "A",
+          ends_at: "2026-10-26T20:00:00+05:30",
+        },
+        {
+          ...shift,
+          id: "short",
+          worker_id: "A",
+          starts_at: "2026-10-26T09:00:00+05:30",
+          ends_at: "2026-10-26T10:00:00+05:30",
+          break_minutes: 0,
+        },
+      ],
+      policy,
+    );
+    expect(risks).toContainEqual({
+      type: "overlap",
+      shiftId: "short",
+      minutes: 60,
+      requiredMinutes: 660,
+      detail:
+        "1h overlapping shifts; resolve the conflict before assessing a rest window",
+    });
+    expect(risks.some((r) => r.type === "short_rest")).toBe(false);
+    expect(risks.some((r) => /-\d.*h rest/.test(r.detail))).toBe(false);
+  });
+  it("does not turn duplicate references to one shift into repeated overtime or overlap", () => {
+    const same = { ...shift, id: "same", worker_id: "A" };
+    expect(schedulingRisks([same, same, same], policy)).toEqual(
+      schedulingRisks([same], policy),
+    );
   });
   it.each([NaN, -1, 1.5])("rejects invalid minimum rest %s", (minimum) => {
     expect(() => restWindow(shift.starts_at, shift.ends_at, minimum)).toThrow(

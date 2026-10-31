@@ -1,4 +1,10 @@
 import { readRecords } from "./records.js";
+import {
+  assistantFacts,
+  assistantActions,
+  questionIntent,
+  AssistantAccessError,
+} from "./assistant.js";
 import { registerSaas, type Identity } from "./saas.js";
 import express, {
   type Request,
@@ -425,54 +431,33 @@ export function createApp(options: { rateGuard?: RateGuard } = {}) {
   });
   app.post("/api/assistant", limit("assistant"), async (req, res) => {
     const b = assistantInput.parse(req.body);
-    let context: object = {};
-    if (b.shift_id) {
-      const c = identity(req).client;
-      const s = await c
-        .from("shifts")
-        .select("*")
-        .eq("id", b.shift_id)
-        .single();
-      if (s.error)
-        return res.status(403).json({ error: "Shift access denied" });
-      const p = await c
-        .from("pay_policies")
-        .select("*")
-        .eq("organization_id", s.data.organization_id)
-        .single();
-      const payroll = await c
-        .from("payroll_entries")
-        .select("gross_paise")
-        .eq("shift_id", b.shift_id)
-        .maybeSingle();
-      if (p.error || !p.data || payroll.error)
-        throw new Error("Unable to load pay explanation");
-      let explanationPolicy = p.data;
-      if (process.env.ENABLE_SAAS === "true") {
-        const employee = await c
-          .from("employee_profiles")
-          .select("pay_basis,rate_paise")
-          .eq("organization_id", s.data.organization_id)
-          .eq("user_id", s.data.worker_id)
-          .maybeSingle();
-        if (employee.error)
-          throw new Error("Unable to load employee pay policy");
-        if (employee.data)
-          explanationPolicy = {
-            ...p.data,
-            basis: employee.data.pay_basis,
-            ...(employee.data.pay_basis === "daily"
-              ? { daily_paise: employee.data.rate_paise }
-              : { hourly_paise: employee.data.rate_paise }),
-          };
-      }
-      context = calculatePay(
-        s.data,
-        policyInput.parse(explanationPolicy),
-        payroll.data?.gross_paise ?? 0,
+    const i = identity(req);
+    const org = b.organization_id || i.memberships[0].organization_id;
+    if (!i.memberships.some((m) => m.organization_id === org))
+      return res.status(403).json({ error: "Organization access denied" });
+    const selected = questionIntent(b.topic, b.question);
+    try {
+      const facts = await assistantFacts(
+        i,
+        selected.topic,
+        selected.intent,
+        org,
+        selected.intent === "recent_shifts" ? undefined : b.shift_id,
       );
+      const answer = await explain(selected.topic, b.language, facts);
+      const action = assistantActions[selected.topic];
+      res.json({
+        ...answer,
+        topic: selected.topic,
+        intent: selected.intent,
+        nextAction: action[b.language],
+        actionPath: action.path,
+      });
+    } catch (error) {
+      if (error instanceof AssistantAccessError)
+        return res.status(403).json({ error: "Shift access denied" });
+      throw error;
     }
-    res.json(await explain(b.topic, b.language, context));
   });
   app.use((err: unknown, _req: Request, res: Response, _next: NextFunction) => {
     if (err instanceof z.ZodError)

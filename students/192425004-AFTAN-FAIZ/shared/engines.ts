@@ -111,10 +111,32 @@ export function restWindow(
 }
 export function schedulingRisks(shifts: Shift[], policy: Policy) {
   policyInput.parse(policy);
-  const ordered = [...shifts].sort(
-    (a, b) => Date.parse(a.starts_at) - Date.parse(b.starts_at),
-  );
-  const risks: { type: string; shiftId?: string; detail: string }[] = [];
+  // A repeated reference to the same persisted shift is not a second shift.
+  const seen = new Set<string>();
+  const ordered = shifts
+    .filter((s) => {
+      if (!s.id) return true;
+      const key = `${s.worker_id ?? ""}:${s.id}`;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    })
+    .sort(
+      (a, b) =>
+        Date.parse(a.starts_at) - Date.parse(b.starts_at) ||
+        ((a.id ?? "") < (b.id ?? "")
+          ? -1
+          : (a.id ?? "") > (b.id ?? "")
+            ? 1
+            : 0),
+    );
+  const risks: {
+    type: string;
+    shiftId?: string;
+    detail: string;
+    minutes?: number;
+    requiredMinutes?: number;
+  }[] = [];
   const day = (s: Shift) =>
     new Intl.DateTimeFormat("en-CA", {
       timeZone: policy.timezone,
@@ -141,10 +163,23 @@ export function schedulingRisks(shifts: Shift[], policy: Policy) {
       .sort((a, b) => Date.parse(b.ends_at) - Date.parse(a.ends_at))[0];
     if (prior) {
       const r = restWindow(prior.ends_at, s.starts_at, policy.min_rest_minutes);
-      if (r.warning)
+      if (r.overlapping)
+        risks.push({
+          type: "overlap",
+          shiftId: s.id,
+          minutes:
+            (Math.min(Date.parse(prior.ends_at), Date.parse(s.ends_at)) -
+              Date.parse(s.starts_at)) /
+            60000,
+          requiredMinutes: policy.min_rest_minutes,
+          detail: `${(Math.min(Date.parse(prior.ends_at), Date.parse(s.ends_at)) - Date.parse(s.starts_at)) / 3600000}h overlapping shifts; resolve the conflict before assessing a rest window`,
+        });
+      else if (r.warning)
         risks.push({
           type: "short_rest",
           shiftId: s.id,
+          minutes: r.minutes,
+          requiredMinutes: r.requiredMinutes,
           detail: `${r.minutes / 60}h rest; configured minimum ${r.requiredMinutes / 60}h`,
         });
     }

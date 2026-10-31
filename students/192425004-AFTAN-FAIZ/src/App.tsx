@@ -1,5 +1,6 @@
 import { ShiftCalendar } from "./components/ShiftCalendar";
 import { ReadAloud } from "./components/ReadAloud";
+import { assistanceCopy, riskLabels } from "./lib/assistance";
 import { zonedDateTimeToIso } from "../shared/timezone";
 import {
   AuthExperience,
@@ -224,14 +225,41 @@ export default function App() {
       explanation: string;
       nextAction: string;
       source: string;
+      topic?: "pay" | "rest" | "safety" | "cases";
+      actionPath?: string;
     } | null>(null);
   const [assistantOpen, setAssistantOpen] = useState(false);
+  const [assistantQuestion, setAssistantQuestion] = useState("");
+  const [assistantTopic, setAssistantTopic] = useState<
+    "pay" | "rest" | "safety" | "cases"
+  >("pay");
+  const [assistantAsked, setAssistantAsked] = useState("");
+  const [assistantHistory, setAssistantHistory] = useState<
+    { question: string; answer: string }[]
+  >([]);
+  const [assistantBusy, setAssistantBusy] = useState(false);
+  const [assistantError, setAssistantError] = useState("");
+  const [restShiftId, setRestShiftId] = useState("");
+  const assistantGeneration = useRef(0);
+  const lastAssistantRequest = useRef<{
+    topic: "pay" | "rest" | "safety" | "cases";
+    question?: string;
+  }>({ topic: "pay" });
   const navigate = useNavigate();
   const loadGeneration = useRef(0);
   const currentUser = useRef(session?.user.id);
   currentUser.current = session?.user.id;
   const currentSession = useRef(session);
   currentSession.current = session;
+  useEffect(() => {
+    assistantGeneration.current++;
+    setAssistant(null);
+    setAssistantHistory([]);
+    setAssistantQuestion("");
+    setAssistantError("");
+    setAssistantBusy(false);
+    setRestShiftId("");
+  }, [session?.user.id, selectedOrg, language]);
   useEffect(() => {
     // A shared browser must not carry anonymous tracking secrets across identities.
     setCredentials(null);
@@ -407,22 +435,46 @@ export default function App() {
     setModal(null);
     await reload();
   }
-  async function ask(topic: "pay" | "rest" | "safety" | "cases" = "pay") {
+  async function ask(
+    topic: "pay" | "rest" | "safety" | "cases" = "pay",
+    question?: string,
+  ) {
+    const generation = ++assistantGeneration.current;
+    lastAssistantRequest.current = { topic, question };
     setAssistantOpen(true);
+    setAssistantTopic(topic);
+    setAssistantBusy(true);
+    setAssistantError("");
+    if (assistant)
+      setAssistantHistory((old) =>
+        [
+          ...old,
+          { question: assistantAsked, answer: assistant.explanation },
+        ].slice(-6),
+      );
     setAssistant(null);
-    await run(
-      async () =>
-        setAssistant(
-          await api<NonNullable<typeof assistant>>("/assistant", {
-            topic,
-            language,
-            ...(topic === "pay" && focusShift
-              ? { shift_id: focusShift.id }
-              : {}),
-          }),
-        ),
-      t.assistSub,
-    );
+    setAssistantAsked(question || t[topic === "safety" ? "report" : topic]);
+    try {
+      const answer = await api<NonNullable<typeof assistant>>("/assistant", {
+        topic,
+        language,
+        ...(selectedOrg ? { organization_id: selectedOrg } : {}),
+        ...(question ? { question } : {}),
+        ...(topic === "pay" && !question && focusShift
+          ? { shift_id: focusShift.id }
+          : {}),
+      });
+      if (generation === assistantGeneration.current) {
+        setAssistant(answer);
+        setAssistantTopic(answer.topic || topic);
+        setAssistantQuestion("");
+      }
+    } catch {
+      if (generation === assistantGeneration.current)
+        setAssistantError(assistanceCopy[language].unavailable);
+    } finally {
+      if (generation === assistantGeneration.current) setAssistantBusy(false);
+    }
   }
   const org = workspace?.organizations[0],
     admin = workspace?.member.role === "admin";
@@ -1630,7 +1682,23 @@ export default function App() {
   function RestPage() {
     const shifts = workspace?.shifts || [];
     const policy = workspace!.pay_policies[0];
-    const next = shifts.find((s) => !s.confirmed) || shifts.at(-1);
+    const copy = assistanceCopy[language];
+    const ordered = [...shifts].sort(
+      (a, b) => Date.parse(a.starts_at) - Date.parse(b.starts_at),
+    );
+    const next =
+      shifts.find((s) => s.id === restShiftId) ||
+      ordered.find(
+        (s) => !s.confirmed && Date.parse(s.starts_at) >= Date.now(),
+      ) ||
+      ordered.find((s) => !s.confirmed) ||
+      ordered.at(-1);
+    const grouped = new Map<string, Workspace["risks"]>();
+    for (const risk of workspace!.risks) {
+      const worker = shifts.find((s) => s.id === risk.shiftId)?.worker_id || "";
+      const key = `${worker}:${risk.type}`;
+      grouped.set(key, [...(grouped.get(key) || []), risk]);
+    }
     return (
       <>
         <PageTitle title={t.restTitle} subtitle={t.restSub} />
@@ -1662,17 +1730,51 @@ export default function App() {
                 {workspace!.risks.length}
               </Badge>
             </div>
-            {workspace!.risks.map((r, i) => (
-              <div className="risk-item" key={i}>
+            {[...grouped.entries()].map(([key, warnings]) => (
+              <div className="risk-item" key={key}>
                 <span className="warning-symbol">
                   <ShieldAlert size={22} />
                 </span>
                 <div>
-                  <h3>{r.type === "short_rest" ? t.warning : human(r.type)}</h3>
-                  <p>{r.detail}</p>
-                  <small>
-                    {shifts.find((s) => s.id === r.shiftId)?.location}
-                  </small>
+                  <h3>
+                    {riskLabels[language][
+                      warnings[0].type as keyof typeof riskLabels.en
+                    ] || human(warnings[0].type)}
+                  </h3>
+                  <p>
+                    {new Set(warnings.map((r) => r.shiftId)).size}{" "}
+                    {copy.affected}
+                  </p>
+                  <details>
+                    <summary>{copy.details}</summary>
+                    {warnings.map((r) => {
+                      const shift = shifts.find((s) => s.id === r.shiftId);
+                      return (
+                        <p key={`${r.type}:${r.shiftId}`}>
+                          <strong>
+                            {shift
+                              ? `${fmt(shift.starts_at)} — ${time(shift.ends_at)}`
+                              : t.shifts}
+                          </strong>
+                          <br />
+                          {r.minutes !== undefined && r.type === "overlap"
+                            ? `${r.minutes / 60}h ${riskLabels[language].overlap.toLowerCase()}`
+                            : r.minutes !== undefined && r.type === "short_rest"
+                              ? `${r.minutes / 60}h ${t.restWindow.toLowerCase()} / ${r.requiredMinutes! / 60}h ${t.minimum.toLowerCase()}`
+                              : r.detail}
+                        </p>
+                      );
+                    })}
+                  </details>
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setMobile(false);
+                      navigate("/app/shifts");
+                    }}
+                  >
+                    {copy.review}
+                  </Button>
                 </div>
               </div>
             ))}
@@ -1684,15 +1786,36 @@ export default function App() {
                 : ""}
             </p>
           </section>
-          {next &&
-            WhatIf({
-              shift: next,
-              policy,
-              editable:
-                !!admin &&
-                !next.confirmed &&
-                !workspace!.payroll_entries.some((p) => p.shift_id === next.id),
-            })}
+          {next && (
+            <div>
+              <Field label={copy.choose}>
+                <select
+                  aria-label={copy.choose}
+                  value={next.id}
+                  onChange={(event) => {
+                    setRestShiftId(event.target.value);
+                    setWhatif(null);
+                  }}
+                >
+                  {ordered.map((s) => (
+                    <option key={s.id} value={s.id}>
+                      {fmt(s.starts_at)} — {time(s.ends_at)}
+                    </option>
+                  ))}
+                </select>
+              </Field>
+              {WhatIf({
+                shift: next,
+                policy,
+                editable:
+                  !!admin &&
+                  !next.confirmed &&
+                  !workspace!.payroll_entries.some(
+                    (p) => p.shift_id === next.id,
+                  ),
+              })}
+            </div>
+          )}
         </div>
       </>
     );
@@ -1751,14 +1874,19 @@ export default function App() {
     } catch (e) {
       previewError = (e as Error).message;
     }
-    const prior = workspace!.shifts
-      .filter(
-        (s) =>
-          s.id !== shift.id &&
-          s.worker_id === shift.worker_id &&
-          Date.parse(s.starts_at) < Date.parse(shift.starts_at),
-      )
-      .sort((a, b) => Date.parse(b.ends_at) - Date.parse(a.ends_at))[0];
+    const others = workspace!.shifts.filter(
+      (s) => s.id !== shift.id && s.worker_id === shift.worker_id,
+    );
+    const conflict = others.find(
+      (s) =>
+        Date.parse(s.starts_at) < Date.parse(end) &&
+        Date.parse(start) < Date.parse(s.ends_at),
+    );
+    const prior =
+      conflict ||
+      others
+        .filter((s) => Date.parse(s.ends_at) <= Date.parse(start))
+        .sort((a, b) => Date.parse(b.ends_at) - Date.parse(a.ends_at))[0];
     const rest = prior
       ? restWindow(prior.ends_at, start, policy.min_rest_minutes)
       : null;
@@ -1768,7 +1896,9 @@ export default function App() {
           <Settings2 size={16} /> PREVENTION, NOT JUST DETECTION
         </div>
         <h2>{t.whatif}</h2>
-        <p>{shift.location}</p>
+        <p>
+          {fmt(shift.starts_at)} — {time(shift.ends_at)}
+        </p>
         {prior && (
           <div className="schedule-window">
             <div>
@@ -1815,11 +1945,29 @@ export default function App() {
               )}
             </span>
             <div>
-              <b>{rest.warning ? t.warning : t.clear}</b>
-              <p>
-                {rest.minutes / 60}h {t.restWindow.toLowerCase()} /{" "}
-                {rest.requiredMinutes / 60}h {t.minimum.toLowerCase()}
-              </p>
+              <b>
+                {conflict
+                  ? assistanceCopy[language].overlap
+                  : rest.warning
+                    ? t.warning
+                    : t.clear}
+              </b>
+              {conflict ? (
+                <p>
+                  {(Math.min(Date.parse(conflict.ends_at), Date.parse(end)) -
+                    Math.max(
+                      Date.parse(conflict.starts_at),
+                      Date.parse(start),
+                    )) /
+                    3600000}{" "}
+                  {assistanceCopy[language].overlaps}
+                </p>
+              ) : (
+                <p>
+                  {rest.minutes / 60}h {t.restWindow.toLowerCase()} /{" "}
+                  {rest.requiredMinutes / 60}h {t.minimum.toLowerCase()}
+                </p>
+              )}
             </div>
           </div>
         )}
@@ -3234,7 +3382,13 @@ export default function App() {
       </Modal>
       <Modal
         open={assistantOpen}
-        onOpenChange={setAssistantOpen}
+        onOpenChange={(open) => {
+          setAssistantOpen(open);
+          if (!open) {
+            assistantGeneration.current++;
+            setAssistantBusy(false);
+          }
+        }}
         title={t.assistant}
         description={t.assistSub}
       >
@@ -3242,7 +3396,7 @@ export default function App() {
           {(["pay", "safety", "rest", "cases"] as const).map((topic) => (
             <Button
               variant="outline"
-              disabled={busy}
+              disabled={assistantBusy}
               key={topic}
               onClick={() => void ask(topic)}
             >
@@ -3250,26 +3404,113 @@ export default function App() {
             </Button>
           ))}
         </div>
+        {!!assistantHistory.length && (
+          <details className="assistant-history">
+            <summary>{assistanceCopy[language].history}</summary>
+            {assistantHistory.map((turn, index) => (
+              <div key={index}>
+                <strong>{turn.question}</strong>
+                <p>{turn.answer}</p>
+              </div>
+            ))}
+          </details>
+        )}
+        {assistantError && (
+          <div role="alert" className="error-banner">
+            {assistantError}
+            <Button
+              variant="outline"
+              onClick={() =>
+                void ask(
+                  lastAssistantRequest.current.topic,
+                  lastAssistantRequest.current.question,
+                )
+              }
+            >
+              {assistanceCopy[language].retry}
+            </Button>
+          </div>
+        )}
         {assistant ? (
           <div className="assistant-response">
             <Badge tone={assistant.source === "gemini" ? "blue" : "green"}>
               <Sparkles size={13} />
               {assistant.source === "gemini" ? t.ai : t.fallback}
             </Badge>
-            <p>{assistant.explanation}</p>
-            <div className="info-strip">
+            <p className="assistant-explanation">{assistant.explanation}</p>
+            <Button
+              variant="outline"
+              onClick={() => {
+                const paths = {
+                  pay: "/app/pay",
+                  rest: "/app/rest",
+                  safety: "/app/report",
+                  cases: "/app/cases",
+                };
+                setAssistantOpen(false);
+                setMobile(false);
+                navigate(paths[assistant.topic || assistantTopic]);
+              }}
+            >
               <ArrowRight size={17} />
               {assistant.nextAction}
-            </div>
+            </Button>
             <ReadAloud
               text={assistant.explanation}
               language={language}
               label={t.readAloud}
             />
           </div>
-        ) : (
-          <div className="loading-screen">{busy ? t.loading : t.explain}</div>
-        )}
+        ) : assistantBusy ? (
+          <div className="loading-screen" role="status">
+            {t.loading}
+          </div>
+        ) : !assistantError ? (
+          <p>{t.explain}</p>
+        ) : null}
+        <form
+          className="assistant-question"
+          onSubmit={(event) => {
+            event.preventDefault();
+            if (assistantQuestion.trim() && !assistantBusy)
+              void ask(assistantTopic, assistantQuestion.trim());
+          }}
+        >
+          <Field
+            label={assistanceCopy[language].question}
+            hint={assistanceCopy[language].privacy}
+          >
+            <textarea
+              value={assistantQuestion}
+              onChange={(event) => setAssistantQuestion(event.target.value)}
+              maxLength={600}
+              rows={2}
+              placeholder={assistanceCopy[language].placeholder}
+            />
+          </Field>
+          <div className="form-actions">
+            <Button
+              type="submit"
+              disabled={assistantBusy || !assistantQuestion.trim()}
+            >
+              {assistanceCopy[language].send}
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                assistantGeneration.current++;
+                setAssistant(null);
+                setAssistantHistory([]);
+                setAssistantQuestion("");
+                setAssistantError("");
+                setAssistantBusy(false);
+              }}
+            >
+              {assistanceCopy[language].clear}
+            </Button>
+          </div>
+        </form>
       </Modal>
       {toast && (
         <div className="toast" role="status">

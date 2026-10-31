@@ -1,6 +1,6 @@
 {
   "application": "NYAVERIS AI",
-  "checkedAt": "2026-10-31T18:42:08.782Z",
+  "checkedAt": "2026-10-31T19:56:43.910Z",
   "origin": "https://nyaveris-ai.vercel.app",
   "project": "https://vkkjuopfidvfhzsqzius.supabase.co",
   "hostedWrites": 0,
@@ -33,8 +33,8 @@
     },
     {
       "path": "/signup",
-      "status": 404,
-      "contentType": "text/plain; charset=utf-8",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
       "securityHeaders": {
         "content-security-policy": true,
         "x-content-type-options": true,
@@ -46,8 +46,8 @@
     },
     {
       "path": "/forgot-password",
-      "status": 404,
-      "contentType": "text/plain; charset=utf-8",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
       "securityHeaders": {
         "content-security-policy": true,
         "x-content-type-options": true,
@@ -59,8 +59,8 @@
     },
     {
       "path": "/reset-password",
-      "status": 404,
-      "contentType": "text/plain; charset=utf-8",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
       "securityHeaders": {
         "content-security-policy": true,
         "x-content-type-options": true,
@@ -72,8 +72,8 @@
     },
     {
       "path": "/verify-email",
-      "status": 404,
-      "contentType": "text/plain; charset=utf-8",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
       "securityHeaders": {
         "content-security-policy": true,
         "x-content-type-options": true,
@@ -85,8 +85,8 @@
     },
     {
       "path": "/auth/callback",
-      "status": 404,
-      "contentType": "text/plain; charset=utf-8",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
       "securityHeaders": {
         "content-security-policy": true,
         "x-content-type-options": true,
@@ -98,8 +98,8 @@
     },
     {
       "path": "/invite",
-      "status": 404,
-      "contentType": "text/plain; charset=utf-8",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
       "securityHeaders": {
         "content-security-policy": true,
         "x-content-type-options": true,
@@ -111,8 +111,8 @@
     },
     {
       "path": "/onboarding",
-      "status": 404,
-      "contentType": "text/plain; charset=utf-8",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
       "securityHeaders": {
         "content-security-policy": true,
         "x-content-type-options": true,
@@ -124,8 +124,8 @@
     },
     {
       "path": "/terms",
-      "status": 404,
-      "contentType": "text/plain; charset=utf-8",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
       "securityHeaders": {
         "content-security-policy": true,
         "x-content-type-options": true,
@@ -137,8 +137,8 @@
     },
     {
       "path": "/privacy",
-      "status": 404,
-      "contentType": "text/plain; charset=utf-8",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
       "securityHeaders": {
         "content-security-policy": true,
         "x-content-type-options": true,
@@ -188,17 +188,7 @@
     "productionSecretEnvironment": "not inspected; public capabilities cannot establish secret values, SMTP, OAuth credentials or sender verification"
   },
   "assessment": {
-    "missingPublicRoutes": [
-      "/signup",
-      "/forgot-password",
-      "/reset-password",
-      "/verify-email",
-      "/auth/callback",
-      "/invite",
-      "/onboarding",
-      "/terms",
-      "/privacy"
-    ],
+    "missingPublicRoutes": [],
     "releaseStatus": "BLOCKED",
     "reason": "Hosted migration, approved deployment and real OAuth/email/device acceptance remain pending; this script only inspects public capabilities."
   }

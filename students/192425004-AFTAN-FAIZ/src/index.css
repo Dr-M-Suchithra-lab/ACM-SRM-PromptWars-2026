@@ -2159,8 +2159,17 @@ td .button-row {
   min-height: 35px;
 }
 .assistant-response {
+  overflow-wrap: anywhere;
   margin-top: 22px;
 }
+.assistant-explanation { white-space: pre-line; }
+.assistant-question { margin-top: 20px; border-top: 1px solid var(--line); padding-top: 16px; }
+.assistant-question textarea { width: 100%; resize: vertical; min-height: 76px; }
+.assistant-history { margin: 12px 0; max-height: 180px; overflow-y: auto; overflow-wrap: anywhere; }
+.assistant-history > div { padding: 10px 0; border-bottom: 1px solid var(--line); }
+.assistant-history p { white-space: pre-line; font-size: 13px; }
+.risk-item details { margin: 8px 0 12px; }
+.risk-item summary, .assistant-history summary { cursor: pointer; min-height: 32px; }
 .assistant-response > p {
   font-size: 14px;
   line-height: 1.9;

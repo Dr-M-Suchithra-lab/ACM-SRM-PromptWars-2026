@@ -83,5 +83,11 @@ export type Workspace = {
   safety_reports: SafetyReport[];
   safety_case_events: SafetyEvent[];
   pay: Pay[];
-  risks: { type: string; shiftId: string; detail: string }[];
+  risks: {
+    type: string;
+    shiftId: string;
+    detail: string;
+    minutes?: number;
+    requiredMinutes?: number;
+  }[];
 };
