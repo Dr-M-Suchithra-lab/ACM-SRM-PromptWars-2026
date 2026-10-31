@@ -6,8 +6,8 @@ PromptWars 2026 × ACM SRM Student Chapter · Theme: **UN SDG 8, Decent Work and
 
 | | |
 |---|---|
-| **Demo link** | Not deployed yet. Runs locally in about two minutes (see [How to run it](#how-to-run-it)). |
-| **Demo video** | _Add a Drive / YouTube (unlisted) link here_ |
+| **Demo link** | [Demo video (Google Drive)](https://drive.google.com/file/d/1wOojJG4SbGS5xTEv67fUf0lRVSsvyx7b/view?usp=sharing) · The app is not deployed; it runs locally in about two minutes (see [How to run it](#how-to-run-it)). |
+| **Demo video** | [Watch on Google Drive](https://drive.google.com/file/d/1wOojJG4SbGS5xTEv67fUf0lRVSsvyx7b/view?usp=sharing) |
 | **Code** | [`src/`](src) |
 | **Prompts** | [`prompts.md`](prompts.md) |
 
