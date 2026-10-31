@@ -95,13 +95,23 @@ A short review flow: open Ravi's pay calendar, submit a safety report, then sign
 
 ## Screenshots
 
-### Worker: report a problem
+Real viewport captures, arranged with presentation frames and captions. Click an image to view it at full size.
 
-![Worker reporting screen](screenshots/worker-report.png)
+### Welcome and language flow
 
-### Admin: dashboard and actions
+![Multilingual welcome, language selection and worker introduction](screenshots/welcome.jpg)
 
-![Admin dashboard](screenshots/admin-dashboard.png)
+### Light and dark themes
+
+![The same payslip in light and dark themes](screenshots/themes.jpg)
+
+### Daily pay and calendar
+
+![Monthly calendar and selected-day pay calculation](screenshots/calendar.jpg)
+
+### Worker and admin reporting
+
+![Worker report form alongside the admin case review](screenshots/workflow.jpg)
 
 ## Key prompts
 

@@ -10,13 +10,25 @@ Two industries ship in the box: **construction** (daily wages at a site gate) an
 
 ## Screenshots
 
-The demo includes fictional campus and construction workers. Screenshots show the dark theme; users can select Light or Auto in the footer.
+The demo includes fictional campus and construction workers. The gallery shows the welcome flow, both themes, daily pay and the worker/admin reporting workflow. These are real viewport captures, arranged with presentation frames and captions.
 
 Inter, Noto Sans Devanagari and Noto Sans Tamil are bundled with the build, so the interface does not depend on installed fonts or a third-party font service. The low-resolution fluid backdrop respects reduced motion and pauses in hidden tabs.
 
-![Worker reporting with text, voice and optional categories](docs/screenshots/worker-report.png)
+### Welcome and language flow
 
-![Administrator dashboard with action counts and report priority filters](docs/screenshots/admin-dashboard.png)
+![Multilingual welcome, language selection and worker introduction](docs/screenshots/welcome.jpg)
+
+### Light and dark themes
+
+![The same payslip in light and dark themes](docs/screenshots/themes.jpg)
+
+### Daily pay and calendar
+
+![Monthly calendar and selected-day pay calculation](docs/screenshots/calendar.jpg)
+
+### Worker and admin reporting
+
+![Worker report form alongside the admin case review](docs/screenshots/workflow.jpg)
 
 ## The problem
 
