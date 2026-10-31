@@ -1,0 +1,286 @@
+/* The Money Jar: a glass jar on a glass panel (material in glass.css). The liquid is what the
+   recorded work earned; nothing in it stands for money paid, which FairShift does not record. */
+
+.jar {
+  margin-bottom: var(--sp-6);
+  padding: var(--sp-5);
+  border-radius: var(--r-slab);
+}
+@media (min-width: 600px) {
+  .jar {
+    padding: var(--sp-7);
+  }
+}
+.jar-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--sp-2) var(--sp-3);
+  margin-bottom: var(--sp-5);
+}
+.jar-title {
+  margin: 0;
+  font-size: var(--fs-text-xl);
+}
+.jar-period {
+  margin: 2px 0 0;
+  color: var(--fs-ink-2);
+  font-size: var(--fs-text-sm);
+}
+
+.jar-body {
+  display: grid;
+  grid-template-columns: minmax(110px, 168px) minmax(0, 1fr);
+  gap: var(--sp-5);
+  align-items: center;
+}
+@media (max-width: 459px) {
+  .jar-body {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .jar-figure {
+    width: 150px;
+    justify-self: center;
+  }
+}
+.jar-figure {
+  position: relative;
+  margin: 0;
+}
+/* The jar casts a soft pool of shadow on the panel */
+.jar-figure::after {
+  content: '';
+  position: absolute;
+  left: 18%;
+  right: 18%;
+  bottom: -6px;
+  height: 14px;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(36, 8, 31, 0.28), transparent);
+  z-index: -1;
+}
+.jar-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+.jar-outline {
+  fill: none;
+  stroke: var(--fs-aubergine);
+  stroke-width: 2.5;
+  stroke-linejoin: round;
+  stroke-opacity: 0.75;
+}
+.jar-rim {
+  fill: none;
+  stroke: #fff;
+  stroke-width: 1.5;
+  stroke-opacity: 0.9;
+}
+.jar-shine {
+  fill: none;
+  stroke: #fff;
+  stroke-width: 7;
+  stroke-linecap: round;
+  opacity: 0.75;
+}
+.jar-shine-thin {
+  fill: none;
+  stroke: #fff;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  opacity: 0.55;
+}
+.jar-meniscus {
+  stroke: #fff;
+  stroke-width: 2;
+  stroke-opacity: 0.45;
+}
+.jar-cut {
+  stroke: #fff;
+  stroke-width: 2;
+}
+.jar-agreed .halo {
+  stroke: #fff;
+  stroke-width: 5;
+  opacity: 0.9;
+}
+.jar-agreed .dash {
+  stroke: var(--fs-aubergine-deep);
+  stroke-width: 2;
+  stroke-dasharray: 7 5;
+}
+/* The one orchestrated moment on the Pay screen: the jar fills once when it appears. */
+.jar-fill {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: jarFill 640ms var(--ease-out) both;
+}
+@keyframes jarFill {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+
+.jar-legend {
+  margin: 0;
+}
+.jar-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  column-gap: var(--sp-3);
+  padding: var(--sp-3) 0;
+  border-top: 1px solid var(--glass-well-edge);
+}
+.jar-row:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+.jar-row dt {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-weight: 650;
+  color: var(--fs-ink);
+}
+.jar-row dd {
+  margin: 0;
+}
+.jar-row dd.figure {
+  align-self: center;
+  font-size: var(--fs-text-lg);
+  font-weight: 650;
+  color: var(--fs-aubergine);
+  text-align: right;
+}
+.jar-explain {
+  grid-column: 1 / -1;
+  margin-top: 2px !important;
+  font-size: var(--fs-text-xs);
+  color: var(--fs-ink-2);
+}
+.jar-row-total dt {
+  font-size: var(--fs-text-lg);
+}
+/* Take-home pay sits in a lit well: the number a worker looks for first */
+.jar-row-total {
+  margin: var(--sp-1) calc(-1 * var(--sp-3));
+  padding: var(--sp-3);
+  border-top: 0;
+  border-radius: var(--r-control);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(244, 236, 242, 0.85));
+  box-shadow:
+    inset 0 1px 0 #fff,
+    inset 0 0 0 1px var(--glass-well-edge),
+    var(--e-lift);
+}
+.jar-row-total + .jar-row {
+  border-top: 0;
+}
+.jar-row-total dd.figure {
+  font-size: var(--fs-text-2xl);
+  font-weight: 700;
+}
+.jar-row-paid {
+  grid-template-columns: minmax(0, 1fr);
+}
+.jar-row-paid .jar-explain {
+  font-size: var(--fs-text-sm);
+}
+.jar-diff {
+  display: block;
+  margin-top: 2px;
+  font-weight: 650;
+}
+.jar-diff.is-more {
+  color: var(--fs-good);
+}
+.jar-diff.is-less {
+  color: var(--fs-caution);
+}
+
+.swatch {
+  flex: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+}
+.swatch-agreed {
+  width: 16px;
+  height: 0;
+  border-radius: 0;
+  border-top: 2px dashed var(--fs-aubergine-deep);
+}
+.swatch-worked {
+  background: linear-gradient(to top, var(--fs-aubergine) 0 60%, var(--fs-marigold) 60% 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+.swatch-deduction {
+  background: repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.78) 0 3px, transparent 3px 6px), var(--fs-aubergine);
+}
+.swatch-net {
+  background: linear-gradient(180deg, var(--fs-aubergine-700), var(--fs-aubergine-deep));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.jar-empty {
+  margin: var(--sp-4) 0 0;
+  color: var(--fs-ink-2);
+}
+.jar-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--sp-2);
+  margin-top: var(--sp-5);
+  padding-top: var(--sp-3);
+  border-top: 1px solid var(--glass-well-edge);
+}
+.jar-glossary {
+  flex: 1 1 260px;
+}
+.jar-glossary summary {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  min-height: var(--tap);
+  color: var(--fs-aubergine);
+  font-weight: 650;
+  cursor: pointer;
+  list-style: none;
+}
+.jar-glossary summary::-webkit-details-marker {
+  display: none;
+}
+.jar-glossary summary::after {
+  content: '';
+  width: 8px;
+  height: 8px;
+  margin-top: -4px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg);
+}
+.jar-glossary[open] summary::after {
+  margin-top: 4px;
+  transform: rotate(-135deg);
+}
+.jar-glossary dl {
+  margin: 0 0 var(--sp-2);
+}
+.jar-glossary dt {
+  margin-top: var(--sp-3);
+  font-weight: 650;
+}
+.jar-glossary dd {
+  margin: 2px 0 0;
+  max-width: 62ch;
+  color: var(--fs-ink-2);
+  font-size: var(--fs-text-sm);
+}

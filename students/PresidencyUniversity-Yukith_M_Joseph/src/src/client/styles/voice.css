@@ -1,0 +1,260 @@
+/* Feedback and the skill passport: the worker's own voice and record */
+
+/* Rating: five faces with numbers, the two ends named in words underneath */
+.rating-scale {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: var(--sp-2);
+  max-width: 520px;
+}
+.rating-option {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 0;
+  padding: var(--sp-3) var(--sp-1) var(--sp-2);
+  border: 1px solid var(--fs-line-strong);
+  border-radius: var(--r-control);
+  color: var(--fs-ink-2);
+  text-align: center;
+  cursor: pointer;
+  transition:
+    border-color var(--m-fast) ease,
+    background var(--m-fast) ease,
+    box-shadow var(--m-base) ease,
+    transform var(--m-fast) ease;
+}
+.rating-option:active {
+  transform: scale(0.96);
+}
+.rating-option input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+.rating-option:has(input:focus-visible) {
+  outline: 3px solid var(--focus-color);
+  outline-offset: 2px;
+}
+.rating-option:has(input:checked) {
+  border-color: var(--fs-aubergine);
+  background: var(--glass-control-pressed);
+  box-shadow:
+    inset 0 0 0 1px var(--fs-aubergine),
+    var(--e-lift);
+  color: var(--fs-aubergine);
+}
+.rating-face {
+  width: 30px;
+  height: 30px;
+}
+.rating-number {
+  font-size: var(--fs-text-lg);
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--fs-ink);
+}
+.rating-ends {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  max-width: 520px;
+  margin: var(--sp-2) 0 0;
+  font-size: var(--fs-text-sm);
+  font-weight: 600;
+  color: var(--fs-ink-2);
+}
+.rating-ends span:last-child {
+  text-align: right;
+}
+.has-error .rating-option {
+  border-color: var(--fs-danger);
+}
+.rating-clear {
+  margin-top: var(--sp-2);
+}
+
+/* What the employer can and cannot see, next to the send button */
+.privacy-note {
+  margin: 0 0 var(--sp-5);
+  padding: var(--sp-4);
+  border-radius: var(--r-record);
+}
+.privacy-note h2 {
+  margin: 0 0 var(--sp-3);
+  font-size: var(--fs-text-md);
+}
+.privacy-note ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--sp-3);
+}
+.privacy-note li {
+  display: flex;
+  gap: var(--sp-3);
+  align-items: flex-start;
+  font-size: var(--fs-text-sm);
+  color: var(--fs-ink-2);
+}
+.privacy-note li svg {
+  flex: none;
+  margin-top: 1px;
+  color: var(--fs-aubergine);
+}
+
+/* Skill passport */
+.passport {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-radius: var(--r-slab);
+}
+.passport-entry {
+  display: flex;
+  gap: var(--sp-3);
+  align-items: flex-start;
+  padding: var(--sp-4);
+}
+.passport-entry + .passport-entry {
+  border-top: 1px solid var(--glass-well-edge);
+}
+.passport-body {
+  min-width: 0;
+  flex: 1;
+}
+.passport-name {
+  margin: 0;
+  font-weight: 700;
+  font-size: var(--fs-text-md);
+}
+.passport-kind {
+  margin: 0;
+  font-size: var(--fs-text-sm);
+  color: var(--fs-ink-2);
+}
+.passport-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  margin: var(--sp-2) 0 0;
+}
+.passport-desc {
+  margin: var(--sp-2) 0 0;
+}
+.passport-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-1) var(--sp-5);
+  margin: var(--sp-2) 0 0;
+  font-size: var(--fs-text-sm);
+}
+.passport-facts dt {
+  color: var(--fs-ink-3);
+}
+.passport-facts dd {
+  margin: 0;
+  font-weight: 600;
+}
+.passport-check {
+  margin: var(--sp-2) 0 0;
+  font-size: var(--fs-text-sm);
+  color: var(--fs-good);
+  font-weight: 600;
+}
+.passport-note {
+  margin: var(--sp-3) 0 0;
+  max-width: 70ch;
+  font-size: var(--fs-text-xs);
+  color: var(--fs-ink-3);
+}
+.passport-add {
+  margin-top: var(--sp-8);
+  max-width: 640px;
+  padding: var(--sp-5);
+  border-radius: var(--r-slab);
+}
+.rating-clear.btn-link {
+  padding-inline: 0;
+}
+
+/* Read aloud: a ghost button that names the language it will read in; while reading, a small
+   glass panel with progress, start again, speed and (where the device has several) voice. */
+.speak {
+  display: grid;
+  gap: var(--sp-1);
+  min-width: 0;
+}
+.speak-main {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-1);
+}
+.speak .btn {
+  min-height: 44px;
+}
+.speak-lang {
+  margin-left: var(--sp-1);
+  padding: 1px 8px;
+  border: 1px solid var(--glass-well-edge);
+  border-radius: var(--r-chip);
+  background: var(--glass-well);
+  font-size: var(--fs-text-xs);
+  font-weight: 650;
+  color: var(--fs-ink-2);
+}
+.speak-panel {
+  display: grid;
+  gap: var(--sp-2);
+  padding: var(--sp-2) var(--sp-3);
+  border-radius: var(--r-control);
+  background: var(--glass-well);
+  box-shadow: inset 0 0 0 1px var(--glass-well-edge);
+  animation: panelIn var(--m-base) var(--ease-out);
+}
+.speak-progress {
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(58, 15, 52, 0.12);
+  overflow: hidden;
+}
+.speak-progress span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, var(--fs-aubergine-700), var(--fs-aubergine));
+  transform-origin: left center;
+  transition: transform var(--m-base) linear;
+}
+.speak-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-1) var(--sp-2);
+}
+.speak-voice select {
+  min-height: 40px;
+  max-width: 15rem;
+  padding: 6px 36px 6px 10px;
+  font-size: var(--fs-text-sm);
+}
+.speak-engine {
+  font-size: var(--fs-text-xs);
+  font-weight: 650;
+  color: var(--fs-ink-2);
+}
+.speak-status {
+  margin: 0;
+  max-width: 60ch;
+  font-size: var(--fs-text-sm);
+  color: var(--fs-ink-2);
+}
+.speak-status:empty {
+  display: none;
+}
+.speak-status.is-error {
+  color: var(--fs-danger);
+  font-weight: 600;
+}
