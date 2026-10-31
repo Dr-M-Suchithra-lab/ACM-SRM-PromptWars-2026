@@ -1,0 +1,14 @@
+# Generated output
+.next/
+out/
+build/
+coverage/
+playwright-report/
+test-results/
+public/sw*
+public/swe-worker*
+next-env.d.ts
+package-lock.json
+
+# Prose is written by hand; tables and mermaid diagrams keep their authored layout.
+*.md

@@ -1,0 +1,14 @@
+# Files Cloud Build does not need (keeps the upload small; secrets never leave this machine)
+.git
+.gitignore
+.gcloudignore
+node_modules
+.next
+coverage
+test-results
+playwright-report
+.vercel
+.env*
+!.env.example
+*.log
+tests
