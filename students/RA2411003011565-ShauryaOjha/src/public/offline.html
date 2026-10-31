@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#1F3FB5" />
+    <title>FairShift: offline</title>
+    <style>
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f2f3ee;
+        color: #1c1d1a;
+        font-family: system-ui, sans-serif;
+        padding: 24px;
+      }
+      main {
+        max-width: 420px;
+      }
+      img {
+        width: 72px;
+        height: 72px;
+      }
+      h1 {
+        font-size: 28px;
+        margin: 16px 0 8px;
+      }
+      p {
+        font-size: 18px;
+        line-height: 1.6;
+        margin: 0 0 12px;
+      }
+      button {
+        min-height: 56px;
+        width: 100%;
+        margin-top: 12px;
+        border: 0;
+        border-radius: 10px;
+        background: #1f3fb5;
+        color: #fff;
+        font-size: 18px;
+        font-weight: 700;
+      }
+      button:focus-visible {
+        outline: 3px solid #1f3fb5;
+        outline-offset: 2px;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <img src="/icons/icon.svg" alt="" />
+      <h1>You are offline</h1>
+      <p>
+        You are offline. You can still check in, check out, report hazards and give feedback.
+        Everything will sync when you are back online.
+      </p>
+      <p lang="hi">
+        आप ऑफ़लाइन हैं। आप अभी भी चेक इन, चेक आउट, ख़तरा रिपोर्ट और फ़ीडबैक दे सकते हैं। ऑनलाइन आने
+        पर सब अपने आप सिंक हो जाएगा।
+      </p>
+      <p lang="ta">
+        நீங்கள் ஆஃப்லைனில் உள்ளீர்கள். நீங்கள் இன்னும் செக்-இன், செக்-அவுட், ஆபத்து புகாரளித்தல்
+        மற்றும் கருத்துக்களை அளிக்கலாம். ஆன்லைனில் வந்ததும் அனைத்தும் தானாகவே ஒத்திசைக்கப்படும்.
+      </p>
+      <button type="button" onclick="location.reload()">Try again</button>
+    </main>
+  </body>
+</html>
