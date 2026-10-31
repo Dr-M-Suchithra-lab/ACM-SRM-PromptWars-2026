@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0f766e">
+  <meta name="description" content="FairShift makes shift work fairer, safer and more transparent: check-in without QR codes, spoken payslips in Hindi and Tamil, fatigue alerts, anonymous voice reporting and team health for managers.">
+  <title>FairShift · Fair pay, safe shifts, every voice heard</title>
+  <link rel="icon" href="/img/logo.svg" type="image/svg+xml">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="stylesheet" href="/css/app.css">
+  <script src="/js/common.js" defer></script>
+  <script src="/js/landing.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="/">
+        <img class="brand-mark" src="/img/logo.svg" alt="" width="32" height="32">
+        <span>FairShift</span>
+      </a>
+      <span class="spacer"></span>
+      <a class="btn btn-ghost btn-sm" href="#how">How it works</a>
+      <a class="btn btn-ghost btn-sm" href="https://github.com/Ashish-pvt/Project" rel="noopener">Source code</a>
+    </div>
+  </header>
+
+  <main id="main" tabindex="-1">
+    <section class="landing-hero">
+      <div class="wrap">
+        <span class="hero-tag">UN SDG 8 · Decent Work and Economic Growth</span>
+        <h1>Fair pay. Safe shifts. Every voice heard.</h1>
+        <p class="lead">
+          FairShift replaces paper registers and WhatsApp groups for construction sites, hospitals,
+          campuses and factories. Workers see every hour and rupee in their own language, on any phone.
+          Managers see burnout and safety risks before they become injuries or resignations.
+        </p>
+        <fieldset class="sector-picker">
+          <legend class="sr-only">Choose an industry for the demo</legend>
+          <label><input type="radio" name="sector" value="construction" checked> Construction site</label>
+          <label><input type="radio" name="sector" value="hospital"> Hospital</label>
+        </fieldset>
+      </div>
+    </section>
+
+    <div class="wrap">
+      <div class="try-grid">
+        <section class="card try-card" aria-labelledby="try-worker">
+          <h2 id="try-worker">
+            <svg class="icon" aria-hidden="true"><use href="/img/icons.svg#hardhat"></use></svg>
+            Worker app
+          </h2>
+          <ul>
+            <li>Start a shift by typing a 4-digit site code</li>
+            <li>Hear your payslip in Hindi, Tamil or English</li>
+            <li>Get rest warnings before you burn out</li>
+            <li>Report danger by voice, anonymously</li>
+          </ul>
+          <button type="button" class="btn btn-primary btn-block" data-try="worker">Try as a worker</button>
+        </section>
+
+        <section class="card try-card" aria-labelledby="try-manager">
+          <h2 id="try-manager">
+            <svg class="icon" aria-hidden="true"><use href="/img/icons.svg#chart"></use></svg>
+            Manager dashboard
+          </h2>
+          <ul>
+            <li>Rotating check-in code for the site gate</li>
+            <li>Team health scores with plain-language reasons</li>
+            <li>Safety board with automatic escalation</li>
+            <li>Roll call for workers without a phone</li>
+          </ul>
+          <button type="button" class="btn btn-primary btn-block" data-try="manager">Try as a manager</button>
+        </section>
+      </div>
+      <p class="error-text" id="try-error" role="alert"></p>
+
+      <section class="section" id="how" aria-labelledby="how-title">
+        <p class="eyebrow">How it works</p>
+        <h2 id="how-title">Three things every worker can do in under a minute</h2>
+        <div class="steps">
+          <div class="card step">
+            <h3>Check in, no QR needed</h3>
+            <p class="muted">The supervisor's screen shows a code that changes every 5 minutes. Workers type it on a big number pad. No phone? The supervisor marks them present.</p>
+          </div>
+          <div class="card step">
+            <h3>See and hear your pay</h3>
+            <p class="muted">Every hour is counted. Overtime and night allowance follow the industry's rules, and the payslip is read aloud in the worker's language.</p>
+          </div>
+          <div class="card step">
+            <h3>Speak up safely</h3>
+            <p class="muted">Hold a button and describe the problem in any language. AI turns it into a clear report for the manager. Unanswered critical issues escalate automatically.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" aria-labelledby="map-title">
+        <p class="eyebrow">Problem → solution</p>
+        <h2 id="map-title">Built around the pain points in the brief</h2>
+        <div class="table-scroll">
+          <table class="map-table">
+            <thead>
+              <tr><th scope="col">Problem today</th><th scope="col">What FairShift does</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Opaque pay, uncounted overtime</td><td>Hours from check-in feed a payslip with basic pay, overtime and night allowance, shown with icons and read aloud.</td></tr>
+              <tr><td>Fear of being identified</td><td>Anonymous reports store no worker identity. Only the reporter's phone holds the tracking link. Team scores hide groups under 5 people.</td></tr>
+              <tr><td>Hazards ignored until injury</td><td>Voice or text reports are triaged by severity, with response deadlines and automatic escalation.</td></tr>
+              <tr><td>No view of overworked or unhappy staff</td><td>Fatigue rules (long days, short rest, long streaks, heavy weeks) and a team health score with reasons.</td></tr>
+              <tr><td>Attrition spotted too late</td><td>Falling attendance, rising overtime and open complaints lower a team's score before people quit.</td></tr>
+              <tr><td>Regional languages, low literacy, cheap phones</td><td>Hindi, Tamil and English, voice in and out, icon-first screens, no camera needed, works offline as an installable web app.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="section" aria-labelledby="sectors-title">
+        <p class="eyebrow">Works across industries</p>
+        <h2 id="sectors-title">One platform, different rules per industry</h2>
+        <p class="muted">Each industry is a small settings file. Adding a factory or a campus is a new file, not new code.</p>
+        <div class="sector-grid">
+          <div class="card">
+            <h3>Construction site</h3>
+            <ul class="rule-list">
+              <li><span>Regular hours</span><span>9 h/day, 48 h/week</span></li>
+              <li><span>Overtime rate</span><span>2×</span></li>
+              <li><span>Rest between shifts</span><span>10 h minimum</span></li>
+              <li><span>Hazards tracked</span><span>falls, electrical, heat</span></li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>Hospital</h3>
+            <ul class="rule-list">
+              <li><span>Regular hours</span><span>12 h/day, 48 h/week</span></li>
+              <li><span>Overtime rate</span><span>1.5×</span></li>
+              <li><span>Rest between shifts</span><span>11 h minimum</span></li>
+              <li><span>Hazards tracked</span><span>sharps, chemicals, slips</span></li>
+            </ul>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    FairShift · Built for Prompt Wars 2026 × SRM ACM Student Chapter · Hosted on Google Cloud Run
+  </footer>
+</body>
+</html>

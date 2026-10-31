@@ -1,0 +1,16 @@
+{
+  "id": "construction",
+  "name": "Construction site",
+  "currency": "INR",
+  "daily_regular_hours": 9,
+  "weekly_regular_hours": 48,
+  "overtime_multiplier": 2.0,
+  "night_window": [22, 6],
+  "night_allowance_per_hour": 25,
+  "max_daily_hours": 12,
+  "min_rest_hours": 10,
+  "max_consecutive_days": 6,
+  "weekly_hours_cap": 60,
+  "hazard_categories": ["fall", "electrical", "heat", "equipment", "harassment", "wages", "other"],
+  "sla_hours": {"critical": 2, "high": 24, "medium": 72, "low": 168}
+}
