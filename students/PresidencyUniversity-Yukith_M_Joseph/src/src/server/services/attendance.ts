@@ -14,7 +14,6 @@ import { generateCorrectedReceiptForShift, generateReceiptForShift, isShiftInFin
 import { findSessionUser, getWorker } from '../repositories/users';
 import { createNotification } from '../repositories/notifications';
 import { notFound } from '../http';
-import { qrUsedBy, recordQrUse, resolveQrToken, type ResolvedQr } from './siteQr';
 
 import { isUniqueViolation } from '../db/db';
 
@@ -41,8 +40,7 @@ export function attendanceStatus(ctx: AppContext, org: OrgRow, workerId: string)
 }
 
 /** Checks the optional site code against the organisation's rule. Returns how the check-in was made. */
-function checkInMethod(ctx: AppContext, org: OrgRow, siteCode: string | undefined, qr: ResolvedQr | null): CheckInMethod {
-  if (qr) return 'site_qr';
+function checkInMethod(ctx: AppContext, org: OrgRow, siteCode: string | undefined): CheckInMethod {
   if (siteCode) {
     if (!verifySiteCode(ctx.config.sessionSecret, org.id, ctx.now(), siteCode)) {
       throw new DomainError('INVALID_SITE_CODE', 'That site code is wrong or has expired. Ask your supervisor for the current code.');
@@ -50,7 +48,7 @@ function checkInMethod(ctx: AppContext, org: OrgRow, siteCode: string | undefine
     return 'site_code';
   }
   if (org.settings.attendance.requireSiteCode) {
-    throw new DomainError('SITE_CODE_REQUIRED', 'Enter the 6-digit site code shown at your workplace, or scan the site QR code, to check in.');
+    throw new DomainError('SITE_CODE_REQUIRED', 'Enter the 6-digit site code shown at your workplace to check in.');
   }
   return 'app';
 }
@@ -61,51 +59,25 @@ export interface AttendanceProof {
   credentialLabel?: string;
 }
 
-/** Optional extras for a check-in: a scanned site QR token, and when an offline phone saved the tap. */
-export interface CheckInExtras {
-  qrToken?: string;
-  /** The phone's own clock: kept in the audit log for review, never used as the check-in time. */
-  queuedAt?: string;
-}
-
-export function checkIn(
-  ctx: AppContext,
-  org: OrgRow,
-  workerId: string,
-  siteCode?: string,
-  proof: AttendanceProof = { auth: 'session' },
-  extras: CheckInExtras = {},
-): ShiftDTO {
+export function checkIn(ctx: AppContext, org: OrgRow, workerId: string, siteCode?: string, proof: AttendanceProof = { auth: 'session' }): ShiftDTO {
   const at = nowIso(ctx);
   const worker = getWorker(ctx.db, org.id, workerId);
   if (worker && !worker.active) {
     throw new DomainError('INACTIVE_ACCOUNT', 'This account has been deactivated. Contact your supervisor.');
   }
-  const qr = extras.qrToken ? resolveQrToken(ctx, org, extras.qrToken) : null;
-  const method = checkInMethod(ctx, org, siteCode, qr);
+  const method = checkInMethod(ctx, org, siteCode);
   try {
     return ctx.db.tx(() => {
       assertCanCheckIn(shifts.getOpenShift(ctx.db, workerId) ?? null);
-      if (qr && qrUsedBy(ctx, qr.nonce, workerId)) {
-        throw new DomainError('QR_ALREADY_USED', 'You already used this QR code. Scan the code on the screen now.');
-      }
 
-      const id = shifts.insertShift(ctx.db, { orgId: org.id, workerId, checkInAt: at, source: 'app', method, auth: proof.auth, siteId: qr?.site.id, at });
-      if (qr) recordQrUse(ctx, qr.nonce, workerId, id);
+      const id = shifts.insertShift(ctx.db, { orgId: org.id, workerId, checkInAt: at, source: 'app', method, auth: proof.auth, at });
       recordAudit(ctx.db, {
         orgId: org.id,
         actorId: workerId,
         entityType: 'shift',
         entityId: id,
         action: 'check_in',
-        after: {
-          checkInAt: at,
-          method,
-          auth: proof.auth,
-          ...(proof.credentialLabel ? { passkey: proof.credentialLabel } : {}),
-          ...(qr ? { siteId: qr.site.id } : {}),
-          ...(extras.queuedAt ? { queuedOfflineAt: extras.queuedAt, queuedOfflineAtSource: 'device clock, unverified' } : {}),
-        },
+        after: { checkInAt: at, method, auth: proof.auth, ...(proof.credentialLabel ? { passkey: proof.credentialLabel } : {}) },
         at,
       });
       return shifts.toShiftDTO(shifts.getShift(ctx.db, org.id, id)!, org.timezone);
@@ -117,7 +89,7 @@ export function checkIn(
   }
 }
 
-export function checkOut(ctx: AppContext, org: OrgRow, workerId: string, proof: AttendanceProof = { auth: 'session' }, queuedAt?: string): ShiftDTO {
+export function checkOut(ctx: AppContext, org: OrgRow, workerId: string, proof: AttendanceProof = { auth: 'session' }): ShiftDTO {
   const at = nowIso(ctx);
   const shift = ctx.db.tx(() => {
     const open = shifts.getOpenShift(ctx.db, workerId) ?? null;
@@ -131,12 +103,7 @@ export function checkOut(ctx: AppContext, org: OrgRow, workerId: string, proof: 
       entityType: 'shift',
       entityId: open.id!,
       action: 'check_out',
-      after: {
-        checkOutAt: at,
-        auth: proof.auth,
-        ...(proof.credentialLabel ? { passkey: proof.credentialLabel } : {}),
-        ...(queuedAt ? { queuedOfflineAt: queuedAt, queuedOfflineAtSource: 'device clock, unverified' } : {}),
-      },
+      after: { checkOutAt: at, auth: proof.auth, ...(proof.credentialLabel ? { passkey: proof.credentialLabel } : {}) },
       at,
     });
     evaluateWorkerFatigue(ctx, org, workerId);

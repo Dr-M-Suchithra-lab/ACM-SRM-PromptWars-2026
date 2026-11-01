@@ -214,11 +214,9 @@ describe('web client', () => {
 
     for (const [link, heading] of [
       ['Workforce', 'Mohammed Irfan'],
-      ['Retention attention', 'How the levels are worked out'],
-      ['Sites & QR check-in', 'Sites & QR check-in'],
+      ['Sites & Locations', 'Sites & Locations'],
       ['Hours alerts', 'Long working day'],
       ['Payslips', 'Issued payslips'],
-      ['Pay check', 'How the status is decided'],
       ['Pay & hours rules', 'Overtime multiplier'],
       ['Feedback', 'Responses'],
       ['Audit log', 'check in'],

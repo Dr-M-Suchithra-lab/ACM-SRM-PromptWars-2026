@@ -24,13 +24,7 @@ export type DomainErrorCode =
   | 'REMEDIATION_PHOTO_REQUIRED'
   | 'AWAITING_REPORTER'
   | 'PASSKEY_REQUIRED'
-  | 'PASSKEY_FAILED'
-  | 'QR_INVALID'
-  | 'QR_EXPIRED'
-  | 'QR_INACTIVE'
-  | 'QR_ALREADY_USED'
-  | 'SITE_INACTIVE'
-  | 'INVALID_PAYMENT';
+  | 'PASSKEY_FAILED';
 
 /** A business-rule violation with a stable code and a user-safe message. */
 export class DomainError extends Error {
