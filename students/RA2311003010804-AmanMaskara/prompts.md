@@ -433,7 +433,7 @@ After submission I kept going with one question: FairShift finds unpaid wages, b
 **What it changed:**
 - **"Pending" explained:** Cashfree only sends the payer back after a final outcome, so a pending payment keeps its page waiting. FairShift lists the checkout as *Waiting for payment*, with *Continue payment*, *Check status*, *Cancel* and a one-line hint.
 - **One payroll page:** a summary card, then one worker list with pay, the FairPay check, the bank account and a tick box; a sticky bar pays everyone ticked in one checkout.
-- **The ₹11.52 bug:** the form rounded hours to a quarter, so *Paid in full* came out short. It now works in exact minutes, and a test records *Paid in full* for every worker and checks none shows a shortfall.
+- **The ₹11.52 bug:** the form rounded hours to a quarter, so *Paid in full* came out short. It now works in exact minutes, and a test records *Paid in full* for every worker with nothing entered yet and checks none shows a shortfall.
 
 **Security, then hardening:**
 
