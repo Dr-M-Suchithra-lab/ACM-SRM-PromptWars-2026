@@ -326,7 +326,7 @@ Each line names a page, a device, an action and what went wrong, and says which 
 - Gemini judges severity from what is happening, and code can only raise it: **fire is always critical, with a one-tap Call 112**.
 - Merges only for the same danger at the same site.
 - Workers add skills and employers verify them.
-- Payroll presets and hour sliders, and **"Pay the gap"** clears the worker's shortfall.
+- Payroll presets and hour sliders, and **"Pay the gap"** clears the worker's shortfall (later replaced by paying in one checkout and *Mark as paid*, §11).
 - A live on-duty count in the menu.
 - A new **Help** tab with verified national helplines and AI next steps.
 
@@ -387,7 +387,7 @@ Each line names a page, a device, an action and what went wrong, and says which 
 - all 36 page measurements under 400 ms (slowest 306 ms)
 - 1 branch, 1.28 MB, no secrets in the code or its history
 
-**Protecting the demo for judges.** A visitor pressed "Pay ₹907" on the live demo, so Ramesh's screen showed ₹167 and contradicted my demo script. Same process: drafted with the agent, sent by me:
+**Protecting the demo for judges.** A visitor pressed "Pay ₹907" (the button at that time) on the live demo, so Ramesh's screen showed ₹167 and contradicted my demo script. Same process: drafted with the agent, sent by me:
 
 > On the live demo, any visitor can press "Pay ₹907". Today someone did, so Ramesh's Pay screen now shows ₹167 and contradicts my README and demo script until the daily reset. Judges must always see the story the docs describe. Propose 2–3 options with the trade-offs (security, effort, risk to the demo) and recommend one. Constraints: demo mode only, no new dependencies, the strict security policy unchanged, all tests green, and a new test proving that a judge's actions cannot break the demo for the next judge. Wait for my choice before building.
 

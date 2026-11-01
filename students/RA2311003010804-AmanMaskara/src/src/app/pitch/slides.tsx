@@ -467,8 +467,9 @@ export const SLIDES: Slide[] = [
         <div className="flex flex-col gap-3">
           <Card icon={<Sparkles className="size-5" />} title="What came out">
             Live on MongoDB in Mumbai within the hour; a phone-first redesign; the AI judges how urgent a hazard is and
-            a fire is always critical, with Call 112; merges only for the same danger at the same site; payroll presets,
-            sliders and <em>Pay the gap</em>; a Help tab with verified helplines and AI next steps.
+            a fire is always critical, with Call 112; merges only for the same danger at the same site; payroll presets
+            and sliders, and later one checkout that pays everyone owed; a Help tab with verified helplines and AI next
+            steps.
           </Card>
           <Card icon={<Bug className="size-5" />} title="How I found the problems">
             By using the live app on my own phone as each demo person, then reporting each one as page, action and

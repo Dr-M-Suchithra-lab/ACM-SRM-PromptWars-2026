@@ -65,7 +65,7 @@ export async function importPaidCsvAction(_prev: CsvFormState, formData: FormDat
 const Arrears = z.object({ workerId: z.string().max(40), month: z.string().refine(isMonthKey) });
 const arrearsLimiter = new RateLimiter({ maxTokens: 30, refillIntervalMs: 60 * 60 * 1000 });
 
-/** "Pay the gap": records an arrears payment of exactly the outstanding shortfall. */
+/** "Mark as paid": the employer settled the gap outside FairShift; records an arrears payment of exactly the outstanding shortfall. */
 export async function payArrearsAction(input: unknown): Promise<{ ok: boolean; error?: string }> {
   const session = await requireRole("admin");
   const parsed = Arrears.safeParse(input);
