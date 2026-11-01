@@ -332,7 +332,7 @@ export const SLIDES: Slide[] = [
   {
     id: "payments",
     eyebrow: "Paying workers, safely",
-    title: "One checkout pays everyone, and nobody can redirect a worker's pay",
+    title: "One checkout pays everyone, and a worker is asked before their pay goes anywhere new",
     body: (
       <div className="grid gap-4 md:grid-cols-3">
         <Card icon={<Send className="size-5" />} title="One checkout">
@@ -706,7 +706,7 @@ export const SLIDES: Slide[] = [
           ],
           [
             "SDG 8",
-            "8.5 fair pay (pay check, 2× overtime, gaps paid in one checkout) · 8.8 safe workplaces and rights (hazards, anonymous voice, welfare eligibility) · 8.10 banking (pay straight to each worker's own account, which only they can approve changing).",
+            "8.5 fair pay (pay check, 2× overtime, gaps paid in one checkout) · 8.8 safe workplaces and rights (hazards, anonymous voice, welfare eligibility) · 8.10 banking (pay straight to each worker's own account; they are asked before any change is used).",
           ],
           [
             "Inclusivity",

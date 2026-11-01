@@ -60,7 +60,7 @@ The app runs **with no API key and no cloud account**: seeded data (generated re
 | Criterion | Focus | What FairShift does | Try it / read it |
 |---|---|---|---|
 | **1. Real-World Impact** | Tangible improvement to worker safety and employer visibility | **Safety:** voice/photo hazard reports with severity deadlines and **auto-escalation** (supervisor → site manager → safety officer); fire and other emergencies are always *critical* with a one-tap **Call 112**; a **Help** tab with 8 verified national helplines and AI next steps; sector fatigue rules. **Visibility:** live *on duty* count, escalated hazards first, explainable quit risk, pay shortfalls flagged before they become disputes | Ramesh → Report / Help · Priya → Overview · [`core/hazard-lifecycle.ts`](src/core/hazard-lifecycle.ts) · [`config/helplines.ts`](src/config/helplines.ts) |
-| **2. Relevance to SDG 8** | Decent Work and Economic Growth | **Target 8.5** (equal pay for work of equal value): every hour recorded, overtime at 2×, minimum-wage check, **FairPay Sentinel** compares hours with what was paid, and the employer pays every gap in **one checkout**. **Target 8.10** (access to banking): pay goes straight to each worker's own bank account, which only the worker can approve changing. **Target 8.8** (labour rights, safe workplaces): hazards fixed on deadline, *safe in numbers* co-signed issues, anonymous feedback, welfare-board eligibility and a **signed work certificate** | Ramesh → Pay (₹907) · Priya → Payroll → *Pay with checkout* · [Pain point table](#pain-point--feature--code) |
+| **2. Relevance to SDG 8** | Decent Work and Economic Growth | **Target 8.5** (equal pay for work of equal value): every hour recorded, overtime at 2×, minimum-wage check, **FairPay Sentinel** compares hours with what was paid, and the employer pays every gap in **one checkout**. **Target 8.10** (access to banking): pay goes straight to each worker's own bank account, and the worker is asked before any change to it is used. **Target 8.8** (labour rights, safe workplaces): hazards fixed on deadline, *safe in numbers* co-signed issues, anonymous feedback, welfare-board eligibility and a **signed work certificate** | Ramesh → Pay (₹907) · Priya → Payroll → *Pay with checkout* · [Pain point table](#pain-point--feature--code) |
 | **3. Inclusivity & Ease of Use** | Regional languages, low literacy, basic phones | **English, हिन्दी, தமிழ், తెలుగు** in native scripts (parity test on every key); **read-aloud on every screen**, voice input, icon-first big buttons (≥48px); **works offline** (check-ins queue in IndexedDB); installable PWA, no app store; SVG-only visuals for a ₹7,000 phone; WCAG AA, **axe: 0 violations** | Landing → *I'm a worker* → தமிழ் · [Accessibility](#accessibility-and-inclusivity) |
 | **4. Technical Implementation** | Clean code, security, working dual interfaces | **Worker app (`/w`) and employer dashboard (`/a`)**, both end-to-end tested. Pure, tested rules in [`src/core`](src/core) (95% coverage gate); *AI decides, code computes*; nonce CSP, role + org check on every mutation, Zod, rate limits, HMAC-signed tokens, **bank accounts encrypted at rest**; **416 unit + 39 Playwright tests, 98% line coverage (CI gate: 95%)**, 43 black-box security probes | [Architecture](#architecture) · [`SECURITY.md`](SECURITY.md) · [Testing](#testing) |
 | **5. Feasibility & Scalability** | Practical adoption across two or more distinct industries | **Construction and hospital** live, with **campus and factory** profiles: every difference (pay basis, roster, fatigue rules, hazard types, escalation chain, welfare schemes) is configuration. Runs without AI or a database; one container, one command to deploy; a site needs only a printed or kiosk QR | [Two sectors, one product](#two-sectors-one-product) · [Feasibility](#feasibility-and-scalability) |
@@ -68,7 +68,7 @@ The app runs **with no API key and no cloud account**: seeded data (generated re
 ## At a glance
 
 - **Problem.** India's unorganised workers (over 90% of the workforce) cannot prove their hours, cannot read their payslips, fear speaking up, lose their work history when they change jobs, and miss welfare they are entitled to because claiming it needs paperwork they do not have.
-- **Solution.** A phone app in their own language that **records every hour, checks every rupee against what was actually paid, lets workers raise issues safely in numbers, gets them help in a crisis, and turns verified attendance into welfare eligibility and a signed work certificate**. Employers get an honest early-warning dashboard.
+- **Solution.** A phone app in their own language that **records every hour, checks every rupee against what was actually paid, lets workers raise issues safely in numbers, gets them help in a crisis, and turns verified attendance into welfare eligibility and a signed work certificate**. Employers get an honest early-warning dashboard, and pay everyone owed in one checkout split to each worker's own bank account.
 - **Why it is trustworthy.** *The AI decides meaning, the code computes.* Every rupee, hour, deadline, eligibility and risk score comes from pure, unit-tested TypeScript in [`src/core`](src/core). Gemini understands speech, judges urgency, matches similar complaints, rewords explanations and reads aloud, and each of those has a deterministic fallback.
 - **Google technology.** Live: Gemini 3.5 Flash-Lite / 3.8 Flash (structured JSON output), Gemini 3.8 Flash-Lite TTS (Tamil/Telugu read-aloud), Google Fonts (self-hosted). Ready to switch on: Cloud Run, Secret Manager, Cloud Build and Cloud Scheduler ([Deployment](#deployment)).
 
@@ -220,10 +220,10 @@ Full threat model with code and test pointers: **[`SECURITY.md`](SECURITY.md)**.
 - **PII scrubbing** of names (every worker and admin in the org), phone numbers, emails and long ids before anything is stored or sent to AI ([`ai/redact.ts`](src/ai/redact.ts)).
 - **Anonymous hazard reports** get a private tracking reference (`FS-7KQ2MZ`); only its HMAC is stored, so the reporter can confirm a fix without being identifiable.
 - **Signed, expiring links.** Skill passports and work certificates use HMAC-SHA256 tokens with the token *kind* bound into the MAC; passports expire after 30 days.
-- **Every mutation** is a Server Action or API route with `requireRole` (worker vs admin, org-scoped), **Zod** validation and **rate limits**. Money is always computed on the server (*Pay the gap* and the checkout never trust an amount from the browser; the browser only says who).
+- **Every mutation** is a Server Action or API route with `requireRole` (worker vs admin, org-scoped), **Zod** validation and **rate limits**. Money is always computed on the server (*Mark as paid* and the checkout never trust an amount from the browser; the browser only says who).
 - **Bank accounts.** Stored only encrypted (AES-256-GCM with the worker id bound in, key from `BANK_ENCRYPTION_KEY`, rotation supported) and decrypted in one place: the split sent to the payment provider. Pages see the last 4 digits. Any change waits for the worker's confirmation; a checkout pays only the account on screen; the browser is only ever redirected to an `https` Cashfree page and the outcome is confirmed with Cashfree server to server.
 - **Headers.** Per-request nonce CSP with `strict-dynamic`, HSTS, `nosniff`, `frame-ancestors 'self'`, COOP `same-origin`, no `x-powered-by`; same-origin and body-size checks on JSON routes; CSV export neutralises formula injection.
-- **Secrets** come only from environment variables (Vercel's encrypted environment on the live demo, Secret Manager on Cloud Run); production refuses to start without them. `npm audit --omit=dev`: 0 vulnerabilities, checked in CI (see [`SECURITY.md`](SECURITY.md#dependencies) for build-time tooling).
+- **Secrets** come only from environment variables (Vercel's encrypted environment on the live demo, Secret Manager on Cloud Run); in production a missing secret raises an error instead of falling back to a default. `npm audit --omit=dev`: 0 vulnerabilities, checked in CI (see [`SECURITY.md`](SECURITY.md#dependencies) for build-time tooling).
 
 ## Accessibility and inclusivity
 
@@ -251,12 +251,12 @@ npm run lint && npm run typecheck && npm run format:check
 
 | Layer | What it proves | Where |
 |---|---|---|
-| **Core rules** (pure functions) | Pay, overtime, pay check, fatigue, risk, eligibility, hazard lifecycle, urgency, co-sign threshold, signed tokens: boundaries, rounding and every error path | [`tests/unit/core`](tests/unit/core) |
+| **Core rules** (pure functions) | Pay, overtime, pay check, *Paid in full* to the paisa, fatigue, risk, eligibility, hazard lifecycle, urgency, co-sign threshold, payouts and bank-change rules, signed tokens: boundaries, rounding and every error path | [`tests/unit/core`](tests/unit/core) |
 | **Services** (in-memory store) | Each feature's workflow end to end, plus the batched admin pages giving exactly the per-worker answers | [`tests/unit/server`](tests/unit/server) |
-| **Security** | Session cookie flags and forgery, `requireRole` redirects, signed-link tampering, expiry and kind confusion, origin and size checks, tracking-cookie injection, secrets required in production; bank encryption (tampering, a value moved to another worker, key rotation, key required in production) | [`security.test.ts`](tests/unit/server/security.test.ts) |
+| **Security** | Session cookie flags and forgery, `requireRole` redirects, signed-link tampering, expiry and kind confusion, origin and size checks, tracking-cookie injection, secrets required in production; bank encryption (tampering, a value moved to another worker, key rotation, key required in production) | [`security.test.ts`](tests/unit/server/security.test.ts) · [`bank-crypto.test.ts`](tests/unit/server/bank-crypto.test.ts) |
 | **Tenant isolation** | A valid manager of one organisation is refused on every record of another (hazards, skills, disputes, payments, payouts, bank details, certificates, issues) and nothing changes | [`tenant-isolation.test.ts`](tests/unit/server/tenant-isolation.test.ts) |
 | **Device glue** | Read-aloud voice choice and server fallback, speech recognition setup, offline check-in queue (ordering, partial sync, offline, errors) | [`tests/unit/lib`](tests/unit/lib) |
-| **End to end** | Both interfaces on a production build, phone viewport, axe accessibility scans | [`tests/e2e`](tests/e2e) |
+| **End to end** | Both interfaces on a production build, phone viewport, axe accessibility scans; paying three workers in one checkout, the worker confirming their bank account in their own app, a checkout left unpaid and cancelled | [`tests/e2e`](tests/e2e) |
 | **Black-box probes** | Headers, auth, cross-site requests, oversized bodies, tampered links, cookie flags, worker → manager APIs, checkout routes, bank accounts never in the page in full or encrypted | [`scripts/security-probe.mjs`](scripts/security-probe.mjs) |
 
 Coverage (unit): **98% lines, 97% statements, 97% functions, 92% branches**, enforced in CI. Not unit-measured, by design: thin Server Action wrappers (covered by e2e), seed data, canvas image compression (browser only) and the MongoDB adapter (same `Repos` contract as the tested in-memory store).
@@ -270,7 +270,7 @@ Highlights: overtime underpaid / regular underpaid / below minimum wage / exact 
 | Area | What we did | Where to look |
 |---|---|---|
 | **Code quality** | Pure `core/` with no I/O; one repository interface; config over code; typed end to end; Server Actions hold only guarded mutations; ESLint (React Compiler rules) with zero warnings | [`src/core`](src/core), [`src/config`](src/config), [`src/server/repos/types.ts`](src/server/repos/types.ts) |
-| **Security** | Nonce CSP, role + org checks on every mutation (tested across tenants), Zod everywhere, rate limits, HMAC guards and signed tokens, secrets only from encrypted env vars, 0 production audit findings, live probe script | [`SECURITY.md`](SECURITY.md), [`proxy.ts`](src/proxy.ts), [`server/actions`](src/server/actions) |
+| **Security** | Nonce CSP, role + org checks on every mutation (tested across tenants), Zod everywhere, rate limits, HMAC guards and signed tokens, bank accounts encrypted at rest and worker-approved bank changes, secrets only from encrypted env vars, 0 production audit findings, black-box probe script | [`SECURITY.md`](SECURITY.md), [`proxy.ts`](src/proxy.ts), [`server/actions`](src/server/actions) |
 | **Efficiency** | Organisation-wide pages load in two batched round trips (payroll, certificates), open-shift-only headcount, idempotent hazard sweep, cached TTS, server-rendered charts, SVG-only visuals | [`services/workforce.ts`](src/server/services/workforce.ts), [`ai/tts.ts`](src/ai/tts.ts) |
 | **Testing** | 416 unit + 39 e2e + 43 black-box probes; 98% line coverage (CI gate: 95% of lines, and 95% on every measure for the core); security and tenant-isolation suites; container smoke test | [`tests/`](tests), [`.github/workflows/ci.yml`](.github/workflows/ci.yml) |
 | **Accessibility** | AA contrast test, axe in e2e, keyboard menus and radiogroups, live regions, reduced motion, 4 languages + voice | [`tests/e2e`](tests/e2e), [`globals.css`](src/app/globals.css) |
@@ -287,7 +287,7 @@ Highlights: overtime underpaid / regular underpaid / below minimum wage / exact 
 | **One repository interface** | Keyless local runs and fast tests in memory; MongoDB in production | An extra layer to maintain |
 | **Groups of 5 for feedback and issues** | Workers can't be identified by elimination | Very small teams see no feedback until 5 respond |
 | **Hosted checkout by redirect, with Easy Split** | The employer pays once on Cashfree's own page (a payment link) and the total is split to each worker's bank account; FairShift only redirects there, so no payment script runs on its pages and the strict security policy stays | One payment for the batch: it is paid or not paid as a whole. Sandbox only (or a built-in simulation without keys); going live needs the employer's KYC and a KYC'd Cashfree vendor per worker |
-| **The worker approves bank changes, with a 48-hour fallback** | Stops anyone quietly redirecting a worker's pay, and *not mine* blocks it outright | A worker who never opens the app is paid into the new account after 48 hours; they can still object until then |
+| **The worker approves bank changes, with a 48-hour fallback** | The worker is asked before a changed account is used, and *not mine* blocks it outright | A worker who never opens the app is paid into the new account after 48 hours; they can still object until then |
 | **Pay screens open on last month for the first 7 days** | Wages for a month are due within 7 days after it ends (Payment of Wages Act, s. 5), so that is the pay check that matters at the start of a month | Workers and managers tap one tab to see the month in progress |
 | **Strict security headers over Lighthouse points** | COOP and the nonce CSP protect users | Some local Lighthouse runs can't measure the page with these headers on |
 
@@ -358,9 +358,9 @@ With credits, this is the intended production target: the same build, no code ch
 
 ```
 src/
-  core/        Pure, deterministic rules: time, overtime, pay, pay-check, eligibility, co-sign,
-               hazard lifecycle, urgency & duplicates, help triage, risk, fatigue, signed tokens,
-               work history, nav stack
+  core/        Pure, deterministic rules: time, overtime, pay, pay-check, pay entry, payouts &
+               bank-change rules, eligibility, co-sign, hazard lifecycle, urgency & duplicates,
+               help triage, risk, fatigue, signed tokens, work history, nav stack
   config/      Data, not code: welfare schemes, minimum wages, hazard deadlines & escalation
                chains, verified helplines
   ai/          Gemini client, prompts, JSON schemas, fallbacks, PII redaction, TTS, AI log
@@ -383,6 +383,7 @@ docs/          screenshots/
 - **More languages** (Kannada, Bengali, Marathi, Odia; Anek already covers their scripts).
 - Live minimum-wage and scheme rules per state from official notifications; direct e-Shram/BOCW application hand-off.
 - Union and NGO view: aggregate, k-anonymous trends across employers.
+- **Live payments**: Cashfree production keys after the employer's KYC, each worker's KYC as a vendor, and payment webhooks alongside *Check status*.
 
 ## Limitations and disclosure
 

@@ -121,7 +121,7 @@ flowchart LR
     subgraph Server["Next.js 16 server · Vercel Mumbai"]
         PX["proxy.ts<br/>nonce CSP · security headers"]
         SA["Server Actions + API routes<br/>requireRole · Zod · rate limits"]
-        CORE["core/ · pure rules<br/>pay · overtime · fatigue · risk<br/>eligibility · hazard deadlines · tokens"]
+        CORE["core/ · pure rules<br/>pay · overtime · fatigue · risk · payouts<br/>eligibility · hazard deadlines · tokens"]
         AI["ai/ · Gemini client<br/>JSON schemas · PII redaction · fallbacks"]
         REPO["repos/ · one interface"]
     end
@@ -184,7 +184,7 @@ The full threat model, with the code and test for each control, is in [`src/SECU
 | **One repository interface** | Keyless local runs and fast tests in memory; MongoDB in production; another database later | An extra layer to maintain |
 | **Groups of 5 for feedback and issues** | Workers can't be identified by elimination | Very small teams see no feedback until 5 respond |
 | **Hosted checkout by redirect, with Easy Split** | The employer pays once on Cashfree's own page and the total is split to each worker's bank account; FairShift only redirects, so no payment script runs on its pages | One payment for the batch, paid or not paid as a whole; sandbox only (the live demo uses a simulated checkout) |
-| **The worker approves bank changes, with a 48-hour fallback** | Nobody can quietly redirect a worker's pay; *No, not mine* blocks it | A worker who never answers is paid into the new account after 48 hours |
+| **The worker approves bank changes, with a 48-hour fallback** | The worker is asked before a changed account is used, and *No, not mine* blocks it | A worker who never answers is paid into the new account after 48 hours |
 | **Pay screens open on last month for the first 7 days** | Wages for a month are due within 7 days after it ends (Payment of Wages Act, s. 5), so that is the pay check that matters at the start of a month | Workers and managers tap one tab to see the month in progress |
 | **Strict security headers over Lighthouse points** | COOP and CSP protect users | Some local Lighthouse runs can't measure the page with these headers on, so scores were measured another way |
 
@@ -276,10 +276,9 @@ The full set, with what each prompt changed and who wrote it, is in **[`prompts.
 
 | Worker (phone) | | |
 |---|---|---|
-| ![Home](screenshots/01-home-phone.png) | ![Worker home](screenshots/03-worker-home-ramesh-phone.png) | ![Pay check](screenshots/04-pay-check-shortfall-phone.png) |
+| ![Home](screenshots/01-home-phone.png) | ![Worker home: Is this your bank account?](screenshots/03-worker-home-ramesh-phone.png) | ![Pay check](screenshots/04-pay-check-shortfall-phone.png) |
 | ![Fire is critical, call 112](screenshots/06-fire-is-critical-call-112-phone.png) | ![Help](screenshots/07-help-helplines-phone.png) | ![Pay in Tamil](screenshots/09c-pay-in-tamil-phone.png) |
 | ![Home in Tamil](screenshots/09b-worker-home-in-tamil-phone.png) | ![Hospital worker in Hindi](screenshots/10-hospital-worker-in-hindi-phone.png) | ![Speak up](screenshots/11-speak-up-anonymous-in-hindi-phone.png) |
-| ![Is this your bank account?](screenshots/03-worker-home-ramesh-phone.png) | | |
 
 | Employer (laptop) | |
 |---|---|
@@ -303,7 +302,7 @@ All screenshots are in [`screenshots/`](screenshots), taken on 1 November 2026 f
 Also note:
 - Minimum-wage figures and scheme rules are **demo values**, labelled in the app; verify them per state before real use.
 - Rate limits are counted per server instance; a real deployment needs a shared store.
-- The live demo is shared: a visitor can change demo data (for example, *Pay the gap*). It resets once a day.
+- The live demo is shared: a visitor can change demo data (for example, by paying a checkout or confirming Ramesh's bank account). It resets once a day.
 - Hosted on Vercel, not Cloud Run, as the organisers allowed; the Cloud Run setup is included but not deployed.
 - Payments run only in Cashfree's sandbox, and the live demo uses the simulated checkout: no real money moves. Going live needs the employer's and each worker's KYC with Cashfree.
 

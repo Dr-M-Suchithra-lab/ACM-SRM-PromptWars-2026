@@ -12,7 +12,7 @@ import { SpeakButton } from "@/components/speak-button";
 
 /**
  * When the employer enters or changes a worker's pay account, the worker is asked here whether it is
- * theirs. "No" blocks payments into it, so nobody can quietly redirect a worker's pay.
+ * theirs. "No" blocks payments into it, so a worker's pay never moves to a new account without them being asked.
  */
 export function BankConfirmCard({ account, employer }: { account: WorkerPayoutAccount; employer: string }) {
   const t = useTranslations("worker.bank");
