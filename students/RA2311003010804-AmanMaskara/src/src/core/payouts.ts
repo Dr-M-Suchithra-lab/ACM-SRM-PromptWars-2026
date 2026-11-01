@@ -28,6 +28,23 @@ export function payableFor(row: {
   return row.outstanding >= MIN_PAYOUT ? { kind: "gap", amount: row.outstanding } : null;
 }
 
+/** "waiting": a checkout with this worker's share is open. "paid": a checkout paid them this month. */
+export type PayLock = "waiting" | "paid";
+
+/**
+ * Workers whose month goes through a FairShift checkout. Their pay record is the payment itself,
+ * so a hand-typed record or CSV row can't replace it (which would reopen a gap and pay them twice).
+ * A failed share locks nothing. Waiting wins over paid: nothing more may be paid until it settles.
+ */
+export function payLocks(items: { workerId: string; status: PayoutStatus }[]): Map<string, PayLock> {
+  const locks = new Map<string, PayLock>();
+  for (const item of items) {
+    if (item.status === "pending") locks.set(item.workerId, "waiting");
+    else if (item.status === "paid" && !locks.has(item.workerId)) locks.set(item.workerId, "paid");
+  }
+  return locks;
+}
+
 // ── Bank details ───────────────────────────────────────────────────
 
 /** Indian IFSC: 4 bank letters, a zero, then 6 letters or digits (RBI format). */

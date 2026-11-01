@@ -29,7 +29,7 @@ import { generateShifts, rameshJoinedAt } from "./attendance";
 import { buildFeedback, buildHazards, buildIssues, SKILLS } from "./records";
 import { buildPayoutAccounts } from "./payouts";
 
-export const SEED_VERSION = 7;
+export const SEED_VERSION = 8;
 
 /** Ramesh was paid for 9h of overtime this month although 13h 32m were recorded. */
 export const RAMESH_UNPAID_OT_MINUTES = 4 * 60 + 32;
@@ -165,14 +165,13 @@ function buildPaidRecords(workers: Worker[], shifts: Shift[], now: Date): PaidRe
   records.push(recordFor("w1004"));
   // Gopal: 9h 47m of regular hours left off the sheet ("Possible shortfall").
   records.push(regularHoursShort(recordFor("w1014"), 9 * 60 + 47, rate(worker("w1014"), org1)));
-  // Babu: paid in full, but the sheet listed 11h 4m fewer regular hours; the employer paid the
-  // difference the check found as arrears ("Gap paid").
+  // Babu: the sheet left off 10h 15m of regular hours and paid that much less; the employer then
+  // paid exactly the gap the check found as arrears ("Gap paid ₹692"), so in total he got his net pay.
   const babuFair = recordFor("w1008");
-  const babuShort = regularHoursShort(babuFair, 11 * 60 + 4, rate(worker("w1008"), org1));
+  const babuShort = regularHoursShort(babuFair, 10 * 60 + 15, rate(worker("w1008"), org1));
   records.push({
-    ...babuFair,
-    paidRegularHours: babuShort.paidRegularHours,
-    arrears: [{ amount: babuFair.grossPaid - babuShort.grossPaid, at: new Date(now.getTime() - DAY_MS), by: "admin1" }],
+    ...babuShort,
+    arrears: [{ amount: babuFair.netPaid - babuShort.netPaid, at: new Date(now.getTime() - DAY_MS), by: "admin1" }],
   });
   // Arun has nothing entered yet ("Not entered").
 

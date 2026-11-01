@@ -12,6 +12,7 @@ import {
   normaliseIfsc,
   paiseToRupees,
   payableFor,
+  payLocks,
   summariseBatch,
   transferIdFor,
 } from "@/core/payouts";
@@ -104,5 +105,25 @@ describe("batch bookkeeping", () => {
   it("converts paise to the rupees payment APIs expect", () => {
     expect(paiseToRupees(90_750)).toBe(907.5);
     expect(paiseToRupees(1)).toBe(0.01);
+  });
+});
+
+describe("whose pay record a checkout locks", () => {
+  it("locks a worker paid by a checkout, and one waiting in a checkout; a failed share locks nothing", () => {
+    const locks = payLocks([
+      { workerId: "paid", status: "paid" },
+      { workerId: "waiting", status: "pending" },
+      { workerId: "failed", status: "failed" },
+    ]);
+    expect(Object.fromEntries(locks)).toEqual({ paid: "paid", waiting: "waiting" });
+  });
+
+  it("says waiting while any checkout for the worker is still open", () => {
+    const items = [
+      { workerId: "w1", status: "paid" as const },
+      { workerId: "w1", status: "pending" as const },
+    ];
+    expect(payLocks(items).get("w1")).toBe("waiting");
+    expect(payLocks(items.toReversed()).get("w1")).toBe("waiting");
   });
 });

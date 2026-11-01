@@ -364,6 +364,17 @@ export interface PayoutBatchRepo {
   update(id: string, data: Partial<PayoutBatch>): Promise<void>;
 }
 
+/**
+ * Short-lived named locks, so two requests can't change the same payroll at once (two checkouts
+ * for one worker, or one payment recorded twice). A lock expires on its own if its holder dies.
+ */
+export interface LockRepo {
+  /** Takes the lock if it is free or expired; false while another holder has it. */
+  acquire(key: string, owner: string, until: Date, now: Date): Promise<boolean>;
+  /** Frees the lock, only if `owner` still holds it. */
+  release(key: string, owner: string): Promise<void>;
+}
+
 export interface AiLogRepo {
   add(entry: AiLogEntry): Promise<void>;
   recent(limit: number): Promise<AiLogEntry[]>;
@@ -392,6 +403,7 @@ export interface Repos {
   certificates: CertificateRepo;
   payoutAccounts: PayoutAccountRepo;
   payoutBatches: PayoutBatchRepo;
+  locks: LockRepo;
   aiLog: AiLogRepo;
   ttsCache: TtsCacheRepo;
 }

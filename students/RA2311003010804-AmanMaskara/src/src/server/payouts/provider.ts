@@ -35,6 +35,11 @@ export interface CheckoutProvider {
   create(request: CheckoutRequest): Promise<{ url: string }>;
   status(batchId: string): Promise<PayoutStatus>;
   cancel(batchId: string): Promise<void>;
+  /**
+   * Optional: get a worker's bank account ready before their first checkout (Cashfree checks a
+   * new account for about 10 minutes, and a checkout that names it before then is refused).
+   */
+  prepare?(account: Omit<CheckoutSplit, "amount">): Promise<void>;
 }
 
 /**

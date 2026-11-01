@@ -37,7 +37,7 @@ export default async function AdminLayout({ children }: LayoutProps<"/a">) {
         </div>
         <OnDuty variant="rail" />
         <Sidebar variant="rail" />
-        <div className="mt-auto flex items-center justify-between gap-2 border-t border-line pt-4">
+        <div className="mt-auto flex flex-wrap items-center justify-between gap-2 border-t border-line pt-4">
           <LanguageMenu side="top" />
           <LogoutButton variant="ghost" size="sm" />
         </div>
@@ -58,8 +58,8 @@ export default async function AdminLayout({ children }: LayoutProps<"/a">) {
             <LogoutButton variant="ghost" size="icon" iconOnly />
           </div>
         </div>
-        <div className="flex min-w-0 items-center gap-2 px-4 pb-2.5">
-          <span className="min-w-0 truncate font-bold">{org?.name}</span>
+        <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1 px-4 pb-2.5">
+          <span className="max-w-full min-w-0 truncate font-bold">{org?.name}</span>
           {org && <Badge tone="brand">{sector}</Badge>}
           <OnDuty variant="strip" />
         </div>

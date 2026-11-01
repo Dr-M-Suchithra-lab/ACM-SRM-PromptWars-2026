@@ -126,7 +126,7 @@ export default async function WorkerHome({ searchParams }: PageProps<"/w">) {
         </header>
 
         <div className="stagger flex flex-col gap-4">
-          {bank && bank.status !== "confirmed" && <BankConfirmCard account={bank} employer={org?.name ?? ""} />}
+          {bank && <BankConfirmCard account={bank} employer={org?.name ?? ""} />}
           <section aria-labelledby="earned-title" className="hero-card flex flex-col gap-3 p-5 md:p-7">
             <div className="flex items-start justify-between gap-3">
               <h2 id="earned-title" className="eyebrow text-primary-strong">

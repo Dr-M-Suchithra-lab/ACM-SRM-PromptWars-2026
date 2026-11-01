@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { notFound, redirect } from "next/navigation";
+import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { CircleCheck, CircleX, FlaskConical } from "lucide-react";
 import { requireRole } from "@/server/dal";
@@ -19,7 +19,9 @@ import { SubmitButton } from "@/components/ui/submit-button";
  */
 export default async function SimulatedCheckoutPage({ params }: PageProps<"/a/payroll/checkout/[batchId]">) {
   const session = await requireRole("admin");
-  if (getCheckoutProvider()?.name !== "simulated") notFound();
+  // With Cashfree keys the checkout happens on Cashfree's page; an old or unknown link here goes
+  // back to payroll, where a waiting checkout can be continued or cancelled.
+  if (getCheckoutProvider()?.name !== "simulated") redirect("/a/payroll");
   const { batchId } = await params;
   const batch = await waitingCheckout(getRepos(), session.orgId, batchId);
   if (!batch || batch.provider !== "simulated") redirect("/a/payroll");

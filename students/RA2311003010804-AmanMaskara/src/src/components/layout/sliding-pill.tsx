@@ -28,9 +28,20 @@ export function useSlidingPill(activeIndex: number): {
       });
     };
     measure();
+    // Watch every item, not just the list: on phones the strip keeps its width while a language
+    // change makes each tab wider or narrower, and the pill must follow its tab.
     const observer = new ResizeObserver(measure);
-    if (list) observer.observe(list);
-    return () => observer.disconnect();
+    if (list) {
+      observer.observe(list);
+      for (const child of list.children) if (!child.hasAttribute("aria-hidden")) observer.observe(child);
+    }
+    // Labels are measured again once the language's font has loaded.
+    let live = true;
+    void document.fonts?.ready.then(() => live && measure());
+    return () => {
+      live = false;
+      observer.disconnect();
+    };
   }, [activeIndex]);
 
   return { listRef, pillStyle };

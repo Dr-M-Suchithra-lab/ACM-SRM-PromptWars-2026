@@ -80,7 +80,7 @@ describe("one organisation can never act on another's records", () => {
       deductions: 0,
       netPaid: 0,
     };
-    expect(await savePaidRecord(getRepos(), "org2", "admin2", record, now)).toBe(false);
+    expect(await savePaidRecord(getRepos(), "org2", "admin2", record, now)).toEqual(NOT_FOUND);
   });
 
   it("certificates and co-signed issues", async () => {

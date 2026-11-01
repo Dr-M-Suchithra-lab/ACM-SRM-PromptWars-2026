@@ -55,7 +55,7 @@ export const vendorIdFor = (split: Pick<CheckoutSplit, "workerId" | "account" | 
     .slice(0, 12)}`;
 
 /** Cashfree vendor names allow letters, spaces and . / - & only. */
-const vendorName = (split: CheckoutSplit) =>
+const vendorName = (split: Pick<CheckoutSplit, "holder" | "workerId">) =>
   split.holder.replace(/[^A-Za-z .\/&-]/g, "").trim() || `Worker ${split.workerId.replace(/[^A-Za-z0-9]/g, "")}`;
 
 async function failure(response: Response): Promise<Error> {
@@ -95,7 +95,7 @@ export function createCashfreeCheckout(config: CashfreeConfig): CheckoutProvider
   }
 
   /** Each worker must exist as an Easy Split vendor with their bank account before a split can name them. */
-  async function ensureVendor(split: CheckoutSplit): Promise<void> {
+  async function ensureVendor(split: Omit<CheckoutSplit, "amount">): Promise<void> {
     const vendorId = vendorIdFor(split);
     const existing = await call(`/easy-split/vendors/${vendorId}`);
     if (existing.ok) return;
@@ -158,6 +158,9 @@ export function createCashfreeCheckout(config: CashfreeConfig): CheckoutProvider
       if (!link.success) throw new Error("Cashfree link status: unexpected response");
       return mapLinkStatus(link.data.link_status);
     },
+
+    /** Registers the account as soon as it is saved, so it is ready by the first checkout. */
+    prepare: ensureVendor,
 
     async cancel(batchId: string) {
       const response = await call(`/links/${encodeURIComponent(batchId)}/cancel`, { method: "POST" });

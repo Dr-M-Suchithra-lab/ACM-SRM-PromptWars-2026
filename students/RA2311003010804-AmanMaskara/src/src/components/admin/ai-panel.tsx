@@ -40,8 +40,8 @@ export function AiPanel({ configured, calls }: { configured: boolean; calls: AiL
               {calls.map((call, i) => (
                 <tr key={i} className="border-t border-line align-top">
                   <td className="py-1.5">{t(`features.${call.feature}`)}</td>
-                  <td className="py-1.5 font-mono text-xs">{call.model}</td>
-                  <td className="figure py-1.5">{call.latencyMs} ms</td>
+                  <td className="py-1.5 font-mono text-xs whitespace-nowrap">{call.model}</td>
+                  <td className="figure py-1.5 whitespace-nowrap">{call.latencyMs} ms</td>
                   <td className="py-1.5">
                     {call.error ? (
                       <span className="text-danger">{t("failed")}</span>

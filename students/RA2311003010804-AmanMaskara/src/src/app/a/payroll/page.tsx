@@ -83,7 +83,7 @@ export default async function PayrollPage({ searchParams }: PageProps<"/a/payrol
 
       <WaitingCheckouts batches={waiting} enabled={provider !== null} />
 
-      <PayrollLedger month={month} provider={provider} rows={ledger.rows} />
+      <PayrollLedger month={month} inProgress={month === monthKey(now)} provider={provider} rows={ledger.rows} />
 
       <CheckoutHistory batches={finished} />
 

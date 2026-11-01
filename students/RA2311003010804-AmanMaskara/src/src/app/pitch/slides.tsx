@@ -116,7 +116,7 @@ export const SLIDES: Slide[] = [
         <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
           <Stat value="4" label="languages, read aloud" />
           <Stat value="2+" label="industries, one codebase" />
-          <Stat value="455" label="automated tests" />
+          <Stat value="489" label="automated tests" />
           <Stat value="0" label="accessibility violations" />
         </div>
       </div>
@@ -355,9 +355,9 @@ export const SLIDES: Slide[] = [
           Only a redirect to an https Cashfree page, so no payment script on FairShift. The return link proves nothing:
           FairShift asks Cashfree whether it was paid before recording anything.
         </Card>
-        <Card icon={<TestTube2 className="size-5" />} title="Proved">
-          Encryption, tampering, wrong worker and key rotation tested; tenant isolation for every checkout action; the
-          worker confirming in their app is an end-to-end test.
+        <Card icon={<TestTube2 className="size-5" />} title="Never paid twice">
+          A paid month can be added to, never lowered; two requests at the same moment can&apos;t both pay; a gap is at
+          most the take-home pay still missing. Tested for every worker in both organisations.
         </Card>
       </div>
     ),
@@ -630,12 +630,12 @@ export const SLIDES: Slide[] = [
         <div className="flex flex-col gap-3">
           {[
             [
-              "Unit · 416",
+              "Unit · 448",
               "Pay, overtime, fatigue, risk, eligibility, hazard deadlines, signed tokens, AI guard rails, contrast, 4 languages.",
             ],
             ["Coverage · 98%", "Of all measured lines, enforced in CI: the build fails below 95%."],
             [
-              "End-to-end · 39",
+              "End-to-end · 41",
               "Real browser (phone + desktop) through both interfaces, with axe accessibility checks.",
             ],
             [
@@ -649,7 +649,7 @@ export const SLIDES: Slide[] = [
             </div>
           ))}
         </div>
-        <Card icon={<Bug className="size-5" />} title="Real bugs the tests caught">
+        <Card icon={<Bug className="size-5" />} title="Real bugs found, each now guarded by a test">
           <ul className="flex list-disc flex-col gap-1 pl-5">
             <li>Overtime capped once per month instead of per week: workers underpaid.</li>
             <li>Seeded shifts 5½ hours off on a UTC server.</li>
@@ -657,6 +657,9 @@ export const SLIDES: Slide[] = [
             <li>“Thank you” screen swallowed by a page refresh.</li>
             <li>Security policy silently blocking chart styles.</li>
             <li>“Paid in full” showing ₹11.52 short: hours rounded to a quarter.</li>
+            <li>A paid month could be typed over and paid again: found by trying to break it.</li>
+            <li>“Pay the gap” handed over the PF share too: paid above the net due.</li>
+            <li>Tamil and Telugu labels spilling out of buttons on phones.</li>
           </ul>
         </Card>
       </div>
@@ -712,7 +715,7 @@ export const SLIDES: Slide[] = [
             "Inclusivity",
             "4 languages, voice in and out, offline, big targets, axe 0 violations, every page under 400 ms.",
           ],
-          ["Technical", "Strict TypeScript, nonce CSP, signed sessions, 455 tests, 98% coverage, green CI."],
+          ["Technical", "Strict TypeScript, nonce CSP, signed sessions, 489 tests, 98% coverage, green CI."],
           [
             "Feasibility",
             "Construction and hospital live from one codebase; a new industry is one config file; Cloud Run–ready.",

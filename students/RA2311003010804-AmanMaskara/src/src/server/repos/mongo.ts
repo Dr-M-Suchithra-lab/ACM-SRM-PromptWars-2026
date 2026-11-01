@@ -76,7 +76,10 @@ async function ensureSeeded(database: Db): Promise<void> {
   if (!(await claimReseed(database, now))) return;
   const seed = getSeedData(now);
   await Promise.all(
-    [...SEEDED_COLLECTIONS, ...GUARD_COLLECTIONS].map((name) => database.collection(name).deleteMany({})),
+    [...SEEDED_COLLECTIONS, ...GUARD_COLLECTIONS].map((name) =>
+      // A checkout still waiting may be paid after the reset: keep it so the payment is recorded.
+      database.collection(name).deleteMany(name === "payoutBatches" ? { "items.status": { $ne: "pending" } } : {}),
+    ),
   );
   await Promise.all(
     SEEDED_COLLECTIONS.map(async (name) => {
@@ -97,6 +100,7 @@ async function ensureSeeded(database: Db): Promise<void> {
     database.collection("skills").createIndex({ workerId: 1 }),
     database.collection("payoutAccounts").createIndex({ orgId: 1 }),
     database.collection("payoutBatches").createIndex({ orgId: 1, month: 1 }),
+    database.collection("locks").createIndex({ until: 1 }, { expireAfterSeconds: 0 }),
     // Metadata only, kept 30 days; cached speech kept 90 days.
     database.collection("aiLog").createIndex({ at: 1 }, { expireAfterSeconds: 30 * 86_400 }),
     database.collection("ttsCache").createIndex({ at: 1 }, { expireAfterSeconds: 90 * 86_400 }),
@@ -256,6 +260,23 @@ export function createMongoRepos(): Repos {
           .limit(Math.min(limit, AI_LOG_LIMIT))
           .toArray();
         return docs as unknown as AiLogEntry[];
+      },
+    },
+    locks: {
+      acquire: async (key, owner, until, now) => {
+        // Matches only a free or expired lock; a held one makes the upsert collide on _id.
+        try {
+          await (
+            await col("locks")
+          ).updateOne({ _id: key, until: { $lte: now } } as Document, { $set: { owner, until } }, { upsert: true });
+          return true;
+        } catch (error) {
+          if ((error as { code?: number }).code === 11000) return false;
+          throw error;
+        }
+      },
+      release: async (key, owner) => {
+        await (await col("locks")).deleteOne({ _id: key, owner } as Document);
       },
     },
     ttsCache: {

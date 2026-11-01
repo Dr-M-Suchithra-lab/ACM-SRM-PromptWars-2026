@@ -86,7 +86,7 @@ const CONSTRUCTION: RosterRow[] = [
   ["1005", "Manoj Kumar", "Mason", "skilled", "ta", "site1", 80_000],
   ["1006", "Ravi Sharma", "Helper", "unskilled", "hi", "site1", 60_000],
   ["1007", "Selvam Murugan", "Electrician", "skilled", "ta", "site1", 85_000],
-  ["1008", "Babu Rajan", "Helper", "unskilled", "ta", "site1", 50_000],
+  ["1008", "Babu Rajan", "Helper", "unskilled", "ta", "site1", 54_000],
   ["1009", "Suresh Naik", "Crane operator", "skilled", "en", "site1", 95_000],
   ["1010", "Prakash Mahto", "Helper", "unskilled", "hi", "site1", 58_000],
   ["1011", "Karthik Raja", "Plumber", "skilled", "ta", "site1", 82_000],

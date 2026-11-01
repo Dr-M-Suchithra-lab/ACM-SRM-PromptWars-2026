@@ -120,10 +120,11 @@ describe("FairPay Sentinel", () => {
   });
 
   it("imports a paid-records CSV row by row and reports bad rows", async () => {
-    const month = monthKey(now);
+    // The month the payroll opens on, with a row well within what Manoj worked and earned.
+    const month = payFocusMonth(now);
     const csv = [
       PAID_CSV_HEADER.join(","),
-      `1005,${month},150,4,"12,000.00",1000,11000`,
+      `1005,${month},10,1,"1,200.00",100,1100`,
       `9999,${month},1,1,1,1,1`,
       `1006,${month},x,1,1,1,1`,
     ].join("\n");
@@ -135,7 +136,7 @@ describe("FairPay Sentinel", () => {
         { row: 3, reason: "invalid" },
       ],
     });
-    expect((await getRepos().paidRecords.get("w1005", month))?.grossPaid).toBe(1_200_000);
+    expect((await getRepos().paidRecords.get("w1005", month))?.grossPaid).toBe(120_000);
     expect(await importPaidCsv(getRepos(), "org1", "admin1", "wrong,header\n1,2", now)).toEqual({
       saved: 0,
       errors: [{ row: 0, reason: "columns" }],
@@ -357,13 +358,15 @@ describe("paying the gap", () => {
     });
   });
 
-  it("keeps arrears when the pay record is corrected, and refuses other organisations", async () => {
+  it("closes the record once the gap is paid, so the arrears can't count twice, and refuses other organisations", async () => {
     const repos = getRepos();
     const month = payFocusMonth(now);
     await payArrears(repos, { orgId: "org1", adminId: "admin1", workerId: "w1001", month, now });
     const record = (await repos.paidRecords.get("w1001", month))!;
-    await savePaidRecord(repos, "org1", "admin1", { ...record, workerId: "w1001", month }, now);
-    expect((await repos.paidRecords.get("w1001", month))!.arrears).toHaveLength(1);
+    // "Paid in full" on top of the arrears would record the gap twice.
+    const full = { ...record, workerId: "w1001", month, paidOvertimeHours: record.paidOvertimeHours + 5 };
+    expect(await savePaidRecord(repos, "org1", "admin1", full, now)).toEqual({ ok: false, error: "settled" });
+    expect(await repos.paidRecords.get("w1001", month)).toEqual(record);
     expect(await payArrears(repos, { orgId: "org2", adminId: "admin2", workerId: "w1001", month, now })).toEqual({
       ok: false,
       error: "not_found",

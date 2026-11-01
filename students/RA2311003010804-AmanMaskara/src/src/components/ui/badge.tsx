@@ -2,9 +2,10 @@ import { cva, type VariantProps } from "class-variance-authority";
 import type { ComponentProps } from "react";
 import { cn } from "@/lib/utils";
 
-// Status is never conveyed by colour alone: callers always pass an icon and a word.
+// Status is never conveyed by colour alone: callers always pass an icon and a word. A badge stays
+// on one line when it fits and wraps inside its pill when it doesn't (long words in other languages).
 const badgeVariants = cva(
-  "inline-flex items-center gap-1 whitespace-nowrap rounded-full px-2.5 py-0.5 text-sm font-bold",
+  "inline-flex max-w-full items-center gap-1 rounded-full px-2.5 py-0.5 text-sm leading-snug font-bold [&>svg]:shrink-0",
   {
     variants: {
       tone: {
