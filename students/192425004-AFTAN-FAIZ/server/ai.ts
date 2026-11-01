@@ -223,6 +223,7 @@ function diagnostic(
   language: Language,
   reason: string,
   status?: number,
+  googleStatus?: string,
 ) {
   console.warn(
     JSON.stringify({
@@ -231,6 +232,7 @@ function diagnostic(
       language,
       reason,
       ...(status ? { status } : {}),
+      ...(googleStatus ? { googleStatus } : {}),
     }),
   );
 }
@@ -311,31 +313,62 @@ export async function explain(
         : undefined;
     // Inspect provider text only in memory. Emit a closed diagnostic category,
     // never the message (which may contain credentials or request details).
-    const providerMessage = error instanceof Error ? error.message : "";
+    const providerMessage =
+      typeof error === "object" &&
+      error !== null &&
+      "message" in error &&
+      typeof error.message === "string"
+        ? error.message
+        : "";
+    let googleStatus: string | undefined;
+    try {
+      const value = JSON.parse(providerMessage)?.error?.status;
+      if (
+        [
+          "INVALID_ARGUMENT",
+          "FAILED_PRECONDITION",
+          "PERMISSION_DENIED",
+          "NOT_FOUND",
+          "RESOURCE_EXHAUSTED",
+          "UNAUTHENTICATED",
+          "UNAVAILABLE",
+          "INTERNAL",
+        ].includes(value)
+      )
+        googleStatus = value;
+    } catch {
+      /* Non-JSON provider errors still receive a closed category. */
+    }
     const reason =
       status === 400 &&
-      /API_KEY_INVALID|API key not valid|API key expired|API_KEY_SERVICE_BLOCKED/i.test(
-        providerMessage,
-      )
+      /API[ _-]?KEY|credential|unauthenticated/i.test(providerMessage)
         ? "provider_credentials"
         : status === 400 &&
-            /response.?schema|additionalProperties|temperature|thinking|unknown name|unsupported.*parameter/i.test(
+            /schema|additional.?properties|temperature|thinking|unknown name|unsupported.*parameter|invalid json|payload/i.test(
               providerMessage,
             )
           ? "provider_parameters"
-          : status === 429
-            ? "quota_or_rate_limit"
-            : status === 401 || status === 403
-              ? "provider_credentials"
-              : status === 404
+          : status === 400 &&
+              /billing|paid tier|payment|free tier/i.test(providerMessage)
+            ? "provider_billing"
+            : status === 400 && /location|region|country/i.test(providerMessage)
+              ? "provider_region"
+              : status === 400 && /model/i.test(providerMessage)
                 ? "model_unavailable"
-                : error instanceof z.ZodError || error instanceof SyntaxError
-                  ? "invalid_output"
-                  : error instanceof Error &&
-                      ["TimeoutError", "AbortError"].includes(error.name)
-                    ? "provider_timeout"
-                    : "provider_error";
-    diagnostic(topic, language, reason, status);
+                : status === 429
+                  ? "quota_or_rate_limit"
+                  : status === 401 || status === 403
+                    ? "provider_credentials"
+                    : status === 404
+                      ? "model_unavailable"
+                      : error instanceof z.ZodError ||
+                          error instanceof SyntaxError
+                        ? "invalid_output"
+                        : error instanceof Error &&
+                            ["TimeoutError", "AbortError"].includes(error.name)
+                          ? "provider_timeout"
+                          : "provider_error";
+    diagnostic(topic, language, reason, status, googleStatus);
     return fallback;
   } finally {
     // A completed request must not retain its timeout until the deadline.

@@ -2,83 +2,98 @@
 
 **Fairness You Can Trace. Trust You Can Prove.**
 
-PromptWars × ACM SRM Student Chapter 2026  
-Participant: **AFTAN FAIZ** · Registration: **192425004**  
-Submission name: **192425004 - AFTAN FAIZ**  
-Submission branch: `192425004-AFTAN-FAIZ`  
-Organizer repository: [ACM-SRM-PromptWars-2026](https://github.com/Dr-M-Suchithra-lab/ACM-SRM-PromptWars-2026)  
-[Official submission instructions](https://github.com/Dr-M-Suchithra-lab/ACM-SRM-PromptWars-2026/blob/main/README.md)
+PromptWars × ACM SRM Student Chapter 2026 · Solo submission  
+**AFTAN FAIZ · 192425004**  
+Branch: `192425004-AFTAN-FAIZ` · Folder: `students/192425004-AFTAN-FAIZ/`  
+[Organizer's required README format](https://github.com/Dr-M-Suchithra-lab/ACM-SRM-PromptWars-2026/blob/main/README.md)
 
 ## 1. Problem Statement
 
-**FairShift — Decent Work Platform** is the original hackathon problem-statement title supplied by the participant. NYAVERIS AI addresses opaque wages, unsafe working conditions and insufficient rest through worker and employer workflows for construction and healthcare.
+**FairShift — Decent Work Platform** is the original challenge title supplied for this project, retained here as historical problem-statement information. The project addresses opaque wages, workplace safety concerns and insufficient rest, aligned with **UN SDG 8 — Decent Work and Economic Growth**.
 
-This supports **UN SDG 8 — Decent Work and Economic Growth**, particularly transparent remuneration, safer workplaces and worker participation in resolving concerns.
-
-**Official wording pending:** the complete organizer-issued statement was not present in the supplied project or located in the public search. The paragraph above describes this implementation; it is not a verbatim official statement. Insert the organizer's exact text or link before final submission.
+The complete organizer-issued wording is not present in the public organizer README or this submission's supplied evidence. The description above is the implementation's scope, not an invented verbatim problem statement; the official full text/link remains to be supplied if the organizer requires it.
 
 ## 2. Our Solution
 
 NYAVERIS AI connects worker and employer dashboards to Supabase Auth and PostgreSQL.  
-**Fairness Twin** (the existing FairPay Twin workflow) compares expected and recorded pay using deterministic integer-paise rules.  
-**ProofLoop** records transactional action history and payroll reviews through employer response and worker confirmation.  
-**SafeSignal** provides anonymous concern reporting with secret-based tracking; **RestGuard** flags schedule risks and previews changes.  
-**Saarthi AI** offers English, Tamil and Hindi guidance with optional server-side Google Gemini explanations and deterministic text fallbacks.
+**Fairness Twin** compares expected and recorded earnings using deterministic integer-paise calculations and saved pay-policy snapshots.  
+**ProofLoop** records payroll reviews, employer responses and worker confirmations in transactional audit history.  
+**SafeSignal** provides concern reporting and secret-based tracking; **RestGuard** distinguishes overlapping shifts from insufficient rest and offers schedule previews.  
+**Saarthi AI** provides English, Tamil and Hindi workplace assistance, relevant navigation and browser speech controls, with optional server-side Gemini and reliable deterministic guidance.
 
-Implemented features include shifts, workforce/payroll views, policy versions, historical policy snapshots and separate synthetic construction/healthcare tenants. There is sign-in and provisioned membership; public registration is not implemented. AI does not calculate wages or change business records.
 
 ## 3. Tools Used
 
-- OpenAI Codex: development prompts recovered from the existing project chat, plus submission preparation in this chat.
-- React 19, TypeScript, Vite, Tailwind CSS 4, React Router, Radix UI and Lucide.
-- Node.js, Express 5, Zod and the official Google Gen AI SDK (`@google/genai`).
-- Supabase Auth and PostgreSQL: sole application database, RLS, protected RPCs and persistent rate limiting.
-- Vitest, Supertest, Playwright and axe-core for automated checks.
-- Vercel: recorded existing deployment; Git/GitHub: source and submission workflow.
+- **OpenAI Codex** for engineering and testing; genuine development excerpts are retained in [prompts.md](prompts.md).
+- **React 19, TypeScript, Vite, Tailwind CSS 4, React Router, Radix UI and Lucide** for the existing accessible interface.
+- **Node.js 24, Express 5 and Zod** for validated APIs and serverless startup.
+- **Supabase PostgreSQL and Supabase Auth** for the sole application database, authentication, RLS, guarded transactional RPCs and shared rate limiting.
+- **Google Gen AI SDK** for optional Gemini explanations; live generation remains unverified after provider HTTP 400 responses.
+- **Vitest, Supertest, Playwright and axe-core** for regression, database-boundary, accessibility and browser checks.
+- **Vercel and GitHub** for the existing deployment and versioned submission.
 
-Versions are pinned in `package.json` and `package-lock.json`. See [architecture](docs/ARCHITECTURE.md).
+Dependency versions are pinned in `package.json` and `package-lock.json`. See [architecture](docs/ARCHITECTURE.md).
 
 ## 4. How to Run
 
-Use Node.js 24 and npm. Run these commands **from this submission folder**:
+Use Node.js 24 and npm. From this participant folder:
 
 ```powershell
 npm ci
-Copy-Item .env.example .env
-# Fill .env locally with your dedicated Supabase project values.
+if (!(Test-Path .env)) { Copy-Item .env.example .env }
+# Configure the existing project's approved values privately in .env.
 npm run dev
-# In another terminal, from the same folder:
+# In a second terminal in this same folder:
 npm run dev:web
 ```
 
-Open `http://127.0.0.1:5173`. Vite proxies `/api` to the backend on port 8080. Do not put server secrets in `VITE_*` variables. Runtime public configuration comes from `/api/config`.
+Open `http://127.0.0.1:5173`. Vite proxies `/api` to Express on port 8080. Configure `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY` and the existing gateway credentials privately. Use `ENABLE_DEMO=true` only with the authorized synthetic demo accounts. Optional AI uses a backend-only `GEMINI_API_KEY`; the existing private alias is supported, and `GEMINI_MODEL` overrides the owner-selected server default. Never put secrets in `VITE_*`, screenshots, prompts or Git.
 
-**Connect a fresh dedicated synthetic Supabase project:** set `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY`; choose random demo/gateway passwords; temporarily configure `SUPABASE_SECRET_KEY` and run `npm run db:provision` to provision the fixed synthetic Auth identities. Apply **every** SQL file in `supabase/migrations/` in filename order, then apply `supabase/seed.sql` once and enroll the gateway using [setup](docs/SETUP.md). Remove the provisioning secret from runtime. Enable `ENABLE_DEMO=true` only for an isolated synthetic deployment. Never seed production employee data.
+**Existing hosted project safety:** use only `vkkjuopfidvfhzsqzius`. Do not run provisioning, seed, reset or blanket migration-push commands against it. Do not create another project. Keep `ENABLE_SAAS` disabled until the approved migration and backup/restore checks pass. The optional performance migration is not automatically authorized. Follow [migration review](docs/MIGRATION_REVIEW.md), [private backup/restore steps](docs/OPERATOR_BACKUP_RESTORE.md) and [SaaS rollout](docs/SAAS_ROLLOUT.md).
 
-`SAFETY_GATEWAY_EMAIL` and `SAFETY_GATEWAY_PASSWORD` are needed for the safety gateway and shared database rate limits. Optional `GEMINI_API_KEY` plus `GEMINI_MODEL` enables live AI; otherwise guidance falls back to text. Existing synthetic email addresses are technical fixtures retained for compatibility.
+Run checks:
 
 ```powershell
 npm run typecheck
 npm test
 npm run build
-# With both development servers running and a dedicated synthetic database:
-npm run test:e2e
-# Optional hosted tenant-isolation check (requires configured credentials):
-npm run test:rls:readonly
+npm run check:security
 ```
 
-Browser checks use Chrome on Windows; elsewhere install Playwright Chromium. The full existing E2E suite can append synthetic workflow records; use a dedicated test database. Submission-only read-only UI capture is available with `node scripts/capture-submission.mjs`; see its environment-variable comments. Current results and limitations are in [validation](docs/SUBMISSION_VALIDATION.md).
+For the **isolated** SQL and complete browser journey, first install the documented optional test runtime. This does not replace Supabase as the application database:
 
-Vercel uses the included `vercel.json`, `api/` handler and Vite build. For a separate deployment, set the project Root Directory to `students/192425004-AFTAN-FAIZ` and configure runtime environment values privately; do not alter the existing live project. The portable Dockerfile is retained. The earlier project documentation records a Cloud Run hosting rule for the original challenge; Vercel alone does not meet that rule. Confirm current organizer requirements manually; no Google Cloud configuration is performed here.
+```powershell
+npm install --prefix .local/saas-db --no-audit --no-fund --ignore-scripts @electric-sql/pglite@0.3.14
+node scripts/test-saas-database.mjs
+node tests/migration-upgrade.mjs
+npx vitest run --config tests/functional.config.ts
+```
+
+Do not point the complete mutating browser suite at production. Browser tests use Chrome on Windows; install Playwright Chromium where required. The synchronization command `node scripts/sync-submission.mjs --check` is run from the **application repository root**, which contains both local copies.
 
 ## 5. Demo Link
 
-[NYAVERIS AI on Vercel](https://nyaveris-ai.vercel.app)
+**[Open NYAVERIS AI](https://nyaveris-ai.vercel.app)**
 
-This URL was found in existing project documentation and rechecked on 31 October 2026: landing page HTTP 200 with the exact NYAVERIS AI title, and `/api/health` HTTP 200 with healthy status. Screenshots are captured from the submitted source served locally against the existing synthetic backend, when available. No deployment changes are required.
+Real signup/login, account recovery and SaaS onboarding code are implemented. **Hosted business creation, employee management and invitations remain gated** until the approved SaaS migration's verified-backup prerequisite is satisfied. New businesses do not inherit demo employees. AI never calculates authoritative wages or changes business records.
+
+Use **Explore worker demo** or **Explore employer demo** for the existing synthetic construction/healthcare workspaces; passwords are not published. These records are demonstrations, not real employment or legal determinations.
+
+Current verification: **203 unit/API tests and 40 isolated browser tests passed** in the activation audit. Both production builds passed. A fresh approved synthetic signup was accepted and its verification email arrived with the production callback; the confirmation link/session was not completed because browser control was stopped. Existing live health and protected-route checks are recorded in the audit; genuine email verification, password recovery, Google consent, invitation receipt, physical voice output and complete hosted new-business acceptance are not claimed from local tests.
+
+Current external blockers: a verified restorable backup and the pending SaaS migration; Google OAuth and invitation-sender configuration; Gemini provider rejection; remaining inbox/device acceptance. See [activation evidence](docs/ACTIVATION_2026-11-01.md). The portable Cloud Run container remains available, but no Cloud Run deployment is claimed. The recorded original challenge's Cloud Run hosting requirement is not satisfied by Vercel alone.
 
 ## 6. Key Prompts
 
-[prompts.md](prompts.md) contains genuine excerpts recovered from the existing development chat for the initial build, Supabase, worker/admin dashboards, Fairness Twin, ProofLoop, SafeSignal, RestGuard, Gemini/Saarthi AI, UI, Vercel deployment and testing/debugging. It records original message identifiers and distinguishes requested features from implemented functionality. Historical branding lines are omitted rather than rewritten inside quotations.
+These short **verbatim excerpts** come from the preserved [prompt history](prompts.md); they describe requested work, not proof of completed external integrations:
 
-The submission includes `README.md`, `prompts.md`, complete application source/configuration, and genuine screenshots where capture succeeds. See [screenshots](screenshots/README.md) and [file manifest](docs/FILE_MANIFEST.txt).
+1. **Implementation:** “You must write actual working code in the project repository.” — [initial development](prompts.md#1-initial-application-development)
+2. **Database:** “Use Supabase PostgreSQL as the database.” — [Supabase integration](prompts.md#2-supabase-integration)
+3. **Fairness Twin:** “Represent money using integer paise rather than floating-point currency values.” — [calculation rules](prompts.md#4-fairness-twin)
+4. **ProofLoop:** “Every important event in a workplace dispute must have a traceable history.” — [audit workflow](prompts.md#5-proofloop)
+5. **SafeSignal:** “Store only a secure hash of the access token.” — [privacy requirements](prompts.md#6-safesignal)
+6. **Saarthi:** “Integrate Google Gemini meaningfully.” — [multilingual assistance](prompts.md#8-gemini-and-saarthi-ai)
+
+The required folder contains this README, complete `src/` and backend/configuration, authentic `prompts.md`, and [genuine screenshots](screenshots/README.md). Existing screenshots and prompt history are preserved. [File manifest](docs/FILE_MANIFEST.txt).
+
+The organizer's instructions require a pull request to record submission time. No PR is created automatically; updates stay on the existing participant branch and inside this folder.

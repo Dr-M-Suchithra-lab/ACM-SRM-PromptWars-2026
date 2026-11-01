@@ -13,6 +13,13 @@ describe("Saarthi explanations", () => {
       "provider_credentials",
     ],
     ["Unknown name response_schema: private prompt", "provider_parameters"],
+    ["API key not found. private credential", "provider_credentials"],
+    [
+      "Billing must be enabled for this request. private project",
+      "provider_billing",
+    ],
+    ["User location is not supported. private location", "provider_region"],
+    ["Invalid model identifier. private model", "model_unavailable"],
   ])(
     "classifies bad provider requests without logging diagnostics: %s",
     async (message, reason) => {
@@ -24,6 +31,27 @@ describe("Saarthi explanations", () => {
       expect(JSON.stringify(log.mock.calls)).not.toContain("private");
     },
   );
+  it("reads structured provider status from a non-Error object without leaking its body", async () => {
+    const log = vi.spyOn(console, "warn").mockImplementation(() => {});
+    await explain("pay", "en", {}, async () => {
+      throw {
+        status: 400,
+        message: JSON.stringify({
+          error: {
+            status: "INVALID_ARGUMENT",
+            message: "API key not found. private",
+          },
+        }),
+      };
+    });
+    const diagnostic = JSON.parse(log.mock.calls[0][0]);
+    expect(diagnostic).toMatchObject({
+      reason: "provider_credentials",
+      status: 400,
+      googleStatus: "INVALID_ARGUMENT",
+    });
+    expect(JSON.stringify(log.mock.calls)).not.toContain("private");
+  });
   it("recognizes the existing server-only production key alias without exposing its value", () => {
     vi.stubEnv("GEMINI_API_KEY", "");
     vi.stubEnv("saathi_api", "synthetic-private-key");

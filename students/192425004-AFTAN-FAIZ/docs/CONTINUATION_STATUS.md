@@ -1,5 +1,6 @@
 # NYAVERIS AI — continuation verification, 31 October 2026
 
+Latest activation/submission audit: [ACTIVATION_2026-11-01.md](ACTIVATION_2026-11-01.md). Historical results below are superseded where this audit or the final handoff says otherwise.
 Latest screenshot/routing/branding repair: [SCREENSHOT_REPAIRS_2026-11-01.md](SCREENSHOT_REPAIRS_2026-11-01.md). Earlier failure/publication statements below are historical.
 Latest functional repairs: [FUNCTIONAL_REPAIR_2026-11-01.md](FUNCTIONAL_REPAIR_2026-11-01.md), covering contextual Saarthi conversations, working navigation, privacy boundaries and actionable overlap/rest warnings. Older execution and publication status below is historical; use the latest handoff for actual remote/deployment SHAs.
 

@@ -6,6 +6,7 @@ students/192425004-AFTAN-FAIZ/Dockerfile
 students/192425004-AFTAN-FAIZ/README.md
 students/192425004-AFTAN-FAIZ/api/[...path].ts
 students/192425004-AFTAN-FAIZ/components.json
+students/192425004-AFTAN-FAIZ/docs/ACTIVATION_2026-11-01.md
 students/192425004-AFTAN-FAIZ/docs/ARCHITECTURE.md
 students/192425004-AFTAN-FAIZ/docs/BACKEND_DATABASE_PLAN.md
 students/192425004-AFTAN-FAIZ/docs/BACKEND_VERIFICATION.md
@@ -20,6 +21,7 @@ students/192425004-AFTAN-FAIZ/docs/FUNCTIONAL_REPAIR_2026-11-01.md
 students/192425004-AFTAN-FAIZ/docs/INTERACTION_INVENTORY.json
 students/192425004-AFTAN-FAIZ/docs/INTERACTION_INVENTORY_2026-11-01.json
 students/192425004-AFTAN-FAIZ/docs/MIGRATION_REVIEW.md
+students/192425004-AFTAN-FAIZ/docs/OPERATOR_BACKUP_RESTORE.md
 students/192425004-AFTAN-FAIZ/docs/PRODUCTION_CAPABILITIES.json
 students/192425004-AFTAN-FAIZ/docs/PRODUCTION_READINESS.md
 students/192425004-AFTAN-FAIZ/docs/SAAS_ROLLOUT.md
@@ -56,6 +58,7 @@ students/192425004-AFTAN-FAIZ/screenshots/restguard.png
 students/192425004-AFTAN-FAIZ/screenshots/safesignal.png
 students/192425004-AFTAN-FAIZ/screenshots/worker-dashboard.png
 students/192425004-AFTAN-FAIZ/screenshots/worker-mobile.png
+students/192425004-AFTAN-FAIZ/scripts/backup-baseline.sql
 students/192425004-AFTAN-FAIZ/scripts/capture-submission.mjs
 students/192425004-AFTAN-FAIZ/scripts/production-readiness.mjs
 students/192425004-AFTAN-FAIZ/scripts/provision.ts

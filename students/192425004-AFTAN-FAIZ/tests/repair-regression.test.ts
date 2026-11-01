@@ -1,8 +1,9 @@
 import { describe, it, expect } from "vitest";
-import { readFileSync, readdirSync } from "node:fs";
+import { readFileSync, readdirSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import { shiftTimes } from "../src/lib/shift-form";
 import { rpcFailure } from "../server/rpc-errors";
+const obsoleteBrand = /fair[\s_-]?shift|saakshi/i;
 describe("reported production repairs", () => {
   it.each([
     ["", "2026-11-02T17:00", 30, "complete start"],
@@ -53,19 +54,37 @@ describe("reported production repairs", () => {
         e.isDirectory() ? walk(join(p, e.name)) : [join(p, e.name)],
       );
     for (const path of [...walk("src"), ...walk("server"), "index.html"]) {
-      const lines = readFileSync(path, "utf8")
-        .split("\n")
-        .filter(
-          (l) =>
-            !l.includes("fairshift-language") &&
-            !l.includes("@demo.fairshift.example"),
+      let source = readFileSync(path, "utf8");
+      // Exempt exact compatibility tokens only, never an entire source line.
+      if (path.replaceAll("\\", "/") === "src/App.tsx")
+        source = source.replaceAll(
+          '"fairshift-language"',
+          '"legacy-language-key"',
         );
-      expect(lines.join("\n"), path).not.toMatch(
-        /fair\s?shift|saakshi|fairshift-saakshi-ai/i,
-      );
+      if (path.replaceAll("\\", "/") === "server/app.ts")
+        source = source.replaceAll(
+          "@demo.fairshift.example",
+          "@legacy.example",
+        );
+      expect(source, path).not.toMatch(obsoleteBrand);
     }
     const app = readFileSync("src/App.tsx", "utf8");
     expect(app).not.toContain("t.fallback");
     expect(app).not.toContain("t.ai :");
+    for (const path of ["AGENTS.md", ".github/workflows/ci.yml"])
+      if (existsSync(path))
+        expect(readFileSync(path, "utf8").split("\n")[0], path).not.toMatch(
+          obsoleteBrand,
+        );
   });
+  it.each([
+    "FairShift",
+    "Fair Shift",
+    "fair-shift",
+    "fair_shift",
+    "FairShift AI",
+    "Saakshi AI",
+  ])("detects obsolete product spelling %s", (value) =>
+    expect(obsoleteBrand.test(value)).toBe(true),
+  );
 });

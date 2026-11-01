@@ -1,5 +1,6 @@
 # Local setup and dedicated Supabase provisioning
 
+Current project safety (1 November 2026): use only the existing project `vkkjuopfidvfhzsqzius`. Do not provision, seed, reset, create a project or blanket-push migrations. Signup is implemented; SaaS activation remains blocked by the verified-backup and exact-migration prerequisites. Use isolated fixtures for mutation tests. Historical provisioning notes below are not current execution instructions.
 Requirements: Node.js 24, npm, and a dedicated Supabase project. Never run the synthetic seed against an unrelated or production project.
 
 ## Run this configured workspace
@@ -26,11 +27,11 @@ npm start
 
 Open http://127.0.0.1:8080. Environment values are read server-side at startup; public Supabase configuration is provided through `/api/config`. Vite does not need any `VITE_*` secrets or separate build-time settings.
 
-## Provision a fresh dedicated project
+## Historical fixture provisioning — not authorized for the existing project
 
 1. Copy `.env.example` to `.env`. Set `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY` from the project dashboard. Set long random `DEMO_PASSWORD` and `SAFETY_GATEWAY_PASSWORD`. Set `ENABLE_DEMO=true` only for a dedicated synthetic project.
 2. Temporarily set the server-only `SUPABASE_SECRET_KEY` to provision synthetic Auth users. Run `npm run db:provision`. This uses the supported Supabase Admin API and creates four synthetic demo accounts plus one restricted gateway account. It does not print passwords.
-3. Apply every SQL file in `supabase/migrations/` in filename order through an authorized SQL connection to the dedicated project. Do not omit the rate-limit or policy-version migrations. All public tables use RLS; application roles have read grants only and explicit guarded RPC grants.
+3. Historical fixture setup used the foundation SQL. Do not replay it on the existing project or apply every file in the migration folder; the reviewed SaaS and optional performance files have separate approval requirements.
 4. Apply `supabase/seed.sql` exactly once on the fresh database. Seed uses fixed user IDs created by the provisioning script and fixed UUIDs for the two organizations. It contains only synthetic workplace data. Enroll the gateway after users exist:
 
 ```sql
@@ -39,7 +40,7 @@ values ('20000000-0000-4000-8000-000000000005') on conflict do nothing;
 ```
 
 5. Remove `SUPABASE_SECRET_KEY` from the runtime environment. The application never needs it. Set `SAFETY_GATEWAY_EMAIL=safety.gateway@demo.fairshift.example` and its random password. Keep this account out of `organization_members`.
-6. Configure Supabase Auth Site URL for the deployed origin and limit allowed redirects. No public signup or user-editable role onboarding exists. Provision real organizations/members through an authorized administrative process, separate from demo projects.
+6. Configure Supabase Auth Site URL for the deployed origin and limit allowed redirects. Public signup exists. Organization ownership and employee onboarding use the protected SaaS flow only after the approved migration/rollout; signing in alone never grants administrator rights.
 7. Run `npm run test:rls`, then the browser tests. Run security advisors. Informational notices for the two private tables with RLS and no policies are intentional deny-all behavior.
 
 ## Environment variables
