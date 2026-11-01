@@ -120,3 +120,25 @@ The initial foundation (project setup, routing, shared UI, page shells) was prod
 - "What is new and unique about the project, as everyone has it? Tell me if something makes it stand out and how to pitch it with the problem statement."
 - "Fix the Vercel deployment, as I'm not able to open it."
 - "Commit the remaining work in groups (dashboard, Money Jar, pay and receipts, safety, notifications and sign-in, console). Re-check the screenshots. Run the full checks: tests, typecheck, lint, formatting, both builds, the 57-step HTTP walkthrough, the accessibility check, a contrast check on the rendered screens, and all seven screen sizes."
+
+---
+
+## 7. Final update: features, themes and cleanup
+
+> **FAIRSHIFT — FINAL UPDATE: Feature Expansion + UI/UX Upgrade + Repository Cleanup**
+>
+> This is the final feature and polish phase before submission. Make FairShift more complete, polished, usable and competitive by implementing practical non-AI features, improving the user experience, introducing multiple visual themes and consolidating all final changes into ONE Git commit. This is not an architecture rewrite. Do not introduce AI features, LLM integrations, predictive AI, external databases or unnecessary infrastructure.
+>
+> **Explainable worker quit-risk panel (rule-based).** Use existing data only (repeated overtime, unresolved wage disputes, attendance irregularities, repeated safety complaints, unresolved feedback, payroll discrepancies). Low / Moderate / High attention, every classification with visible reasons, counts, search, filtering, sorting, a detail view, historical records and suggested follow-up. Do not label anyone as definitely intending to quit. Never penalize workers or automatically change wages, attendance or employment status.
+>
+> **Installable PWA and offline experience.** Manifest, service worker, icons, standalone mode, offline fallback, app-shell caching, update notification. A safe offline queue for check-ins, safety report drafts and report submissions: show offline state, show queued actions, synchronize on reconnect, prevent duplicates, handle expired authentication and passkey challenges, show pending / synchronized / failed, allow retry. Do not cache sensitive records or credentials. Offline attendance must be labelled pending verification. Do not bypass server-side validation.
+>
+> **Rotating QR attendance check-in.** Site-specific rotating codes with a countdown, refresh and active/inactive controls; scanning, site verification, confirmation, duplicate prevention and history for workers. Short-lived signed tokens, server-side expiry, site binding, replay protection. Do not trust the client clock, do not treat a screenshot as proof, do not bypass passkeys.
+>
+> **Possible pay shortfall indicator.** Compare the configured rate, verified duration, expected earnings and recorded payments, in integer paise. No discrepancy / possible shortfall / requires review, with the calculation shown. Do not hardcode a minimum wage; if no rate is configured, say the calculation cannot be completed reliably. Not a legal finding; never deduct or transfer money.
+>
+> **Major UI/UX upgrade.** Keep the brand (Deep Aubergine `#3A0F34`, Ice Silver `#DDE3E8`, Marigold `#EAAA00`) and Glassmorphism V2. Three appearance modes: Light, Dark and Night, with Dark and Night distinct and not simple inversions; System / Light / Dark / Night setting, persisted, no flash of the wrong theme, applied to every screen, chart, dialog and overlay. Keep 44 px targets, readable contrast and reduced-motion support. […]
+>
+> **README, cleanup and testing.** A point-by-point feature mapping table, honest limitations (including SQLite on Vercel), captioned screenshots, no invented URLs or coverage numbers. Tests for every new feature; do not weaken existing tests. Exactly one commit named `final_update`.
+
+Follow-up for this submission folder: "Push the final update as exactly one commit named `final_update` directly to `main` of the class repository, changing only `students/PresidencyUniversity-Yukith_M_Joseph/`. No second pull request, no force-push."
