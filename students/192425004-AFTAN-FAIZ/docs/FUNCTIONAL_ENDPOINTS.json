@@ -1,0 +1,158 @@
+[
+  {
+    "request": "GET /api/config 200",
+    "count": 172
+  },
+  {
+    "request": "GET /api/demo-organizations 200",
+    "count": 171
+  },
+  {
+    "request": "POST /api/demo-session 200",
+    "count": 29
+  },
+  {
+    "request": "GET /api/account 200",
+    "count": 297
+  },
+  {
+    "request": "GET /api/workspace 200",
+    "count": 287
+  },
+  {
+    "request": "POST /api/businesses 201",
+    "count": 3
+  },
+  {
+    "request": "GET /api/employees 200",
+    "count": 23
+  },
+  {
+    "request": "POST /api/employees 200",
+    "count": 5
+  },
+  {
+    "request": "POST /api/invitations 201",
+    "count": 3
+  },
+  {
+    "request": "POST /api/invitations/preview 200",
+    "count": 3
+  },
+  {
+    "request": "POST /api/invitations/accept 200",
+    "count": 2
+  },
+  {
+    "request": "POST /api/shifts 200",
+    "count": 7
+  },
+  {
+    "request": "POST /api/shifts/confirm 200",
+    "count": 3
+  },
+  {
+    "request": "POST /api/payroll 200",
+    "count": 3
+  },
+  {
+    "request": "POST /api/reviews 200",
+    "count": 3
+  },
+  {
+    "request": "POST /api/reviews/resolve 200",
+    "count": 4
+  },
+  {
+    "request": "POST /api/reviews/reopen 200",
+    "count": 1
+  },
+  {
+    "request": "POST /api/reviews/confirm 200",
+    "count": 3
+  },
+  {
+    "request": "POST /api/safety 201",
+    "count": 2
+  },
+  {
+    "request": "POST /api/safety/track 200",
+    "count": 4
+  },
+  {
+    "request": "POST /api/safety/update 200",
+    "count": 6
+  },
+  {
+    "request": "POST /api/business-settings 200",
+    "count": 1
+  },
+  {
+    "request": "POST /api/policies 200",
+    "count": 4
+  },
+  {
+    "request": "POST /api/businesses/review 200",
+    "count": 1
+  },
+  {
+    "request": "POST /api/invitations/resend 201",
+    "count": 1
+  },
+  {
+    "request": "POST /api/invitations/accept 403",
+    "count": 3
+  },
+  {
+    "request": "POST /api/invitations/revoke 200",
+    "count": 1
+  },
+  {
+    "request": "POST /api/administrator-access 403",
+    "count": 1
+  },
+  {
+    "request": "GET /api/workspace 403",
+    "count": 1
+  },
+  {
+    "request": "GET /api/employees 403",
+    "count": 1
+  },
+  {
+    "request": "POST /api/administrator-access 200",
+    "count": 2
+  },
+  {
+    "request": "POST /api/business-settings 403",
+    "count": 1
+  },
+  {
+    "request": "POST /api/shifts/cancel 200",
+    "count": 1
+  },
+  {
+    "request": "POST /api/invitations/preview 403",
+    "count": 2
+  },
+  {
+    "request": "POST /api/assistant 200",
+    "count": 6
+  },
+  {
+    "request": "GET /api/health 200",
+    "count": 1
+  },
+  {
+    "request": "POST /api/reviews 409",
+    "count": 1
+  },
+  {
+    "request": "POST /api/reviews/resolve 403",
+    "count": 1
+  },
+  {
+    "request": "POST /api/safety/track 404",
+    "count": 1
+  }
+]

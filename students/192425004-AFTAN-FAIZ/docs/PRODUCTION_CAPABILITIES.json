@@ -1,0 +1,195 @@
+{
+  "application": "NYAVERIS AI",
+  "checkedAt": "2026-10-31T19:56:43.910Z",
+  "origin": "https://nyaveris-ai.vercel.app",
+  "project": "https://vkkjuopfidvfhzsqzius.supabase.co",
+  "hostedWrites": 0,
+  "routes": [
+    {
+      "path": "/",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "securityHeaders": {
+        "content-security-policy": true,
+        "x-content-type-options": true,
+        "x-frame-options": true,
+        "referrer-policy": true,
+        "permissions-policy": true,
+        "strict-transport-security": true
+      }
+    },
+    {
+      "path": "/login",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "securityHeaders": {
+        "content-security-policy": true,
+        "x-content-type-options": true,
+        "x-frame-options": true,
+        "referrer-policy": true,
+        "permissions-policy": true,
+        "strict-transport-security": true
+      }
+    },
+    {
+      "path": "/signup",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "securityHeaders": {
+        "content-security-policy": true,
+        "x-content-type-options": true,
+        "x-frame-options": true,
+        "referrer-policy": true,
+        "permissions-policy": true,
+        "strict-transport-security": true
+      }
+    },
+    {
+      "path": "/forgot-password",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "securityHeaders": {
+        "content-security-policy": true,
+        "x-content-type-options": true,
+        "x-frame-options": true,
+        "referrer-policy": true,
+        "permissions-policy": true,
+        "strict-transport-security": true
+      }
+    },
+    {
+      "path": "/reset-password",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "securityHeaders": {
+        "content-security-policy": true,
+        "x-content-type-options": true,
+        "x-frame-options": true,
+        "referrer-policy": true,
+        "permissions-policy": true,
+        "strict-transport-security": true
+      }
+    },
+    {
+      "path": "/verify-email",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "securityHeaders": {
+        "content-security-policy": true,
+        "x-content-type-options": true,
+        "x-frame-options": true,
+        "referrer-policy": true,
+        "permissions-policy": true,
+        "strict-transport-security": true
+      }
+    },
+    {
+      "path": "/auth/callback",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "securityHeaders": {
+        "content-security-policy": true,
+        "x-content-type-options": true,
+        "x-frame-options": true,
+        "referrer-policy": true,
+        "permissions-policy": true,
+        "strict-transport-security": true
+      }
+    },
+    {
+      "path": "/invite",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "securityHeaders": {
+        "content-security-policy": true,
+        "x-content-type-options": true,
+        "x-frame-options": true,
+        "referrer-policy": true,
+        "permissions-policy": true,
+        "strict-transport-security": true
+      }
+    },
+    {
+      "path": "/onboarding",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "securityHeaders": {
+        "content-security-policy": true,
+        "x-content-type-options": true,
+        "x-frame-options": true,
+        "referrer-policy": true,
+        "permissions-policy": true,
+        "strict-transport-security": true
+      }
+    },
+    {
+      "path": "/terms",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "securityHeaders": {
+        "content-security-policy": true,
+        "x-content-type-options": true,
+        "x-frame-options": true,
+        "referrer-policy": true,
+        "permissions-policy": true,
+        "strict-transport-security": true
+      }
+    },
+    {
+      "path": "/privacy",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "securityHeaders": {
+        "content-security-policy": true,
+        "x-content-type-options": true,
+        "x-frame-options": true,
+        "referrer-policy": true,
+        "permissions-policy": true,
+        "strict-transport-security": true
+      }
+    },
+    {
+      "path": "/app/home",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "securityHeaders": {
+        "content-security-policy": true,
+        "x-content-type-options": true,
+        "x-frame-options": true,
+        "referrer-policy": true,
+        "permissions-policy": true,
+        "strict-transport-security": true
+      }
+    },
+    {
+      "path": "/api/health",
+      "status": 200,
+      "contentType": "application/json; charset=utf-8",
+      "securityHeaders": {
+        "content-security-policy": true,
+        "x-content-type-options": true,
+        "x-frame-options": true,
+        "referrer-policy": true,
+        "permissions-policy": true,
+        "strict-transport-security": true
+      }
+    }
+  ],
+  "configuration": {
+    "emailEnabled": true,
+    "signupDisabled": false,
+    "emailAutoConfirm": false,
+    "googleProviderEnabled": false,
+    "deployedGoogleButtonEnabled": false,
+    "deployedSaasEnabled": false,
+    "deployedSupabaseProjectMatches": true,
+    "localInvitationApiKeyPresent": false,
+    "localInvitationSenderPresent": false,
+    "productionSecretEnvironment": "not inspected; public capabilities cannot establish secret values, SMTP, OAuth credentials or sender verification"
+  },
+  "assessment": {
+    "missingPublicRoutes": [],
+    "releaseStatus": "BLOCKED",
+    "reason": "Hosted migration, approved deployment and real OAuth/email/device acceptance remain pending; this script only inspects public capabilities."
+  }
+}
