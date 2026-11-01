@@ -141,7 +141,6 @@ Pressed controls scale down slightly; row chevrons nudge on hover. There are no 
 
 ## Verification
 
-See [GLASSMORPHISM_V2_FINAL_REPORT.md](GLASSMORPHISM_V2_FINAL_REPORT.md) for the browser sweep, accessibility, rendered contrast and test results.
 
 ## Appearance themes (final update)
 

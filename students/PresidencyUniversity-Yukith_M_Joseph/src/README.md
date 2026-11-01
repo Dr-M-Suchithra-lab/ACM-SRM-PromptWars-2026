@@ -490,7 +490,6 @@ CI (`.github/workflows/ci.yml`) runs `npm ci`, the format check, lint, typecheck
 
 | Topic                               | Document                                                                                                                                                                               |
 | :---------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Latest release (V5)                 | [docs/V5_FINAL_RELEASE_REPORT.md](docs/V5_FINAL_RELEASE_REPORT.md)                                                                                                                     |
 | Deployment and persistence          | [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md), [docs/DEPLOYMENT_RUNBOOK.md](docs/DEPLOYMENT_RUNBOOK.md), [docs/PRODUCTION_CONFIGURATION.md](docs/PRODUCTION_CONFIGURATION.md)               |
 | Security and authentication         | [docs/SECURITY.md](docs/SECURITY.md), [docs/AUTHENTICATION.md](docs/AUTHENTICATION.md)                                                                                                 |
 | FairShift Proof                     | [docs/FAIRSHIFT_PROOF.md](docs/FAIRSHIFT_PROOF.md), [docs/V32_INDEPENDENT_PROOF_ARCHITECTURE.md](docs/V32_INDEPENDENT_PROOF_ARCHITECTURE.md)                                           |
@@ -499,7 +498,7 @@ CI (`.github/workflows/ci.yml`) runs `npm ci`, the format check, lint, typecheck
 | Earnings, Money Jar, dispute notice | [docs/V41_WORKER_EARNINGS_EXPERIENCE.md](docs/V41_WORKER_EARNINGS_EXPERIENCE.md), [docs/V41_WAGE_DISPUTE_ASSISTANCE.md](docs/V41_WAGE_DISPUTE_ASSISTANCE.md)                           |
 | Heat safety                         | [docs/V41_ENVIRONMENTAL_SAFETY.md](docs/V41_ENVIRONMENTAL_SAFETY.md)                                                                                                                   |
 | Localisation                        | [docs/V41_LOCALIZATION.md](docs/V41_LOCALIZATION.md)                                                                                                                                   |
-| Design system and UI                | [docs/DESIGN_SYSTEM.md](docs/DESIGN_SYSTEM.md), [docs/UI_UX_REPORT_V4.2.md](docs/UI_UX_REPORT_V4.2.md), [docs/GLASSMORPHISM_V2_FINAL_REPORT.md](docs/GLASSMORPHISM_V2_FINAL_REPORT.md) |
+| Design system and UI                | [docs/DESIGN_SYSTEM.md](docs/DESIGN_SYSTEM.md) |
 | Demo script                         | [docs/DEMO_SCRIPT.md](docs/DEMO_SCRIPT.md)                                                                                                                                             |
 | Roadmap                             | [docs/FAIRSHIFT_FEATURE_GAP_ROADMAP.md](docs/FAIRSHIFT_FEATURE_GAP_ROADMAP.md), [docs/CONTRACTOR_SUBCONTRACTOR_PROPOSAL.md](docs/CONTRACTOR_SUBCONTRACTOR_PROPOSAL.md)                 |
 
