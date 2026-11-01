@@ -1,0 +1,122 @@
+/* Design tokens. Mirrors the Figma file "Shiftseal — App design" (Foundations page). */
+:root {
+  --bg: #f4f2ec;
+  --surface: #ffffff;
+  --surface-2: #fbfaf7;
+  --subtle: #ece9e1;
+  --ink: #15161b;
+  --ink-2: #565560;
+  --ink-3: #6b6973;
+  --line: #e6e2d8;
+  --line-strong: #cfc9bb;
+
+  --accent: #2b4c8c;
+  --accent-pressed: #223e74;
+  --accent-soft: #e8eef8;
+  --accent-ink: #1f3a70;
+  --on-accent: #ffffff;
+
+  /* Deep navy used for hero surfaces and the employer sidebar. */
+  --navy: #13213f;
+  --navy-2: #1b2d55;
+  --on-navy: #f4f6fb;
+  --on-navy-2: #a9b6d3;
+  --ring-track: rgba(255, 255, 255, 0.14);
+
+  /* A warm brass accent, used sparingly for the seal and highlights. */
+  --brass: #b78a3e;
+  --brass-soft: #f6eedd;
+
+  /* Seal vermilion: the colour of stamp ink. Used only where something is sealed. */
+  --seal: #f2441d;
+  --seal-soft: #fde7e0;
+  --seal-glow: rgba(242, 68, 29, 0.35);
+
+  --good: #1f6b43;
+  --good-soft: #e3f1e8;
+  --warn: #8a5000;
+  --warn-soft: #fbefd8;
+  --danger: #a3241b;
+  --danger-soft: #fae6e3;
+
+  /*
+   * Type voices. Headings, labels and numbers share one family (--head, set in
+   * finish.css); body text is
+   * Figtree; clock times and codes use JetBrains Mono.
+   */
+  --font: 'Figtree', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --display: 'Fraunces', Georgia, serif;
+  --numeric: 'Bricolage Grotesque', 'Figtree', sans-serif;
+  --label: 'JetBrains Mono', ui-monospace, monospace;
+  --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  --r-sm: 10px;
+  --r-md: 14px;
+  --r-lg: 20px;
+  --shadow-1: 0 1px 2px rgba(21, 22, 27, 0.05), 0 1px 1px rgba(21, 22, 27, 0.03);
+  --shadow-2: 0 1px 2px rgba(21, 22, 27, 0.04), 0 8px 24px -6px rgba(21, 22, 27, 0.1);
+  --shadow-3: 0 2px 4px rgba(19, 33, 63, 0.08), 0 18px 40px -12px rgba(19, 33, 63, 0.45);
+  --ease: cubic-bezier(0.2, 0, 0, 1);
+  --tabbar-h: 68px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0f1013;
+    --surface: #17181d;
+    --surface-2: #1b1c22;
+    --subtle: #23242b;
+    --ink: #f1efe9;
+    --ink-2: #b8b6c1;
+    --ink-3: #9a98a4;
+    --line: #2a2b33;
+    --line-strong: #40414b;
+    --accent: #89a8ec;
+    --accent-pressed: #a3bcf1;
+    --accent-soft: #1c2742;
+    --accent-ink: #b9cbf5;
+    --on-accent: #0d1527;
+    --navy: #16233f;
+    --navy-2: #1d2e52;
+    --brass: #d3a95d;
+    --brass-soft: #2c2415;
+    --seal: #ff6a3d;
+    --seal-soft: #3a1a10;
+    --seal-glow: rgba(255, 106, 61, 0.35);
+    --good: #6bcb95;
+    --good-soft: #15291e;
+    --warn: #f0b350;
+    --warn-soft: #2e220e;
+    --danger: #f4867f;
+    --danger-soft: #321816;
+    --shadow-1: none;
+    --shadow-2: 0 0 0 1px rgba(255, 255, 255, 0.02);
+    --shadow-3: 0 18px 40px -12px rgba(0, 0, 0, 0.6);
+  }
+}
+
+html[lang='ta'] {
+  --font: 'Figtree', 'Noto Sans Tamil', sans-serif;
+  --display: 'Fraunces', 'Noto Serif Tamil', serif;
+  --label: 'JetBrains Mono', 'Noto Sans Tamil', monospace;
+}
+html[lang='hi'] {
+  --font: 'Figtree', 'Noto Sans Devanagari', sans-serif;
+  --display: 'Fraunces', 'Noto Serif Devanagari', serif;
+  --label: 'JetBrains Mono', 'Noto Sans Devanagari', monospace;
+}
+html[lang='ja'] {
+  --font: 'Figtree', 'Noto Sans JP', 'Hiragino Sans', 'Yu Gothic', sans-serif;
+  --display: 'Noto Serif JP', 'Hiragino Mincho ProN', 'Yu Mincho', serif;
+  --label: 'JetBrains Mono', 'Noto Sans JP', monospace;
+}
+html[lang='zh'] {
+  --font: 'Figtree', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  --display: 'Noto Serif SC', 'Songti SC', serif;
+  --label: 'JetBrains Mono', 'Noto Sans SC', monospace;
+}
+html[lang='ko'] {
+  --font: 'Figtree', 'Noto Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+  --display: 'Noto Serif KR', 'AppleMyungjo', serif;
+  --label: 'JetBrains Mono', 'Noto Sans KR', monospace;
+}

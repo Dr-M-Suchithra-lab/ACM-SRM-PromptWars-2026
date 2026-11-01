@@ -1,0 +1,38 @@
+{
+  "sector": "common",
+  "name": "Workplace policies for every country",
+  "rules": {
+    "burnout.lateHour": {
+      "id": "burnout.lateHour",
+      "value": 21,
+      "unit": "hour of day",
+      "kind": "policy",
+      "source": "Workplace wellbeing policy: check-outs after this hour count as late nights",
+      "note": "Late nights are counted over 14 days."
+    },
+    "burnout.maxLateNights14d": {
+      "id": "burnout.maxLateNights14d",
+      "value": 3,
+      "unit": "nights/14d",
+      "kind": "policy",
+      "source": "Workplace wellbeing policy",
+      "note": "More than 3 late nights in 14 days is a burnout signal."
+    },
+    "burnout.maxWeekendDays28d": {
+      "id": "burnout.maxWeekendDays28d",
+      "value": 2,
+      "unit": "days/28d",
+      "kind": "policy",
+      "source": "Workplace wellbeing policy",
+      "note": "Working more than 2 weekly-off days in 28 days is a burnout signal."
+    },
+    "burnout.maxDaysWithoutLeave": {
+      "id": "burnout.maxDaysWithoutLeave",
+      "value": 90,
+      "unit": "days",
+      "kind": "policy",
+      "source": "Workplace wellbeing policy",
+      "note": "No leave taken for more than 90 days is a burnout signal."
+    }
+  }
+}
