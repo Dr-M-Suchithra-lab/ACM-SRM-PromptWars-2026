@@ -1,0 +1,25 @@
+[project]
+name = "fairshift"
+version = "1.0.0"
+description = "FairShift: decent-work platform for shift workers (UN SDG 8)"
+requires-python = ">=3.11"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "S", "SIM"]
+ignore = ["S101"]  # assert is fine in tests
+
+[tool.ruff.lint.flake8-bugbear]
+# FastAPI's dependency markers are designed to be used as argument defaults.
+extend-immutable-calls = ["fastapi.Depends", "fastapi.Query", "fastapi.File", "fastapi.Form"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S105", "S106"]
+"app/store/seed.py" = ["S311"]  # deterministic demo data, not cryptography

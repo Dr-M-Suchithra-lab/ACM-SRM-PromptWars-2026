@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0f766e">
+  <meta name="description" content="FairShift worker app: check in, see your pay, rest safely and report problems in your own language.">
+  <title>FairShift · Worker</title>
+  <link rel="icon" href="/img/logo.svg" type="image/svg+xml">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="stylesheet" href="/css/app.css">
+  <script src="/js/common.js" defer></script>
+  <script src="/js/i18n.js" defer></script>
+  <script src="/js/worker.js" defer></script>
+</head>
+<body class="worker-body">
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="/" aria-label="FairShift home">
+        <img class="brand-mark" src="/img/logo.svg" alt="" width="32" height="32">
+        <span>FairShift</span>
+      </a>
+      <span class="spacer"></span>
+      <div class="lang-switch" role="group" aria-label="Language / भाषा / மொழி">
+        <button type="button" data-lang="en" aria-pressed="true" lang="en">EN</button>
+        <button type="button" data-lang="hi" aria-pressed="false" lang="hi">हिं</button>
+        <button type="button" data-lang="ta" aria-pressed="false" lang="ta">த</button>
+      </div>
+      <button type="button" class="btn btn-ghost btn-sm" id="logout-btn" hidden>
+        <svg class="icon" aria-hidden="true"><use href="/img/icons.svg#logout"></use></svg>
+        <span class="sr-only" data-i18n="logout">Log out</span>
+      </button>
+    </div>
+  </header>
+
+  <p class="alert alert-warning" id="offline-banner" role="status" hidden>
+    <span data-i18n="offline">You are offline</span>
+  </p>
+
+  <main id="main" class="app-shell" tabindex="-1">
+    <div class="loading page-loading" id="page-loading" role="status">
+      <span class="spinner" aria-hidden="true"></span>
+    </div>
+
+    <!-- Login -->
+    <section id="login-view" class="card login-card" hidden aria-labelledby="login-title">
+      <h1 id="login-title" data-i18n="login_title">Log in</h1>
+      <form id="login-form" novalidate>
+        <div class="field">
+          <label for="phone" data-i18n="phone">Mobile number</label>
+          <input id="phone" name="phone" type="tel" inputmode="numeric" autocomplete="tel"
+                 pattern="\d{10}" maxlength="10" required>
+        </div>
+        <div class="field">
+          <label for="pin" data-i18n="pin">4-digit PIN</label>
+          <input id="pin" name="pin" type="password" inputmode="numeric" autocomplete="current-password"
+                 pattern="\d{4}" maxlength="4" required>
+        </div>
+        <button class="btn btn-primary btn-block btn-xl" type="submit" data-i18n="login_btn">Log in</button>
+        <p class="error-text" id="login-error" role="alert"></p>
+      </form>
+      <div class="demo-box">
+        <p class="muted" data-i18n="demo_title">Trying the demo?</p>
+        <div class="demo-buttons">
+          <button type="button" class="btn btn-block" data-demo="construction">
+            <svg class="icon" aria-hidden="true"><use href="/img/icons.svg#hardhat"></use></svg>
+            <span data-i18n="demo_construction">Construction worker (Ravi)</span>
+          </button>
+          <button type="button" class="btn btn-block" data-demo="hospital">
+            <svg class="icon" aria-hidden="true"><use href="/img/icons.svg#hospital"></use></svg>
+            <span data-i18n="demo_hospital">Hospital nurse (Lakshmi)</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- App -->
+    <div id="app-view" hidden>
+      <div class="greeting">
+        <h1 id="hello">Hello</h1>
+        <p class="muted small" id="where"></p>
+      </div>
+
+      <!-- Shift tab -->
+      <section id="panel-shift" role="tabpanel" aria-labelledby="tab-shift">
+        <div class="card">
+          <div class="shift-status">
+            <div class="status-dot" id="status-dot">
+              <svg class="icon" aria-hidden="true"><use href="/img/icons.svg#clock"></use></svg>
+            </div>
+            <div aria-live="polite">
+              <p class="status-title" id="status-title">…</p>
+              <p class="muted small" id="status-sub"></p>
+            </div>
+          </div>
+
+          <div id="shift-actions">
+            <button type="button" class="btn btn-primary btn-block btn-xl" id="start-btn" hidden>
+              <svg class="icon" aria-hidden="true"><use href="/img/icons.svg#play"></use></svg>
+              <span data-i18n="start_shift">Start shift</span>
+            </button>
+            <button type="button" class="btn btn-danger btn-block btn-xl" id="end-btn" hidden>
+              <svg class="icon" aria-hidden="true"><use href="/img/icons.svg#stop"></use></svg>
+              <span data-i18n="end_shift">End shift</span>
+            </button>
+          </div>
+
+          <form id="code-form" hidden novalidate>
+            <p data-i18n="enter_code">Type the 4-digit code shown at the site gate</p>
+            <label for="code-input" class="sr-only" data-i18n="code_label">Site code</label>
+            <input id="code-input" class="sr-only" type="text" inputmode="numeric" maxlength="4"
+                   autocomplete="one-time-code" pattern="\d{4}">
+            <div class="code-display" id="code-display" aria-hidden="true">
+              <span></span><span></span><span></span><span></span>
+            </div>
+            <div class="numpad" id="numpad">
+              <button type="button" data-key="1">1</button>
+              <button type="button" data-key="2">2</button>
+              <button type="button" data-key="3">3</button>
+              <button type="button" data-key="4">4</button>
+              <button type="button" data-key="5">5</button>
+              <button type="button" data-key="6">6</button>
+              <button type="button" data-key="7">7</button>
+              <button type="button" data-key="8">8</button>
+              <button type="button" data-key="9">9</button>
+              <button type="button" data-key="back" aria-label="Delete">
+                <svg class="icon" aria-hidden="true"><use href="/img/icons.svg#backspace"></use></svg>
+              </button>
+              <button type="button" data-key="0">0</button>
+              <button type="submit" class="numpad-ok" aria-label="OK">
+                <svg class="icon" aria-hidden="true"><use href="/img/icons.svg#check"></use></svg>
+              </button>
+            </div>
+            <div class="field">
+              <label class="check" for="share-location">
+                <input type="checkbox" id="share-location">
+                <span data-i18n="share_location">Also share my location (optional)</span>
+              </label>
+            </div>
+            <p class="error-text" id="code-error" role="alert"></p>
+            <button type="button" class="btn btn-ghost btn-block" id="code-cancel" data-i18n="cancel">Cancel</button>
+          </form>
+
+          <div class="stat-row">
+            <div class="stat"><span class="stat-value" id="stat-today">0</span><span class="stat-label" data-i18n="today">Today</span></div>
+            <div class="stat"><span class="stat-value" id="stat-week">0</span><span class="stat-label" data-i18n="this_week">This week</span></div>
+            <div class="stat"><span class="stat-value" id="stat-days">0</span><span class="stat-label" data-i18n="days_row">Days in a row</span></div>
+          </div>
+          <p class="muted small" data-i18n="no_phone_tip">No phone? Your supervisor can mark you present.</p>
+        </div>
+
+        <div class="card">
+          <h2 class="eyebrow" data-i18n="health_title">Rest &amp; safety</h2>
+          <div id="alerts" aria-live="polite"></div>
+        </div>
+      </section>
+
+      <!-- Pay tab -->
+      <section id="panel-pay" role="tabpanel" aria-labelledby="tab-pay" hidden>
+        <div class="card">
+          <div class="week-nav">
+            <button type="button" class="btn btn-sm" id="prev-week">
+              <svg class="icon" aria-hidden="true"><use href="/img/icons.svg#chevron-left"></use></svg>
+              <span class="sr-only" data-i18n="prev_week">Previous week</span>
+            </button>
+            <h2 class="eyebrow" id="pay-period">This week's pay</h2>
+            <button type="button" class="btn btn-sm" id="next-week">
+              <svg class="icon" aria-hidden="true"><use href="/img/icons.svg#chevron-right"></use></svg>
+              <span class="sr-only" data-i18n="next_week">Next week</span>
+            </button>
+          </div>
+          <div class="payslip-total">
+            <span class="muted small" data-i18n="total_earned">Total earned</span>
+            <span class="amount" id="pay-total">₹0</span>
+          </div>
+          <ul class="pay-lines" id="pay-lines"></ul>
+          <div class="say-box">
+            <p id="pay-sentence"></p>
+            <button type="button" class="speak-btn" id="pay-speak">
+              <svg class="icon" aria-hidden="true"><use href="/img/icons.svg#speaker"></use></svg>
+              <span class="sr-only" data-i18n="listen">Listen</span>
+            </button>
+          </div>
+          <p class="muted small" id="ot-note"></p>
+        </div>
+      </section>
+
+      <!-- Report tab -->
+      <section id="panel-report" role="tabpanel" aria-labelledby="tab-report" hidden>
+        <div class="card">
+          <h2 data-i18n="report_title">Report a problem</h2>
+          <p class="muted" data-i18n="report_help">Hold the button and speak in any language.</p>
+          <form id="report-form" novalidate>
+            <div class="mic-wrap">
+              <button type="button" class="mic-btn" id="mic-btn" aria-describedby="mic-state">
+                <svg class="icon" aria-hidden="true"><use href="/img/icons.svg#mic"></use></svg>
+                <span class="sr-only" data-i18n="hold_to_speak">Hold to speak</span>
+              </button>
+              <p class="mic-time" id="mic-state" aria-live="polite" data-i18n="hold_to_speak">Hold to speak</p>
+              <button type="button" class="btn btn-sm btn-ghost" id="mic-discard" hidden data-i18n="discard">Delete recording</button>
+            </div>
+            <p class="divider" data-i18n="or_type">or type</p>
+            <div class="field">
+              <label for="report-text" data-i18n="type_label">Write your report</label>
+              <textarea id="report-text" maxlength="2000"></textarea>
+            </div>
+            <div class="field">
+              <label class="check" for="anonymous">
+                <input type="checkbox" id="anonymous" checked>
+                <span>
+                  <span data-i18n="anonymous">Keep my name hidden</span><br>
+                  <span class="muted small" data-i18n="anonymous_help">Your manager will not see who sent this.</span>
+                </span>
+              </label>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block btn-xl" id="report-send">
+              <svg class="icon" aria-hidden="true"><use href="/img/icons.svg#send"></use></svg>
+              <span data-i18n="send">Send report</span>
+            </button>
+            <p class="error-text" id="report-error" role="alert"></p>
+          </form>
+        </div>
+
+        <div class="card">
+          <h2 class="eyebrow" data-i18n="my_reports">My reports</h2>
+          <div id="my-reports" aria-live="polite"></div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <nav class="tabbar" id="tabbar" hidden aria-label="Sections">
+    <div class="tabbar-inner" role="tablist">
+      <button type="button" class="tab" role="tab" id="tab-shift" aria-controls="panel-shift" aria-selected="true">
+        <svg class="icon" aria-hidden="true"><use href="/img/icons.svg#clock"></use></svg>
+        <span data-i18n="tab_shift">Shift</span>
+      </button>
+      <button type="button" class="tab" role="tab" id="tab-pay" aria-controls="panel-pay" aria-selected="false" tabindex="-1">
+        <svg class="icon" aria-hidden="true"><use href="/img/icons.svg#rupee"></use></svg>
+        <span data-i18n="tab_pay">My pay</span>
+      </button>
+      <button type="button" class="tab" role="tab" id="tab-report" aria-controls="panel-report" aria-selected="false" tabindex="-1">
+        <svg class="icon" aria-hidden="true"><use href="/img/icons.svg#mic"></use></svg>
+        <span data-i18n="tab_report">Report</span>
+      </button>
+    </div>
+  </nav>
+</body>
+</html>
