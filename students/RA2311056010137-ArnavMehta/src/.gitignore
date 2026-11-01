@@ -1,0 +1,23 @@
+# dependencies and build output
+node_modules/
+frontend/.next/
+frontend/out/
+*.tsbuildinfo
+__pycache__/
+.venv/
+
+# secrets: never committed
+.env
+.env.*
+!.env.example
+backend/.dev-secrets.json
+
+# local only
+backend/static
+test-qr/
+.DS_Store
+
+# Xcode per-user and build files
+ios/**/xcuserdata/
+ios/build/
+docs/video/voiceover/
