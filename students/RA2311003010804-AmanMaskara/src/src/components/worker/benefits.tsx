@@ -142,7 +142,7 @@ function Scheme({
             <BadgeCheck aria-hidden="true" className="size-9" />
           </span>
         )}
-        <div className="flex flex-1 flex-col gap-1">
+        <div className="flex min-w-0 flex-1 flex-col gap-1">
           <h3 className="text-lg leading-tight font-extrabold">{card.name}</h3>
           <p className="text-ink-2">{card.summary}</p>
           <Badge tone={ruledOut ? "neutral" : eligible ? "success" : "warning"} className="mt-1 w-fit">

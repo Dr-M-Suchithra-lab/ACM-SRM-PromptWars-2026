@@ -147,6 +147,39 @@ test("manual pay entry from presets, then marking the gap paid clears it", async
   await expect(row.getByText(/Gap paid/)).toBeVisible();
 });
 
+test("record pay opens on what is already paid, and can only add to it", async ({ page }) => {
+  await loginAs(page, /Priya/);
+  await page.goto("/a/payroll");
+  await page.getByRole("button", { name: "Record pay for one worker" }).click();
+  const sheet = page.getByRole("dialog", { name: "Record what was paid" });
+  // Paid in full (Dinesh) and gap already paid (Babu): closed, so not offered.
+  await expect(sheet.getByRole("option", { name: /Dinesh Singh/ })).toHaveCount(0);
+  await expect(sheet.getByRole("option", { name: /Babu Rajan/ })).toHaveCount(0);
+
+  // Gopal: 9h 47m of regular hours were left off his sheet. The form shows what is recorded.
+  await sheet.locator("#paid-worker").selectOption({ label: "Gopal Das (#1014)" });
+  await expect(sheet.getByText(/Already recorded as paid/)).toBeVisible();
+  await expect(sheet.getByRole("radio", { name: "Some hours not paid" })).toBeChecked();
+  // His overtime is already paid, so "Overtime not paid" no longer fits.
+  await expect(sheet.getByRole("radio", { name: "Overtime not paid" })).toBeDisabled();
+  await expect(sheet.getByText(/Starts at .*, already recorded as paid/)).toBeVisible();
+  const regular = sheet.getByRole("slider", { name: /Regular hours paid/ });
+  await regular.focus();
+  await page.keyboard.press("Home");
+  // The slider can't go below what is recorded: the amount stays what was already paid.
+  await expect(sheet.getByText(/less than is already recorded/)).toHaveCount(0);
+  await expect(sheet.getByText(/less than due/)).toBeVisible();
+  await expectNoA11yViolations(page);
+
+  await sheet.getByText("Paid in full", { exact: true }).click();
+  await expect(sheet.getByText("Matches what is due")).toBeVisible();
+  await sheet.getByRole("button", { name: "Save", exact: true }).click();
+  await expect(page.getByRole("row", { name: /Gopal Das/ }).getByText("Matches")).toBeVisible();
+  // Paid in full now: Gopal is no longer offered.
+  await page.getByRole("button", { name: "Record pay for one worker" }).click();
+  await expect(sheet.getByRole("option", { name: /Gopal Das/ })).toHaveCount(0);
+});
+
 test("paid in full from a worker's own row matches FairPay Sentinel", async ({ page }) => {
   await loginAs(page, /Priya/);
   await page.goto("/a/payroll");
@@ -217,7 +250,11 @@ test("pay three workers in one checkout: add bank details, the worker confirms, 
   await expect(card).toContainText("••••3142");
   await expectNoA11yViolations(worker);
   await card.getByRole("button", { name: "Yes, it's mine" }).click();
-  await expect(worker.getByText(/Your pay will go to ••••3142/)).toBeVisible();
+  const thanks = worker.getByText(/Your pay will go to ••••3142/);
+  await expect(thanks).toBeVisible();
+  // The thank-you must survive the page refresh the answer triggers (it once vanished at once).
+  await worker.waitForTimeout(2000);
+  await expect(thanks).toBeVisible();
 
   await page.reload();
   await expect(valliRow.getByText(/Waiting for the worker/)).toHaveCount(0);
@@ -240,6 +277,13 @@ test("pay three workers in one checkout: add bank details, the worker confirms, 
   await page.waitForURL(/\/a\/payroll\?m=/);
   await expect(page.getByRole("row", { name: /Venkat Rao/ }).getByText("Matches")).toBeVisible();
   await expect(page.getByRole("checkbox", { name: /^Pay Venkat Rao/ })).toHaveCount(0);
+  await expect(page.getByRole("row", { name: /Venkat Rao/ }).getByText("Paid by checkout")).toBeVisible();
+  // That payment is the record: "Record pay" no longer offers Venkat, so he can't be paid twice.
+  await page.getByRole("button", { name: "Record pay for one worker" }).click();
+  const recordSheet = page.getByRole("dialog", { name: "Record what was paid" });
+  await expect(recordSheet.getByText(/aren't listed: what was paid can't be changed/)).toBeVisible();
+  await expect(recordSheet.getByRole("option", { name: /Venkat Rao/ })).toHaveCount(0);
+  await recordSheet.getByRole("button", { name: /close/i }).click();
   await page.getByText(/^Checkout history/).click();
   await expect(page.getByText("3 paid · 0 not paid · 0 waiting")).toBeVisible();
   await expectNoA11yViolations(page);

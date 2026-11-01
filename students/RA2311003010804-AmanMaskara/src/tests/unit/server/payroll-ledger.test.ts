@@ -40,6 +40,17 @@ describe("the payroll ledger", () => {
       status: "gap_paid",
       paid: of.get("w1008")!.paid!.netPaid + of.get("w1008")!.arrearsPaid,
     });
+    // "Record pay" can add to Ramesh's and Gopal's partial pay and fill in Arun's; Dinesh is paid in
+    // full and Babu's gap is paid, so theirs are closed.
+    expect(["w1001", "w1014", "w1002", "w1004", "w1008"].map((id) => row.get(id)?.recordable)).toEqual([
+      true,
+      true,
+      true,
+      false,
+      false,
+    ]);
+    expect(row.get("w1014")?.recorded).toMatchObject({ net: of.get("w1014")!.paid!.netPaid });
+    expect(row.get("w1002")?.recorded).toBeNull();
     // Valli has no bank details: due, but nowhere to send it yet.
     expect(row.get("w1017")).toMatchObject({ account: null, due: { kind: "salary" } });
     expect(row.get("w1001")?.account?.masked).toMatch(/^••••\d{4}$/);
@@ -56,7 +67,12 @@ describe("the payroll ledger", () => {
       now,
     });
     const { rows: ledgerRows } = await ledger();
-    expect(ledgerRows.find((r) => r.workerId === "w1003")?.status).toBe("waiting");
+    expect(ledgerRows.find((r) => r.workerId === "w1003")).toMatchObject({
+      status: "waiting",
+      lock: "waiting",
+      recordable: false,
+    });
+    expect(ledgerRows.find((r) => r.workerId === "w1002")?.lock).toBeNull();
   });
 
   it("totals the month: due, recorded as paid, open shortfalls and who is not entered", async () => {

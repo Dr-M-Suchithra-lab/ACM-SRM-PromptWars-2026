@@ -105,3 +105,53 @@ describe("checkPay (FairPay Sentinel)", () => {
     expect(result.totalShortfall).toBe(Math.max(itemised, minimum));
   });
 });
+
+describe("the gap is what is missing from take-home pay", () => {
+  // 200h regular at ₹100/h, PF ₹2,400: net due ₹17,600.
+  const base = {
+    attendance: { regularMinutes: 200 * 60, overtimeMinutes: 0 },
+    payRules: {
+      hourlyRate: 100_00,
+      overtimeRate: 200_00,
+      expectedDeductions: 2_400_00,
+      expected: { gross: 20_000_00, net: 17_600_00 },
+    },
+    minimumWage: { dailyRate: 400_00, dailyHours: 8 },
+  };
+  const record = (hours: number, gross: number, net: number) => ({
+    paidRegularHours: hours,
+    paidOvertimeHours: 0,
+    grossPaid: gross,
+    deductions: gross - net,
+    netPaid: net,
+  });
+
+  it("nothing paid: the gap is the net pay, not the gross", () => {
+    const result = checkPay({ ...base, paidRecord: record(0, 0, 0) });
+    expect(result.findings.map((f) => f.code)).toContain("REGULAR_UNDERPAID");
+    expect(result.totalShortfall).toBe(17_600_00);
+  });
+
+  it("fewer hours on the sheet but the full pay handed over: nothing is owed", () => {
+    expect(checkPay({ ...base, paidRecord: record(190, 20_000_00, 17_600_00) }).totalShortfall).toBe(0);
+  });
+
+  it("hours short and pay short by the same amount: exactly that", () => {
+    expect(checkPay({ ...base, paidRecord: record(190, 19_000_00, 16_600_00) }).totalShortfall).toBe(1_000_00);
+  });
+
+  it("a payslip below the legal minimum wage still owes the legal difference", () => {
+    // ₹30/h is below the ₹50/h minimum: the worker is owed more than this payslip's own net.
+    const low = {
+      ...base,
+      payRules: {
+        ...base.payRules,
+        hourlyRate: 30_00,
+        expectedDeductions: 0,
+        expected: { gross: 6_000_00, net: 6_000_00 },
+      },
+    };
+    const result = checkPay({ ...low, paidRecord: record(200, 6_000_00, 6_000_00) });
+    expect(result.totalShortfall).toBe(4_000_00);
+  });
+});

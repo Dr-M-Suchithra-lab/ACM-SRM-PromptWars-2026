@@ -9,9 +9,11 @@ import {
   normaliseHolder,
   normaliseIfsc,
   payableFor,
+  payLocks,
   summariseBatch,
   transferIdFor,
   usableFrom,
+  type PayLock,
   type PayoutAccountStatus,
   type PayoutFailure,
   type PayoutKind,
@@ -19,9 +21,11 @@ import {
 } from "@/core/payouts";
 import { decryptAccount, encryptAccount } from "@/server/bank-crypto";
 import type { CheckoutProvider } from "@/server/payouts/provider";
+import { createSimulatedCheckout } from "@/server/payouts/simulated";
 import type { PayoutAccount, PayoutAccountEvent, PayoutBatch, PayoutItem, Repos } from "@/server/repos/types";
 import { buildPayroll, type PayrollRow } from "./payroll";
-import { recordArrears, savePaidRecord } from "./pay-check";
+import { recordArrears, writePaidRecord } from "./pay-check";
+import { withPayrollLock } from "./pay-lock";
 
 /** What the dashboard may see of a bank account: never the full number. */
 export interface MaskedAccount {
@@ -63,6 +67,8 @@ export interface PayoutOverview {
   /** Every worker, with their account if one is on file (for the bank details form) */
   accounts: { workerId: string; name: string; code: string; account: MaskedAccount | null }[];
   batches: PayoutBatchView[];
+  /** Workers paid, or being paid, through a checkout this month: their pay record can't be typed over */
+  locks: Record<string, PayLock>;
 }
 
 /** Checkouts shown for a month: any still waiting, and the latest finished ones. */
@@ -100,8 +106,10 @@ function batchView(batch: PayoutBatch): PayoutBatchView {
   };
 }
 
-const busyWorkers = (batches: PayoutBatch[]) =>
-  new Set(batches.flatMap((b) => b.items.filter((i) => i.status === "pending").map((i) => i.workerId)));
+const locksOf = (batches: PayoutBatch[]) => payLocks(batches.flatMap((b) => b.items));
+
+const busyWorkers = (locks: Map<string, PayLock>) =>
+  new Set([...locks].filter(([, lock]) => lock === "waiting").map(([workerId]) => workerId));
 
 /**
  * Who can be paid this month and how much, the bank details on file, and recent checkouts.
@@ -120,7 +128,8 @@ export async function payoutOverview(
     repos.payoutBatches.getByOrgMonth(orgId, month),
   ]);
   const accountOf = new Map(accounts.map((a) => [a.id, mask(a, now)]));
-  const busy = busyWorkers(batches);
+  const locks = locksOf(batches);
+  const busy = busyWorkers(locks);
   const payable = rows.flatMap((row) => {
     const due = payableFor({ net: row.net, outstanding: row.outstanding, hasRecord: Boolean(row.paid) });
     if (!due) return [];
@@ -147,6 +156,7 @@ export async function payoutOverview(
       .toSorted((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
       .slice(0, RECENT_CHECKOUTS)
       .map(batchView),
+    locks: Object.fromEntries(locks),
   };
 }
 
@@ -154,7 +164,7 @@ export type PayRejection = "not_found" | "nothing_owed" | "no_account" | "accoun
 
 export type StartCheckoutResult =
   | { ok: true; batchId: string; url: string }
-  | { ok: false; error: "invalid" }
+  | { ok: false; error: "invalid" | "busy" }
   | { ok: false; error: "rejected"; rejected: { workerId: string; reason: PayRejection }[] }
   | { ok: false; error: "checkout_failed"; detail: string };
 
@@ -180,62 +190,71 @@ export async function startCheckout(
   const ids = [...new Set(input.workerIds)];
   if (ids.length === 0 || ids.length > MAX_BATCH) return { ok: false, error: "invalid" };
 
-  const [rows, accounts, batches, admin] = await Promise.all([
-    buildPayroll(repos, input.orgId, input.month),
-    repos.payoutAccounts.getByOrg(input.orgId),
-    repos.payoutBatches.getByOrgMonth(input.orgId, input.month),
-    repos.admins.getById(input.adminId),
-  ]);
-  const rowOf = new Map(rows.map((r) => [r.workerId, r]));
-  const accountOf = new Map(accounts.map((a) => [a.id, a]));
-  const busy = busyWorkers(batches);
+  // Who can be paid is checked and the checkout saved as one step, under the payroll lock: two
+  // checkouts opened at the same moment can't both claim a worker.
+  const claimed = await withPayrollLock(repos, input.orgId, input.month, async () => {
+    const [rows, accounts, batches, admin] = await Promise.all([
+      buildPayroll(repos, input.orgId, input.month),
+      repos.payoutAccounts.getByOrg(input.orgId),
+      repos.payoutBatches.getByOrgMonth(input.orgId, input.month),
+      repos.admins.getById(input.adminId),
+    ]);
+    const rowOf = new Map(rows.map((r) => [r.workerId, r]));
+    const accountOf = new Map(accounts.map((a) => [a.id, a]));
+    const busy = busyWorkers(locksOf(batches));
 
-  const rejected: { workerId: string; reason: PayRejection }[] = [];
-  const chosen: { row: PayrollRow; kind: PayoutKind; amount: number }[] = [];
-  for (const workerId of ids) {
-    const row = rowOf.get(workerId);
-    const due = row && payableFor({ net: row.net, outstanding: row.outstanding, hasRecord: Boolean(row.paid) });
-    if (!row) rejected.push({ workerId, reason: "not_found" });
-    else if (!due) rejected.push({ workerId, reason: "nothing_owed" });
-    else if (!accountOf.has(workerId)) rejected.push({ workerId, reason: "no_account" });
-    else if (!accountUsable(accountOf.get(workerId)!, input.now)) {
-      rejected.push({ workerId, reason: "account_unconfirmed" });
-    } else if (busy.has(workerId)) rejected.push({ workerId, reason: "in_progress" });
-    else chosen.push({ row, ...due });
-  }
-  if (rejected.length) return { ok: false, error: "rejected", rejected };
+    const rejected: { workerId: string; reason: PayRejection }[] = [];
+    const chosen: { row: PayrollRow; kind: PayoutKind; amount: number }[] = [];
+    for (const workerId of ids) {
+      const row = rowOf.get(workerId);
+      const due = row && payableFor({ net: row.net, outstanding: row.outstanding, hasRecord: Boolean(row.paid) });
+      if (!row) rejected.push({ workerId, reason: "not_found" });
+      else if (!due) rejected.push({ workerId, reason: "nothing_owed" });
+      else if (!accountOf.has(workerId)) rejected.push({ workerId, reason: "no_account" });
+      else if (!accountUsable(accountOf.get(workerId)!, input.now)) {
+        rejected.push({ workerId, reason: "account_unconfirmed" });
+      } else if (busy.has(workerId)) rejected.push({ workerId, reason: "in_progress" });
+      else chosen.push({ row, ...due });
+    }
+    if (rejected.length) return { ok: false as const, rejected };
 
-  const batchId = batchIdFor(input.month, input.randomHex);
-  const batch: PayoutBatch = {
-    id: batchId,
-    orgId: input.orgId,
-    month: input.month,
-    provider: provider.name,
-    createdAt: input.now,
-    createdBy: input.adminId,
-    updatedAt: input.now,
-    items: chosen.map(({ row, kind, amount }, index) => {
-      const account = accountOf.get(row.workerId)!;
-      return {
-        transferId: transferIdFor(batchId, index),
-        workerId: row.workerId,
-        name: row.name,
-        kind,
-        amount,
-        accountMasked: maskLast4(account.last4),
-        ifsc: account.ifsc,
-        status: "pending",
-        payslip: {
-          regularMinutes: row.regularMinutes,
-          overtimeMinutes: row.overtimeMinutes,
-          gross: row.gross,
-          deductions: row.deductions,
-        },
-      };
-    }),
-  };
-  // Saved before the checkout opens: these workers can't be put in a second checkout meanwhile.
-  await repos.payoutBatches.create(batch);
+    const batchId = batchIdFor(input.month, input.randomHex);
+    const batch: PayoutBatch = {
+      id: batchId,
+      orgId: input.orgId,
+      month: input.month,
+      provider: provider.name,
+      createdAt: input.now,
+      createdBy: input.adminId,
+      updatedAt: input.now,
+      items: chosen.map(({ row, kind, amount }, index) => {
+        const account = accountOf.get(row.workerId)!;
+        return {
+          transferId: transferIdFor(batchId, index),
+          workerId: row.workerId,
+          name: row.name,
+          kind,
+          amount,
+          accountMasked: maskLast4(account.last4),
+          ifsc: account.ifsc,
+          status: "pending",
+          payslip: {
+            regularMinutes: row.regularMinutes,
+            overtimeMinutes: row.overtimeMinutes,
+            gross: row.gross,
+            deductions: row.deductions,
+          },
+        };
+      }),
+    };
+    // Saved before the checkout opens: these workers can't be put in a second checkout meanwhile.
+    await repos.payoutBatches.create(batch);
+    return { ok: true as const, batch, accountOf, admin };
+  });
+  if (claimed === "busy") return { ok: false, error: "busy" };
+  if (!claimed.ok) return { ok: false, error: "rejected", rejected: claimed.rejected };
+  const { batch, accountOf, admin } = claimed;
+  const batchId = batch.id;
 
   try {
     const { url } = await provider.create({
@@ -275,14 +294,17 @@ export async function confirmCheckout(
   const batch = await repos.payoutBatches.getById(input.batchId);
   if (!batch || batch.orgId !== input.orgId) return { ok: false, error: "not_found" };
   if (!waiting(batch)) return { ok: true, batch: batchView(batch), month: batch.month };
+  const owner = providerFor(repos, batch, provider);
+  if (!owner) return { ok: false, error: "unavailable" };
   let status: PayoutStatus;
   try {
-    status = await provider.status(batch.id);
+    status = await owner.status(batch.id);
   } catch {
     return { ok: false, error: "unavailable" };
   }
   const next =
     status === "pending" ? batch : await settle(repos, batch, status, input.now, { failure: "payment_failed" });
+  if (next === "busy") return { ok: false, error: "unavailable" };
   return { ok: true, batch: batchView(next), month: batch.month };
 }
 
@@ -299,13 +321,15 @@ export async function cancelCheckout(
   const confirmed = await confirmCheckout(repos, provider, input);
   if (!confirmed.ok) return confirmed;
   if (confirmed.batch.summary.pending === 0) return { ok: true };
+  const owner = providerFor(repos, batch, provider);
+  if (!owner) return { ok: false, error: "unavailable" };
   try {
-    await provider.cancel(batch.id);
+    await owner.cancel(batch.id);
   } catch {
     return { ok: false, error: "unavailable" };
   }
-  await settle(repos, batch, "failed", input.now, { failure: "payment_cancelled" });
-  return { ok: true };
+  const settled = await settle(repos, batch, "failed", input.now, { failure: "payment_cancelled" });
+  return settled === "busy" ? { ok: false, error: "unavailable" } : { ok: true };
 }
 
 /** Simulation only: the employer chose the outcome on the stand-in checkout page. */
@@ -332,7 +356,9 @@ export async function waitingCheckout(repos: Repos, orgId: string, batchId: stri
 
 /**
  * Gives every waiting share the checkout's outcome, and writes each newly paid one to the
- * worker's pay record exactly once. A share that is already paid or failed never changes.
+ * worker's pay record exactly once. A share that is already paid or failed never changes. Runs
+ * under the payroll lock on a fresh copy of the batch, so the return link and a "Check status"
+ * arriving together can't record the same payment twice.
  */
 async function settle(
   repos: Repos,
@@ -340,22 +366,35 @@ async function settle(
   status: Exclude<PayoutStatus, "pending">,
   now: Date,
   why: { failure: PayoutFailure; detail?: string },
-): Promise<PayoutBatch> {
-  const items: PayoutItem[] = [];
-  for (const item of batch.items) {
-    if (item.status !== "pending") {
-      items.push(item);
-      continue;
+): Promise<PayoutBatch | "busy"> {
+  return withPayrollLock(repos, batch.orgId, batch.month, async () => {
+    const current = (await repos.payoutBatches.getById(batch.id)) ?? batch;
+    if (!waiting(current)) return current;
+    const items: PayoutItem[] = [];
+    for (const item of current.items) {
+      if (item.status !== "pending") {
+        items.push(item);
+        continue;
+      }
+      if (status === "failed") {
+        items.push({ ...item, status, failure: why.failure, ...(why.detail ? { detail: why.detail } : {}) });
+        continue;
+      }
+      if (!item.recordedAt) await recordPayment(repos, current, item, now);
+      items.push({ ...item, status, recordedAt: item.recordedAt ?? now });
     }
-    if (status === "failed") {
-      items.push({ ...item, status, failure: why.failure, ...(why.detail ? { detail: why.detail } : {}) });
-      continue;
-    }
-    if (!item.recordedAt) await recordPayment(repos, batch, item, now);
-    items.push({ ...item, status, recordedAt: item.recordedAt ?? now });
-  }
-  await repos.payoutBatches.update(batch.id, { items, updatedAt: now });
-  return { ...batch, items, updatedAt: now };
+    await repos.payoutBatches.update(current.id, { items, updatedAt: now });
+    return { ...current, items, updatedAt: now };
+  });
+}
+
+/**
+ * The provider that opened a checkout is the one asked about it: a simulated checkout is still
+ * answered by the simulation after Cashfree keys are added. null when it can't be reached.
+ */
+function providerFor(repos: Repos, batch: PayoutBatch, current: CheckoutProvider): CheckoutProvider | null {
+  if (batch.provider === current.name) return current;
+  return batch.provider === "simulated" ? createSimulatedCheckout(repos) : null;
 }
 
 /** A paid month's pay becomes the month's pay record; a paid gap is added to it as arrears. */
@@ -371,7 +410,7 @@ async function recordPayment(repos: Repos, batch: PayoutBatch, item: PayoutItem,
     });
     return;
   }
-  await savePaidRecord(
+  await writePaidRecord(
     repos,
     batch.orgId,
     batch.createdBy,
@@ -398,7 +437,7 @@ const withEvent = (history: PayoutAccountEvent[], event: PayoutAccountEvent) =>
 /**
  * The employer saves where a worker's share is settled. Formats and the worker's organisation are
  * checked, the number is stored encrypted, and any change waits for the worker to confirm it.
- * Saving the same details again changes nothing.
+ * Saving the same details again changes nothing, unless the worker had said they are not theirs.
  */
 export async function savePayoutAccount(
   repos: Repos,
@@ -414,7 +453,9 @@ export async function savePayoutAccount(
   if (!worker || worker.orgId !== input.orgId) return { ok: false, error: "not_found" };
 
   const existing = await repos.payoutAccounts.get(worker.id);
-  if (existing && sameDetails(existing, { holder, account, ifsc })) {
+  // Saving the same details changes nothing, except after the worker said "this isn't my
+  // account": entering it again asks them again (they may have tapped "No" by mistake).
+  if (existing && existing.status !== "disputed" && sameDetails(existing, { holder, account, ifsc })) {
     return { ok: true, account: mask(existing, input.now) };
   }
   const saved: PayoutAccount = {

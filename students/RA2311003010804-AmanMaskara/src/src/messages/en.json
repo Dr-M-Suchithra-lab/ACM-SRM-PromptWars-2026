@@ -89,7 +89,7 @@
       },
       "checkout": {
         "title": "Pay everyone in one checkout",
-        "text": "Tick who is owed, pay the total once, and each share goes to that worker’s own bank account."
+        "text": "Tick who is owed, pay the total once, and each share goes to that worker’s own bank account. Nobody is paid twice."
       }
     },
     "sdgTitle": "Built for UN SDG 8",
@@ -735,9 +735,16 @@
           "unknown_worker": "Unknown worker code",
           "file": "Choose a CSV file under 100 KB.",
           "rate_limited": "Too many changes. Please wait a few minutes.",
-          "columns": "The columns do not match the template."
+          "columns": "The columns do not match the template.",
+          "locked": "Paid through a FairShift checkout this month. That payment is the record and can't be changed.",
+          "settled": "This month is already paid in full, or its gap was paid. What was paid can't be changed.",
+          "below_recorded": "This is less than is already recorded as paid. Pay can be added to, not taken back.",
+          "busy": "Someone else is updating this payroll. Please try again in a moment.",
+          "above_due": "More than this month's net due, or more hours than were worked. Record only this month's wages."
         },
         "manualHint": "Start from what FairShift calculated, then say what was actually paid.",
+        "lockedNote": "Workers already paid in full, whose gap was paid, or paid by checkout aren't listed: what was paid can't be changed.",
+        "recordedNote": "Already recorded as paid: {hours} + {overtime} overtime, {amount}. Record the new total: it can go up, not down.",
         "calculated": "FairShift recorded {hours} + {overtime} overtime. Due: {amount}.",
         "howPaid": "How was this worker paid?",
         "presets": {
@@ -748,6 +755,7 @@
         "regularHours": "Regular hours paid",
         "overtimeHours": "Overtime hours paid",
         "hoursOf": "{paid} of {total}",
+        "fromRecorded": "Starts at {time}, already recorded as paid",
         "amounts": "Amounts",
         "changeAmounts": "Change amounts",
         "useCalculated": "Use calculated",
@@ -814,7 +822,8 @@
           "rate_limited": "Too many checkouts. Please wait a few minutes.",
           "unavailable": "Paying is not available right now. Please try again.",
           "invalid": "Could not open the checkout. Please try again.",
-          "checkout_failed": "The checkout could not be opened. Please try again."
+          "checkout_failed": "The checkout could not be opened. If bank details were just added or changed, Cashfree needs about 10 minutes to check them. Please try again then.",
+          "busy": "Someone else is updating this payroll. Please try again in a moment."
         },
         "account": {
           "edit": "Bank details",
@@ -859,7 +868,8 @@
           "fail": "Make the payment fail",
           "back": "Back to payroll (pay later)"
         },
-        "sandboxNote": "Test mode: no real money moves."
+        "sandboxNote": "Test mode: no real money moves.",
+        "inProgress": "This month isn't over yet: this pays the days worked so far. Days worked after today will show as still to pay."
       },
       "summary": {
         "due": "Net pay due",
@@ -887,7 +897,8 @@
         "editBank": "Change bank details for {name}",
         "idle": "Tick the workers who are owed pay to pay them together in one checkout.",
         "selected": "{count, plural, one {1 worker} other {# workers}} selected · {amount}",
-        "pay": "Pay with checkout"
+        "pay": "Pay with checkout",
+        "viaCheckout": "Paid by checkout"
       },
       "checkouts": {
         "waitingTitle": "Waiting for payment",

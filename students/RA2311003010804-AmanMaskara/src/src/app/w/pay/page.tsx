@@ -71,7 +71,7 @@ export default async function PayPage({ searchParams }: PageProps<"/w/pay">) {
         ))}
       </nav>
 
-      {bank && bank.status !== "confirmed" && <BankConfirmCard account={bank} employer={org?.name ?? ""} />}
+      {bank && <BankConfirmCard account={bank} employer={org?.name ?? ""} />}
 
       {check.outstanding > 0 ? (
         <ShortfallCard

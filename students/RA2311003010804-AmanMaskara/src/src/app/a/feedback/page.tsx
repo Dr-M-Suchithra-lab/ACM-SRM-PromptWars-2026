@@ -89,13 +89,13 @@ export default async function FeedbackAdminPage() {
               <Card className="flex h-full flex-col gap-3 p-4 md:p-5">
                 <h2 className="font-display flex items-center justify-between gap-2 text-lg font-extrabold">
                   {siteOf.get(siteId)}
-                  <Badge>{week}</Badge>
+                  <Badge className="shrink-0 whitespace-nowrap">{week}</Badge>
                 </h2>
                 {!gate.visible ? (
                   <p className="text-ink-2">{t("hidden", { count: gate.count, k: gate.needed })}</p>
                 ) : (
                   <>
-                    <dl className="grid grid-cols-3 gap-2 text-center">
+                    <dl className="grid grid-cols-[repeat(auto-fit,minmax(6.5rem,1fr))] gap-2 text-center">
                       {QUESTIONS.map((q) => {
                         const score = avg(gate.items.map((f) => f.scores[q]));
                         return (

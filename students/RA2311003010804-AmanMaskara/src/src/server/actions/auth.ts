@@ -1,5 +1,6 @@
 "use server";
 
+import { refresh } from "next/cache";
 import { cookies, headers } from "next/headers";
 import { redirect, RedirectType } from "next/navigation";
 import { z } from "zod";
@@ -23,6 +24,15 @@ export async function setLocaleAction(locale: unknown): Promise<void> {
   const parsed = z.enum(locales).safeParse(locale);
   if (!parsed.success) return;
   (await cookies()).set("locale", parsed.data, { path: "/", maxAge: ONE_YEAR_S, sameSite: "lax" });
+}
+
+/**
+ * The language menu: saves the choice and re-renders the current page in the same response, so
+ * the switch takes one round trip instead of two (save, then refresh). No history entry either.
+ */
+export async function switchLocaleAction(locale: unknown): Promise<void> {
+  await setLocaleAction(locale);
+  refresh();
 }
 
 async function clientIp(): Promise<string> {

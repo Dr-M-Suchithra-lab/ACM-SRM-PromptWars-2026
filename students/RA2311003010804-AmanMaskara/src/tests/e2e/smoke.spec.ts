@@ -55,6 +55,28 @@ test("the language menu switches language in place, without a history entry", as
   await expect(page).toHaveURL(/\/$/);
 });
 
+test("the phone menu highlight follows its tab after the language changes", async ({ page }) => {
+  await page.goto("/login");
+  await page.getByRole("button", { name: /Priya/ }).first().click();
+  await page.waitForURL(/\/a(\?welcome=1)?$/);
+  const strip = page.locator("header nav ul");
+  await strip.getByRole("link", { name: "Hazards" }).click();
+  await page.waitForURL(/\/a\/hazards$/);
+  await page.getByRole("button", { name: "Change language" }).click();
+  await page.getByRole("menuitemradio", { name: /தமிழ்/ }).click();
+  await expect(page.locator("html")).toHaveAttribute("lang", "ta");
+  // The tab labels change width; the green pill must sit exactly on the active tab again.
+  const active = strip.locator("a[aria-current='page']");
+  const pill = strip.locator("li[aria-hidden='true']");
+  await expect
+    .poll(async () => {
+      const [a, p] = await Promise.all([active.boundingBox(), pill.boundingBox()]);
+      if (!a || !p) return Infinity;
+      return Math.max(Math.abs(a.x - p.x), Math.abs(a.width - p.width));
+    })
+    .toBeLessThan(2);
+});
+
 test("protected pages redirect to login without a session", async ({ page }) => {
   await page.goto("/w");
   await expect(page).toHaveURL(/\/login$/);

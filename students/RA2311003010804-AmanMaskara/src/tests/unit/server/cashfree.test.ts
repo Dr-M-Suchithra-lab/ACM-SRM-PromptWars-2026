@@ -180,3 +180,24 @@ describe("Cashfree checkout (sandbox)", () => {
     }
   });
 });
+
+describe("getting a bank account ready before the first checkout", () => {
+  it("registers a new account with Cashfree as soon as it is saved, and leaves a known one alone", async () => {
+    const account = { workerId: "w1017", holder: "Valli Ammal", account: "1233943142", ifsc: "ICIC0000009" };
+    const vendor = vendorIdFor(account);
+    const fetchImpl = vi
+      .fn<typeof fetch>()
+      .mockResolvedValueOnce(json(400, { message: "vendor does not exist" }))
+      .mockResolvedValueOnce(json(200, { vendor_id: vendor, status: "IN_BANK_VALIDATION" }))
+      .mockResolvedValueOnce(json(200, { vendor_id: vendor, status: "ACTIVE" }));
+    const provider = checkout(fetchImpl);
+    await provider.prepare!(account);
+    expect(body(fetchImpl.mock.calls[1])).toMatchObject({
+      vendor_id: vendor,
+      name: "Valli Ammal",
+      bank: { account_number: "1233943142", ifsc: "ICIC0000009" },
+    });
+    await provider.prepare!(account);
+    expect(fetchImpl.mock.calls.map(([, init]) => init?.method)).toEqual(["GET", "POST", "GET"]);
+  });
+});

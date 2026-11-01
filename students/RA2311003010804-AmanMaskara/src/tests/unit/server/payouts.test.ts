@@ -19,6 +19,7 @@ import {
   workerPayoutAccount,
 } from "@/server/services/payouts";
 import { BANK_CHANGE_COOLING_OFF_MS } from "@/core/payouts";
+import { importPaidCsv, PAID_CSV_HEADER, payArrears, savePaidRecord } from "@/server/services/pay-check";
 
 const now = new Date();
 const month = payFocusMonth(now);
@@ -270,6 +271,80 @@ describe("after the checkout", () => {
     }
     const { batches } = await payoutOverview(getRepos(), "org1", month);
     expect(batches.map((b) => b.items[0].workerId)).toEqual(ids.slice(1).reverse());
+  });
+});
+
+describe("a month paid through a checkout can't be typed over", () => {
+  const zeroPaid = (workerId: string) => ({
+    workerId,
+    month,
+    paidRegularHours: 0,
+    paidOvertimeHours: 0,
+    grossPaid: 0,
+    deductions: 0,
+    netPaid: 0,
+  });
+
+  it("refuses 'Record pay' after the checkout, so the worker can't be paid a second time", async () => {
+    const fake = fakeProvider({ status: "paid" });
+    const { batchId } = await open(fake.provider, ["w1003"]);
+    await confirmCheckout(getRepos(), fake.provider, { orgId: "org1", batchId, now });
+    const record = await getRepos().paidRecords.get("w1003", month);
+
+    // The exploit: record ₹0 as paid to reopen the whole month as a gap, then pay it again.
+    expect(await savePaidRecord(getRepos(), "org1", "admin1", zeroPaid("w1003"), now)).toEqual({
+      ok: false,
+      error: "locked",
+    });
+    expect(await getRepos().paidRecords.get("w1003", month)).toEqual(record);
+    const { payable, locks } = await payoutOverview(getRepos(), "org1", month);
+    expect(payable.some((p) => p.workerId === "w1003")).toBe(false);
+    expect(locks.w1003).toBe("paid");
+    expect(
+      await startCheckout(getRepos(), fake.provider, { ...admin, workerIds: ["w1003"], randomHex: randomHex() }),
+    ).toEqual({ ok: false, error: "rejected", rejected: [{ workerId: "w1003", reason: "nothing_owed" }] });
+  });
+
+  it("locks a worker whose gap a checkout paid, too", async () => {
+    const fake = fakeProvider({ status: "paid" });
+    const { batchId } = await open(fake.provider, ["w1014"]);
+    await confirmCheckout(getRepos(), fake.provider, { orgId: "org1", batchId, now });
+    expect(await savePaidRecord(getRepos(), "org1", "admin1", zeroPaid("w1014"), now)).toMatchObject({
+      error: "locked",
+    });
+  });
+
+  it("refuses the same change from a CSV row, and saves the other rows", async () => {
+    const fake = fakeProvider({ status: "paid" });
+    const { batchId } = await open(fake.provider, ["w1003"]);
+    await confirmCheckout(getRepos(), fake.provider, { orgId: "org1", batchId, now });
+    const [paid, other] = await Promise.all([getRepos().workers.getById("w1003"), getRepos().workers.getById("w1005")]);
+    const rows = [PAID_CSV_HEADER.join(","), `${paid!.code},${month},0,0,0,0,0`, `${other!.code},${month},0,0,0,0,0`];
+    const csv = rows.join("\n");
+    expect(await importPaidCsv(getRepos(), "org1", "admin1", csv, now)).toEqual({
+      saved: 1,
+      errors: [{ row: 1, reason: "locked" }],
+    });
+    expect((await getRepos().paidRecords.get("w1003", month))?.netPaid).toBe(fake.created[0]!.amount);
+  });
+
+  it("while a checkout waits: no hand-typed record and no 'Mark as paid' for that worker", async () => {
+    const fake = fakeProvider({ status: "pending" });
+    await open(fake.provider, ["w1003", "w1014"]);
+    expect(await savePaidRecord(getRepos(), "org1", "admin1", zeroPaid("w1003"), now)).toMatchObject({
+      error: "locked",
+    });
+    expect(await payArrears(getRepos(), { orgId: "org1", adminId: "admin1", workerId: "w1014", month, now })).toEqual({
+      ok: false,
+      error: "in_progress",
+    });
+  });
+
+  it("frees the record again when the checkout fails", async () => {
+    const fake = fakeProvider({ status: "failed" });
+    const { batchId } = await open(fake.provider, ["w1003"]);
+    await confirmCheckout(getRepos(), fake.provider, { orgId: "org1", batchId, now });
+    expect(await savePaidRecord(getRepos(), "org1", "admin1", zeroPaid("w1003"), now)).toEqual({ ok: true });
   });
 });
 

@@ -1,10 +1,9 @@
 "use client";
 
 import { useEffect, useId, useRef, useState, useTransition, type KeyboardEvent } from "react";
-import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { Check, ChevronDown, Languages, Loader2 } from "lucide-react";
-import { setLocaleAction } from "@/server/actions/auth";
+import { switchLocaleAction } from "@/server/actions/auth";
 import { LANGUAGE_LABELS, locales, type Locale } from "@/i18n/locales";
 import { cn } from "@/lib/utils";
 
@@ -18,7 +17,6 @@ import { cn } from "@/lib/utils";
 export function LanguageMenu({ className, side = "bottom" }: { className?: string; side?: "top" | "bottom" }) {
   const t = useTranslations("a11y");
   const current = useLocale() as Locale;
-  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [pending, startTransition] = useTransition();
   const menuId = useId();
@@ -45,9 +43,9 @@ export function LanguageMenu({ className, side = "bottom" }: { className?: strin
     close();
     if (locale === current) return;
     startTransition(async () => {
-      await setLocaleAction(locale);
+      // One round trip: the action saves the language and sends back the page re-rendered in it.
+      await switchLocaleAction(locale);
       document.documentElement.lang = locale;
-      router.refresh();
     });
   }
 

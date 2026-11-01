@@ -42,8 +42,8 @@ export function WaitingCheckouts({ batches, enabled }: { batches: PayoutBatchVie
       </h2>
       <ul className="flex flex-col gap-3">
         {batches.map((batch) => (
-          <li key={batch.id} className="flex flex-col gap-2 rounded-2xl bg-surface p-3 sm:flex-row sm:items-center">
-            <p className="min-w-0 flex-1 text-sm">
+          <li key={batch.id} className="flex flex-wrap items-center gap-2 rounded-2xl bg-surface p-3">
+            <p className="min-w-0 flex-1 basis-64 text-sm">
               <span className="font-bold">{formatWhen(batch.createdAt, locale)}</span> ·{" "}
               {batch.items.map((i) => i.name).join(", ")} ·{" "}
               <span className="figure font-semibold">{formatINR(total(batch))}</span>

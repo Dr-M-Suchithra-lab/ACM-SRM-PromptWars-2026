@@ -381,7 +381,7 @@ Each line names a page, a device, an action and what went wrong, and says which 
 
 **What it changed:** a release decision based on evidence instead of a feeling. All six targets passed:
 - lint, typecheck and formatting clean
-- 323/323 unit and 35/35 end-to-end tests, at 98% line coverage with the 95% gate enforced in CI (the final build, after the payments work in §11, has 416 unit and 39 end-to-end tests, all passing)
+- 323/323 unit and 35/35 end-to-end tests, at 98% line coverage with the 95% gate enforced in CI (the final build, after the payments work in §11, has 448 unit and 41 end-to-end tests, all passing)
 - 0 production vulnerabilities
 - health OK, and 34/34 live security probes
 - all 36 page measurements under 400 ms (slowest 306 ms)
@@ -449,6 +449,34 @@ After submission I kept going with one question: FairShift finds unpaid wages, b
 - **The worker approves changes:** a new or changed account waits for the worker: *"Is this your bank account?"* in their language, read aloud. *No, not mine* blocks it; no answer makes it payable after 48 hours, so nobody is left unpaid.
 - **Proof:** 416 unit and 39 end-to-end tests, 43/43 security probes, 0 production vulnerabilities.
 
+**Trying to break it myself:**
+
+> in payroll dashboard , after paying , i am still able to make changes by using record pay feature and i can pay again . this can be exploited . please fix this
+
+**What it changed:** after a checkout paid a worker, *Record pay* (or a CSV row) could overwrite that month's record, for example with ₹0. The month then showed as unpaid, and the checkout offered to pay the same worker again. Now a payment through FairShift *is* the month's record: the server refuses to replace it, and refuses *Mark as paid* while a checkout for that worker is still open. The form no longer lists those workers, and their row says *Paid by checkout*. A failed checkout unlocks the record again. Seven new tests cover it, including the exact exploit.
+
+> there are a lot of bugs on the new payroll page which are related to record pay for one worker . once the worker is paid full or partially the slider and overtime not payed should be adjusted accordingly . cashfree payment is working well , there is issue in out internal code . please fix all other bugs you found too . go through full payroll page once again .
+
+**What it changed:** *Record pay* now opens on what is already recorded: the matching preset, the hours and the exact amounts. The sliders start at the minutes already paid and can't go lower, and *Overtime not paid* is offered only while no overtime is paid. Pay can be added to, never taken back, and a month paid in full is closed. Going through the page again found three more bugs, each now covered by a test: two checkouts opened at the same moment could both claim a worker, and a payment confirmed twice at once was recorded twice (both now run under one payroll lock per organisation and month); a worker's mistaken *No, not mine* could not be undone (entering the account again now asks them again).
+
+> in workers check arun yadav records , it looks suspicious . paid is more than net due . fix that and check this for all records
+
+**What it changed:** two causes. *Pay the gap* paid missing regular hours at their gross value, so the worker also got their PF share in hand; and the demo's *Gap paid* row added the gap on top of full pay. Now a gap is at most the take-home pay still missing (plus anything the payslip itself falls below the legal minimum wage), and *Record pay* can't record more than is due. "Check this for all records" became a test: for every worker of both organisations, in every month the payroll shows, paid never exceeds the net due, and paying every open gap lands exactly on it.
+
+**The interface in every language:**
+
+> there is one more change , the phone ui in admin panel is causing issue in english language , in click to skip page and and overview page and payroll page . also except for english language the ui is causing trouble in other 3 langauges in both phone and laptop for example the login button in laptop exceeds the margin when in different language . and the text also exceeds in other languages in many places . please fix this ui issue also
+
+> i meant logout button
+
+**What it changed:** instead of fixing screens one by one, a script loaded every page in all four languages at 360, 800, 1024 and 1280 px and flagged anything wider than the screen, spilling out of its box, sticking out of its container or squeezed to a sliver: 138 problems went to 0. The causes were few: grid columns that one long line could widen (the admin overview was 527 px wide on a 360 px phone, which also broke the *Tap anywhere to skip* welcome), badges and buttons that never wrapped, and the sidebar row that holds *Log out*.
+
+> when using phone and changing the menu and then changing the language the green thing on menu bar crashes and stays on same particular area instead of itself according to button and then when selcting another option menu again it fixes
+
+**What it changed:** the highlight was measured only when the whole menu bar changed size, and on a phone the bar keeps its width while a language change resizes each tab. It now follows every tab. An end-to-end test repeats the exact steps: before the fix the highlight was 54 px off its tab, now it sits on it.
+
+**Proof, at the end:** 448 unit and 41 end-to-end tests, 43/43 security probes against the live demo, 0 production vulnerabilities, and the layout check clean on the live site.
+
 ---
 
 ## What didn't work, and how my prompting changed
@@ -463,6 +491,8 @@ After submission I kept going with one question: FairShift finds unpaid wages, b
 | **Speed versus security.** A strict security header got in the way of the Lighthouse audit | A score is not worth a weaker app | I set the rule "dont compromise security … for lighthouse" and kept the header |
 | **A form looked right but the numbers were not.** *Paid in full* showed "₹11.52 less than due" | Rounding (hours to a quarter) hides inside correct-looking screens | I pasted the exact screen text into the prompt (§11); the fix came with a test across every worker |
 | **The docs and the real sandbox disagreed.** Cashfree's documentation said a missing vendor returns 404; the sandbox returned 400, and rejected a business type the docs did not list | Read the docs, then check against the real service early | A read-only call to my own sandbox found the first before I tested; my first real checkout found the second, and Cashfree's error message named the fix (§11) |
+| **Features that worked could still be abused.** After a checkout paid a worker, *Record pay* could reopen the month so it could be paid again | Testing as a user is not testing as an adversary | I tried to break payroll as an employer, then asked for the rule to hold "for all records": a test now checks every worker of both organisations in every month |
+| **The interface was only checked in English.** Tamil and Telugu labels spilled out of buttons, and the admin overview scrolled sideways on phones | Every language is its own layout | Every page is now checked in all four languages at four screen widths, by a script rather than by eye |
 | **Asking "is it done?" after the work** instead of defining done at the start | Verification belongs in the prompt, not after it | Later prompts set the bar up front: "make sure all tests passed", "make sure that nothing crashes"; the release-gate prompt then set six measurable pass/fail targets before submission (§9) |
 
 ## How I would write it today (hindsight)

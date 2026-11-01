@@ -76,7 +76,8 @@ export default async function LandingPage() {
             <span className="w-fit rounded-full border border-line bg-surface px-3 py-1 text-xs font-bold tracking-wide uppercase">
               {t("sdg")}
             </span>
-            <h1 className="font-display text-[2.8rem] leading-[0.98] font-extrabold md:text-[4.6rem]">
+            {/* Scales with the screen, so long Tamil and Telugu words fit beside the demo card on tablets. */}
+            <h1 className="font-display text-[2.8rem] leading-[0.98] font-extrabold md:text-[clamp(3rem,6vw,4.6rem)]">
               <RevealText text={t("subtitle")} markLast />
             </h1>
             <ul className="stagger flex flex-col gap-3">
@@ -124,14 +125,14 @@ export default async function LandingPage() {
           <h2 id="how" className="font-display text-3xl font-extrabold">
             {t("howTitle")}
           </h2>
-          <ol className="grid gap-3 md:grid-cols-3">
+          <ol className="grid gap-3 lg:grid-cols-3">
             {steps.map(({ Icon, text }, i) => (
               <li key={text} className="card flex items-center gap-4 p-5">
                 <span className="figure font-display text-4xl font-extrabold text-primary">0{i + 1}</span>
                 <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-accent-soft text-warning-ink">
                   <Icon aria-hidden="true" className="size-6" />
                 </span>
-                <p className="leading-snug font-bold">
+                <p className="min-w-0 leading-snug font-bold">
                   <span className="sr-only">{t("step", { n: i + 1 })}: </span>
                   {text}
                 </p>
@@ -160,9 +161,9 @@ export default async function LandingPage() {
 
         <section
           aria-labelledby="sdg-title"
-          className="card flex flex-col gap-4 p-5 md:flex-row md:items-center md:gap-8 md:p-6"
+          className="card flex flex-col gap-4 p-5 md:p-6 lg:flex-row lg:items-center lg:gap-8"
         >
-          <div className="flex items-center gap-3 md:w-64 md:shrink-0">
+          <div className="flex items-center gap-3 lg:w-64 lg:shrink-0">
             <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-primary text-on-primary">
               <Target aria-hidden="true" className="size-6" />
             </span>

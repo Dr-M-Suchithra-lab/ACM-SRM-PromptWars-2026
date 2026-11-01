@@ -42,14 +42,14 @@ export function PayrollSummary({ summary }: { summary: LedgerSummary }) {
       <h2 id="payroll-summary" className="sr-only">
         {t("sentinel.title")}
       </h2>
-      <dl className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+      <dl className="grid gap-3 min-[400px]:grid-cols-2 xl:grid-cols-4">
         {stats.map(({ icon: Icon, label, value, hint, alert }) => (
           <div key={label} className="flex flex-col gap-1 rounded-2xl bg-surface/70 p-3">
             <dt className="flex items-center gap-1.5 text-sm font-bold text-ink-2">
               <Icon aria-hidden="true" className={cn("size-4", alert ? "text-danger" : "text-primary")} />
               {label}
             </dt>
-            <dd className={cn("figure text-2xl font-extrabold", alert && "text-danger")}>{value}</dd>
+            <dd className={cn("figure text-xl font-extrabold sm:text-2xl", alert && "text-danger")}>{value}</dd>
             <dd className="text-xs text-ink-2">{hint}</dd>
           </div>
         ))}

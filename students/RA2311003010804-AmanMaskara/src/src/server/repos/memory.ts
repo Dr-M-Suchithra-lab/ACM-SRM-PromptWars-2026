@@ -10,6 +10,7 @@ interface MemoryStore extends SeedData {
   issueSigners: Set<string>;
   aiLog: AiLogEntry[];
   ttsCache: Map<string, string>;
+  locks: Map<string, { owner: string; until: Date }>;
 }
 
 const AI_LOG_LIMIT = 200;
@@ -25,6 +26,7 @@ function getStore(): MemoryStore {
     issueSigners: new Set(),
     aiLog: [],
     ttsCache: new Map(),
+    locks: new Map(),
   };
   return globalStore.__fairshiftStore;
 }
@@ -182,6 +184,17 @@ export function createMemoryRepos(): Repos {
       getById: payoutBatches.byId,
       create: payoutBatches.create,
       update: payoutBatches.update,
+    },
+    locks: {
+      acquire: async (key, owner, until, now) => {
+        const held = getStore().locks.get(key);
+        if (held && held.until > now) return false;
+        getStore().locks.set(key, { owner, until });
+        return true;
+      },
+      release: async (key, owner) => {
+        if (getStore().locks.get(key)?.owner === owner) getStore().locks.delete(key);
+      },
     },
     aiLog: {
       add: async (entry) => {

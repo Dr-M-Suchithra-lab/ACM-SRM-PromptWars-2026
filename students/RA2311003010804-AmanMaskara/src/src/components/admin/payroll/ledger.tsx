@@ -13,6 +13,7 @@ import {
   FileUp,
   HandCoins,
   Landmark,
+  Lock,
   PenLine,
   Send,
 } from "lucide-react";
@@ -53,7 +54,18 @@ const canSelect = (r: LedgerRow) => Boolean(r.due && r.account?.usable && r.stat
  * check, and their bank account. Tick the workers who are owed money to pay them together in one
  * checkout; record pay, upload a sheet or add bank details from the toolbar or the row itself.
  */
-export function PayrollLedger({ month, provider, rows }: { month: string; provider: Provider; rows: LedgerRow[] }) {
+export function PayrollLedger({
+  month,
+  inProgress,
+  provider,
+  rows,
+}: {
+  month: string;
+  /** The month isn't over: a checkout pays the days worked so far */
+  inProgress: boolean;
+  provider: Provider;
+  rows: LedgerRow[];
+}) {
   const t = useTranslations("admin.payrollPage");
   const locale = useLocale();
   const router = useRouter();
@@ -301,7 +313,7 @@ export function PayrollLedger({ month, provider, rows }: { month: string; provid
               <Landmark aria-hidden="true" className="size-4" />
               {t(`payouts.mode.${provider}`)}
             </Badge>
-            <p aria-live="polite" className="min-w-0 flex-1 text-sm font-semibold">
+            <p aria-live="polite" className="min-w-0 flex-1 basis-56 text-sm font-semibold">
               {chosen.length
                 ? t("ledger.selected", { count: chosen.length, amount: formatINR(chosenTotal) })
                 : t("ledger.idle")}
@@ -347,6 +359,7 @@ export function PayrollLedger({ month, provider, rows }: { month: string; provid
             </li>
           ))}
         </ul>
+        {inProgress && <p className="rounded-2xl bg-info-soft px-3 py-2 text-sm">{t("payouts.inProgress")}</p>}
         <p className="text-sm font-semibold text-warning-ink">{t("payouts.sandboxNote")}</p>
         {error && (
           <p role="alert" className="text-sm font-semibold text-danger">
@@ -429,14 +442,36 @@ function StatusCell({ row, onRecord, onGap }: { row: LedgerRow; onRecord: () => 
         </>
       );
     case "gap_paid":
-      return badge(
-        "success",
-        <CircleCheck aria-hidden="true" className="size-4" />,
-        t("check.gapPaid", { amount: formatRupees(row.arrearsPaid) }),
+      return (
+        <>
+          {badge(
+            "success",
+            <CircleCheck aria-hidden="true" className="size-4" />,
+            t("check.gapPaid", { amount: formatRupees(row.arrearsPaid) }),
+          )}
+          <PaidByCheckout row={row} />
+        </>
       );
     default:
-      return badge("success", <CircleCheck aria-hidden="true" className="size-4" />, t("check.matches"));
+      return (
+        <>
+          {badge("success", <CircleCheck aria-hidden="true" className="size-4" />, t("check.matches"))}
+          <PaidByCheckout row={row} />
+        </>
+      );
   }
+}
+
+/** A month paid through a checkout: its record is that payment, so "Record pay" leaves it alone. */
+function PaidByCheckout({ row }: { row: LedgerRow }) {
+  const t = useTranslations("admin.payrollPage.ledger");
+  if (row.lock !== "paid") return null;
+  return (
+    <span className="inline-flex items-center gap-1 text-xs font-semibold text-ink-2">
+      <Lock aria-hidden="true" className="size-3.5" />
+      {t("viaCheckout")}
+    </span>
+  );
 }
 
 function RecordPay({
@@ -456,13 +491,17 @@ function RecordPay({
     if (result.ok) onSaved();
     return result;
   }, {});
+  // Paid in full, gap already paid, or paid by checkout: what was paid can't change (the server
+  // refuses it too). Everyone else opens on what is already recorded.
+  const open = rows.filter((r) => r.recordable);
   return (
     <>
       <p className="text-ink-2">{t("manualHint")}</p>
+      {open.length < rows.length && <p className="text-sm text-ink-2">{t("lockedNote")}</p>}
       <PayEntryForm
         month={month}
-        initialWorkerId={initialWorkerId}
-        workers={rows.map((r) => ({
+        initialWorkerId={open.some((r) => r.workerId === initialWorkerId) ? initialWorkerId : undefined}
+        workers={open.map((r) => ({
           id: r.workerId,
           label: `${r.name} (#${r.code})`,
           regularMinutes: r.regularMinutes,
@@ -470,6 +509,7 @@ function RecordPay({
           rates: r.rates,
           gross: r.gross,
           deductions: r.deductions,
+          recorded: r.recorded,
         }))}
         action={action}
       />

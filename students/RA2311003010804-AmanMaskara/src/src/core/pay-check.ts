@@ -32,7 +32,16 @@ export interface PayFinding {
 
 export interface PayCheckInput {
   attendance: { regularMinutes: number; overtimeMinutes: number };
-  payRules: { hourlyRate: number; overtimeRate: number; expectedDeductions: number };
+  payRules: {
+    hourlyRate: number;
+    overtimeRate: number;
+    expectedDeductions: number;
+    /**
+     * FairShift's own payslip (paise). With it, the total owed is capped at what is missing from
+     * the worker's take-home pay, so paying the gap can never pay more than the net due.
+     */
+    expected?: { gross: number; net: number };
+  };
   paidRecord: PaidRecord | null;
   minimumWage: { dailyRate: number; dailyHours: number };
 }
@@ -136,7 +145,22 @@ export function checkPay(input: PayCheckInput): PayCheckResult {
     deductionFinding(input, record),
   ].filter((f): f is PayFinding => f !== null);
 
-  return { status: "checked", findings, totalShortfall: totalShortfall(findings) };
+  return { status: "checked", findings, totalShortfall: inHand(input, record, findings) };
+}
+
+/**
+ * The gap to pay the worker. The findings say why hours or deductions look wrong, but money the
+ * worker already received counts: the gap is at most the take-home pay still missing
+ * (net due − net paid). PF on missing regular hours is the employer's to deposit, not to hand
+ * over. Only a payslip below the legal minimum wage can owe more than its own net.
+ */
+function inHand(input: PayCheckInput, record: PaidRecord, findings: PayFinding[]): number {
+  const total = totalShortfall(findings);
+  const expected = input.payRules.expected;
+  if (!expected) return total;
+  const minimum = findings.find((f) => f.code === "BELOW_MINIMUM_WAGE");
+  const belowLegal = minimum ? Math.max(0, minimum.expected - expected.gross) : 0;
+  return Math.min(total, Math.max(0, expected.net - record.netPaid) + belowLegal);
 }
 
 /**

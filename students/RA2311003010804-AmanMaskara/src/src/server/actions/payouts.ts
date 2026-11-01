@@ -2,9 +2,10 @@
 
 import { randomBytes } from "node:crypto";
 import { revalidatePath } from "next/cache";
+import { after } from "next/server";
 import { redirect } from "next/navigation";
 import { z } from "zod";
-import { MAX_BATCH } from "@/core/payouts";
+import { MAX_BATCH, normaliseAccount, normaliseHolder, normaliseIfsc } from "@/core/payouts";
 import { monthKey } from "@/core/period";
 import { requireRole } from "@/server/dal";
 import { currentOrigin } from "@/server/origin";
@@ -133,6 +134,20 @@ export async function savePayoutAccountAction(_prev: AccountFormState, formData:
     now: new Date(),
   });
   if (!result.ok) return { error: result.error };
+  // Start Cashfree's check of the account now, after the response, so it is ready by the first
+  // checkout. A failure here changes nothing: the checkout registers it again if needed.
+  const provider = getCheckoutProvider();
+  if (provider?.prepare) {
+    const { workerId, holder, account, ifsc } = parsed.data;
+    after(() =>
+      provider.prepare!({
+        workerId,
+        holder: normaliseHolder(holder),
+        account: normaliseAccount(account),
+        ifsc: normaliseIfsc(ifsc),
+      }).catch(() => undefined),
+    );
+  }
   revalidatePath("/a/payroll");
   return { ok: true };
 }

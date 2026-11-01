@@ -99,6 +99,20 @@ body {
   min-height: 100dvh;
   font-feature-settings: "kern", "liga";
   -webkit-font-smoothing: antialiased;
+  /*
+   * A word longer than the whole line (a long Tamil or Telugu word in a narrow column) breaks
+   * instead of spilling out. It never makes a box narrower, so rupee amounts stay whole.
+   */
+  overflow-wrap: break-word;
+}
+
+/*
+ * Grid items may be narrower than their content, so one long line (an alert, a rupee amount, a
+ * word in another language) can't widen a column past the screen. Zero specificity: any
+ * explicit min-width still wins.
+ */
+:where(.grid) > * {
+  min-width: 0;
 }
 
 h1,

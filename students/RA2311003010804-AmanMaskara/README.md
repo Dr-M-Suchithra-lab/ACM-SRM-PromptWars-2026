@@ -82,7 +82,7 @@ It runs construction sites and hospitals on the same code; *the AI understands w
 ## What it covers
 
 - **Every hour is recorded.** Workers check in with a rotating QR, and it works offline.
-- **Pay is checked, then paid.** Every rupee is checked against what was actually paid; FairShift shows a *possible shortfall* with the arithmetic. The employer ticks everyone owed and pays them **in one checkout** (Cashfree sandbox), split to each worker's bank account.
+- **Pay is checked, then paid.** Every rupee is checked against what was actually paid; FairShift shows a *possible shortfall* with the arithmetic. The employer ticks everyone owed and pays them **in one checkout** (Cashfree sandbox), split to each worker's bank account. Nobody is paid twice, and nobody is paid more than they are owed.
 - **Pay goes to the right account.** Account numbers are stored encrypted, and if an account is changed the worker is asked *“Is this your bank account?”* in their language; *No, not mine* blocks it.
 - **Hazards are reported by speaking.** Deadlines escalate automatically, and a fire always offers *Call 112*.
 - **Workers speak up safely.** Feedback is anonymous, and issues reach management only when 5 workers sign.
@@ -101,9 +101,10 @@ On the employer side, quit risk comes with its reasons, fatigue is flagged befor
 The full mapping of every point of the brief and every judging criterion to code is in [`src/README.md`](src/README.md#the-brief-point-by-point).
 
 **Quality, in numbers:**
-- 416 unit tests and 39 end-to-end tests, all passing, at 98% line coverage (CI fails below 95%)
-- 43 of 43 security probes pass against a production build, and `npm audit` shows 0 production vulnerabilities
-- a security review of the payments work found one issue, fixed and covered by a test
+- 448 unit tests and 41 end-to-end tests, all passing, at 98% line coverage (CI fails below 95%)
+- 43 of 43 security probes pass against the live demo, and `npm audit` shows 0 production vulnerabilities
+- a security review of the payments work found one issue; trying to break payroll as an employer found four more (paying a month twice, two requests at the same moment, a gap paid with the PF share, a mistaken *not mine*). All five are fixed, each with a test
+- every page checked in all 4 languages at phone, tablet and laptop widths: nothing spills off the screen
 - axe reports 0 accessibility violations
 - every page loads in under 400 ms on phone and desktop (typically 150–200 ms, measured on the live demo)
 
@@ -156,6 +157,7 @@ flowchart LR
 | **Privacy** | Feedback is shown only in groups of 5+; co-signed issues stay hidden below 5 signers; signers are never stored. Names and phone numbers are removed before anything reaches AI or storage |
 | **Bank accounts** | Stored only encrypted (AES-256-GCM, bound to the worker, key rotation supported) and decrypted in one place: the split sent to the payment provider. Pages see ••••1772. Any change waits for the worker's *Yes, it's mine* (or 48 hours); *No, not mine* blocks it. A checkout pays only the account on screen |
 | **Payments** | Amounts always come from payroll on the server. The browser is only redirected to an `https` Cashfree page, and the result is confirmed with Cashfree server to server before anything is recorded. A checkout is refused whole if any worker can't be paid; each paid share is recorded once |
+| **No double payment** | Pay already recorded can be added to, never lowered, and a month paid in full or by checkout is closed. Opening a checkout, recording its payment and *Mark as paid* run under one payroll lock, so two requests at the same moment can't both pay. A gap is never more than the take-home pay still missing: a test checks every worker of both organisations in every month |
 | **Browser and data** | A per-request nonce Content Security Policy, HSTS, `nosniff`, COOP `same-origin`. Same-origin and size checks on JSON routes. CSV exports neutralise spreadsheet formulas. Secrets only from environment variables |
 
 The full threat model, with the code and test for each control, is in [`src/SECURITY.md`](src/SECURITY.md).
@@ -164,12 +166,12 @@ The full threat model, with the code and test for each control, is in [`src/SECU
 
 | Suite | Tests | What it proves |
 |---|---|---|
-| Core rules | 174 | Pay, overtime, pay check, *Paid in full* to the paisa, fatigue, quit risk, eligibility, hazard deadlines, urgency, anonymity threshold, payouts and bank-change rules, signed tokens: boundaries, rounding, error paths |
-| Server and services | 170 | Each feature's workflow, the batched admin pages, the checkout (Cashfree client and simulation), **bank encryption** (tampering, wrong worker, key rotation), **security** (cookies, role checks, tampered links, origin and size checks), **tenant isolation** |
+| Core rules | 186 | Pay, overtime, pay check, *Paid in full* to the paisa, recorded pay that can only go up, fatigue, quit risk, eligibility, hazard deadlines, urgency, anonymity threshold, payouts and bank-change rules, signed tokens: boundaries, rounding, error paths |
+| Server and services | 190 | Each feature's workflow, the batched admin pages, the checkout (Cashfree client and simulation), **no double payment** (two requests at once, paid never above net due for every worker), **bank encryption** (tampering, wrong worker, key rotation), **security** (cookies, role checks, tampered links, origin and size checks), **tenant isolation** |
 | AI | 25 | Fallbacks, guard rails (no invented phone numbers, numbers in rewordings must match), PII removal |
 | Design, languages, admin, device | 47 | Colour contrast meets WCAG AA; all 4 languages have every key; CSV safety; read-aloud, speech and the offline queue |
-| **End to end** | 39 | Both interfaces on a production build, phone viewport, with axe accessibility scans (0 violations), including paying three workers in one checkout and the worker confirming their bank account |
-| **Security probes** | 43 | Read-only attacks on a production build: anonymous and forged access, cross-site requests, oversized bodies, tampered links, cookie flags, checkout routes, bank accounts never in a page |
+| **End to end** | 41 | Both interfaces on a production build, phone viewport, with axe accessibility scans (0 violations), including paying three workers in one checkout, the worker confirming their bank account, *Record pay* building on what is already paid, and the phone menu after a language change |
+| **Security probes** | 43 | Read-only attacks on the live demo: anonymous and forged access, cross-site requests, oversized bodies, tampered links, cookie flags, checkout routes, bank accounts never in a page |
 
 **Coverage** (unit, enforced in CI: the build fails below 95% of lines): **98% lines**, 97% statements, 97% functions, 92% branches. By area: core rules 99%, services 97%, the security and session code at or near 100%. Every push runs lint, a format check, typecheck, unit tests with the coverage limit, a dependency audit, all end-to-end tests, and a Docker build with a container smoke test. [CI runs](https://github.com/amanmaskara04/fairshift/actions).
 
@@ -183,7 +185,8 @@ The full threat model, with the code and test for each control, is in [`src/SECU
 | **Server Components, no chart or animation libraries** | Small pages for ₹7,000 phones on slow networks | Charts and animations hand-built in HTML, SVG and CSS |
 | **One repository interface** | Keyless local runs and fast tests in memory; MongoDB in production; another database later | An extra layer to maintain |
 | **Groups of 5 for feedback and issues** | Workers can't be identified by elimination | Very small teams see no feedback until 5 respond |
-| **Hosted checkout by redirect, with Easy Split** | The employer pays once on Cashfree's own page and the total is split to each worker's bank account; FairShift only redirects, so no payment script runs on its pages | One payment for the batch, paid or not paid as a whole; sandbox only (the live demo uses a simulated checkout) |
+| **Hosted checkout by redirect, with Easy Split** | The employer pays once on Cashfree's own page and the total is split to each worker's bank account; FairShift only redirects, so no payment script runs on its pages | One payment for the batch, paid or not paid as a whole; sandbox only (the live demo uses Cashfree's sandbox checkout) |
+| **Recorded pay can be added to, never lowered** | Lowering a recorded payment would reopen a gap that could then be paid a second time | A month recorded as paid in full can't be corrected in the app |
 | **The worker approves bank changes, with a 48-hour fallback** | The worker is asked before a changed account is used, and *No, not mine* blocks it | A worker who never answers is paid into the new account after 48 hours |
 | **Pay screens open on last month for the first 7 days** | Wages for a month are due within 7 days after it ends (Payment of Wages Act, s. 5), so that is the pay check that matters at the start of a month | Workers and managers tap one tab to see the month in progress |
 | **Strict security headers over Lighthouse points** | COOP and CSP protect users | Some local Lighthouse runs can't measure the page with these headers on, so scores were measured another way |
@@ -248,9 +251,9 @@ These are public demo accounts that exist only in the seeded demo data.
 Tests and checks:
 
 ```bash
-npm test                          # 416 unit tests
+npm test                          # 448 unit tests
 npx playwright install chromium   # once, before the first end-to-end run
-npm run e2e                       # 39 end-to-end tests on a production build, with accessibility scans
+npm run e2e                       # 41 end-to-end tests on a production build, with accessibility scans
 npm run lint && npm run typecheck
 ```
 
@@ -271,6 +274,7 @@ The full set, with what each prompt changed and who wrote it, is in **[`prompts.
 6. **Quality bar:** *"do full test and security audit … make sure all tests passed . act as proper testing engineer."* This added the tenant-isolation and security tests, the coverage gate and the live security probes.
 7. **Release gate** (drafted with the agent, sent by me): *"Act as a release engineer … Verify against these exact targets and report a pass/fail table: … line coverage ≥ 95%, enforced by CI … npm audit --omit=dev: 0 vulnerabilities … npm run probe passes 34/34 … Every page … load under 400 ms."* All six targets passed before submission.
 8. **Paying workers, safely:** *"tell best payment gateway like phonepe sandbox for this projecct in which paying at once , 3-4 workers will be paid"* and later *"how can we secure bank account keys more"*. This brought one checkout split to each worker's bank account, encrypted account numbers, and the worker's approval of any change (§11 of `prompts.md`).
+9. **Trying to break it myself:** *"after paying , i am still able to make changes by using record pay feature and i can pay again . this can be exploited"* and *"paid is more than net due . fix that and check this for all records"*. Recorded pay now only goes up, two requests at once can't pay twice, and a test checks every worker in every month (§11).
 
 ## Screenshots
 
@@ -285,9 +289,10 @@ The full set, with what each prompt changed and who wrote it, is in **[`prompts.
 | ![Overview](screenshots/14-employer-overview-desktop.png) | ![Hazards](screenshots/15-hazards-escalation-desktop.png) |
 | ![People](screenshots/16-people-fatigue-quit-risk-certificates-desktop.png) | ![Payroll](screenshots/17-payroll-fairpay-sentinel-desktop.png) |
 | ![Tick workers to pay](screenshots/21-payroll-tick-workers-desktop.png) | ![Pay in one checkout](screenshots/22-pay-in-one-checkout-desktop.png) |
-| ![Split to each bank account](screenshots/23-checkout-split-to-each-bank-desktop.png) | ![Bank details with change history](screenshots/24-bank-details-history-desktop.png) |
+| ![Split to each bank account](screenshots/23-checkout-split-to-each-bank-desktop.png) | ![Cashfree's sandbox checkout](screenshots/23b-cashfree-sandbox-checkout-desktop.png) |
+| ![Bank details with change history](screenshots/24-bank-details-history-desktop.png) | ![Record pay opens on what is already paid](screenshots/25-record-pay-builds-on-what-is-paid-desktop.png) |
 
-All screenshots are in [`screenshots/`](screenshots), taken on 1 November 2026 from a production build with the live demo's data (so taking them changed nothing judges see).
+All screenshots are in [`screenshots/`](screenshots), taken on 1 November 2026. The overview screens are from the live demo (Gemini connected); the rest are from a local production build with the same demo data, so taking them changed nothing judges see. That build has no Cashfree keys, so it shows the simulated checkout; Cashfree's own sandbox page, which the live demo opens, is shot 23b.
 
 ## Limitations: built vs not built
 
@@ -304,7 +309,8 @@ Also note:
 - Rate limits are counted per server instance; a real deployment needs a shared store.
 - The live demo is shared: a visitor can change demo data (for example, by paying a checkout or confirming Ramesh's bank account). It resets once a day.
 - Hosted on Vercel, not Cloud Run, as the organisers allowed; the Cloud Run setup is included but not deployed.
-- Payments run only in Cashfree's sandbox, and the live demo uses the simulated checkout: no real money moves. Going live needs the employer's and each worker's KYC with Cashfree.
+- Payments run only in Cashfree's sandbox, which the live demo uses: no real money moves. Going live needs the employer's and each worker's KYC with Cashfree.
+- A month recorded as paid in full can't be corrected in the app (pay can only be added to), so a typing mistake needs a note outside FairShift.
 
 ## Security note
 
