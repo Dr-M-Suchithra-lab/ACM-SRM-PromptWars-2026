@@ -79,6 +79,8 @@ export function createMemoryRepos(): Repos {
   const payDisputes = table("payDisputes");
   const issues = table("issues");
   const certificates = table("certificates");
+  const payoutAccounts = table("payoutAccounts");
+  const payoutBatches = table("payoutBatches");
 
   return {
     orgs: { getAll: orgs.all, getById: orgs.byId },
@@ -166,6 +168,20 @@ export function createMemoryRepos(): Repos {
       getById: certificates.byId,
       create: certificates.create,
       update: certificates.update,
+    },
+    payoutAccounts: {
+      getByOrg: (orgId) => payoutAccounts.where((a) => a.orgId === orgId),
+      get: payoutAccounts.byId,
+      upsert: async (account) => {
+        if (await payoutAccounts.byId(account.id)) await payoutAccounts.update(account.id, account);
+        else await payoutAccounts.create(account);
+      },
+    },
+    payoutBatches: {
+      getByOrgMonth: (orgId, month) => payoutBatches.where((b) => b.orgId === orgId && b.month === month),
+      getById: payoutBatches.byId,
+      create: payoutBatches.create,
+      update: payoutBatches.update,
     },
     aiLog: {
       add: async (entry) => {

@@ -2,28 +2,23 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { formatINR } from "@/lib/format";
+import { minutesAtStop, paidAmounts, sliderStops, stopFor, type PayslipFigures } from "@/core/pay-entry";
+import { formatDuration, formatINR } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input, Label } from "@/components/ui/input";
 import { SubmitButton } from "@/components/ui/submit-button";
 
 /** What FairShift calculated for one worker this month: the starting point of the form. */
-export interface PayEntryWorker {
+export interface PayEntryWorker extends PayslipFigures {
   id: string;
   label: string;
-  regularMinutes: number;
-  overtimeMinutes: number;
-  /** Paise per hour */
-  rates: { regular: number; overtime: number };
-  /** Paise, from the payslip */
-  gross: number;
-  deductions: number;
 }
 
 type Preset = "full" | "no_overtime" | "custom";
 const PRESETS: Preset[] = ["full", "no_overtime", "custom"];
 const HOUR_KINDS = ["regular", "overtime"] as const;
+type HourKind = (typeof HOUR_KINDS)[number];
 const AMOUNT_FIELDS = [
   { key: "gross", name: "grossPaid" },
   { key: "deductions", name: "deductions" },
@@ -31,52 +26,48 @@ const AMOUNT_FIELDS = [
 ] as const;
 type Amounts = Record<(typeof AMOUNT_FIELDS)[number]["key"], string>;
 
-const paiseFor = (hours: number, ratePerHour: number) => Math.round(hours * ratePerHour);
 const toRupees = (paise: number) => (paise / 100).toFixed(2);
-/** Hours rounded to a quarter, the sliders' step. */
-const quarterHours = (minutes: number) => Math.round(minutes / 15) / 4;
+const recorded = (w: PayEntryWorker, kind: HourKind) => (kind === "regular" ? w.regularMinutes : w.overtimeMinutes);
 
 /**
- * Manual entry built around what FairShift already knows: the worker's recorded hours and
- * rates. The admin says how many of those hours were paid (a preset or two sliders) and the
- * amounts follow; "Change amounts" allows typing the exact figures from the pay sheet.
+ * Manual entry built around what FairShift already knows: the worker's recorded time and rates.
+ * The admin says how much of that time was paid (a preset or two sliders) and the amounts follow;
+ * "Change amounts" allows typing the exact figures from the pay sheet. Time is kept in exact
+ * minutes throughout, so "Paid in full" always matches FairPay Sentinel's check.
  */
 export function PayEntryForm({
   month,
   workers,
+  initialWorkerId,
   action,
 }: {
   month: string;
   workers: PayEntryWorker[];
+  initialWorkerId?: string;
   action: (formData: FormData) => void;
 }) {
   const t = useTranslations("admin.payrollPage.record");
-  const [workerId, setWorkerId] = useState(workers[0]?.id ?? "");
+  const [workerId, setWorkerId] = useState(initialWorkerId ?? workers[0]?.id ?? "");
   const [preset, setPreset] = useState<Preset>("full");
-  const [paidHours, setPaidHours] = useState<{ regular: number; overtime: number } | null>(null);
+  const [paidMinutes, setPaidMinutes] = useState<Record<HourKind, number> | null>(null);
   const [override, setOverride] = useState<Amounts | null>(null);
   const worker = workers.find((w) => w.id === workerId) ?? workers[0];
   if (!worker) return null;
 
-  const full = { regular: quarterHours(worker.regularMinutes), overtime: quarterHours(worker.overtimeMinutes) };
-  const hours = preset === "full" ? full : preset === "no_overtime" ? { ...full, overtime: 0 } : (paidHours ?? full);
+  const all = { regular: worker.regularMinutes, overtime: worker.overtimeMinutes };
+  const minutes = preset === "full" ? all : preset === "no_overtime" ? { ...all, overtime: 0 } : (paidMinutes ?? all);
 
   function reset(next: Preset) {
     setPreset(next);
-    setPaidHours(null);
+    setPaidMinutes(null);
     setOverride(null);
   }
 
-  // Paid in full uses the payslip's own figures; anything else is hours × rate.
-  const gross =
-    preset === "full"
-      ? worker.gross
-      : paiseFor(hours.regular, worker.rates.regular) + paiseFor(hours.overtime, worker.rates.overtime);
-  const deductions = Math.min(worker.deductions, gross);
+  const computed = paidAmounts(worker, { regularMinutes: minutes.regular, overtimeMinutes: minutes.overtime });
   const amounts: Amounts = override ?? {
-    gross: toRupees(gross),
-    deductions: toRupees(deductions),
-    net: toRupees(gross - deductions),
+    gross: toRupees(computed.gross),
+    deductions: toRupees(computed.deductions),
+    net: toRupees(computed.net),
   };
   const due = worker.gross - worker.deductions;
   const shortBy = due - Math.round(Number(amounts.net) * 100);
@@ -84,8 +75,9 @@ export function PayEntryForm({
   return (
     <form action={action} className="flex flex-col gap-4">
       <input type="hidden" name="month" value={month} />
-      <input type="hidden" name="paidRegularHours" value={hours.regular} />
-      <input type="hidden" name="paidOvertimeHours" value={hours.overtime} />
+      {/* Exact hours (minutes ÷ 60), never rounded: the pay check compares them minute for minute. */}
+      <input type="hidden" name="paidRegularHours" value={minutes.regular / 60} />
+      <input type="hidden" name="paidOvertimeHours" value={minutes.overtime / 60} />
       <div>
         <Label htmlFor="paid-worker">{t("worker")}</Label>
         <select
@@ -105,7 +97,11 @@ export function PayEntryForm({
           ))}
         </select>
         <p className="mt-1.5 text-sm text-ink-2">
-          {t("calculated", { hours: full.regular, overtime: full.overtime, amount: formatINR(due) })}
+          {t("calculated", {
+            hours: formatDuration(all.regular),
+            overtime: formatDuration(all.overtime),
+            amount: formatINR(due),
+          })}
         </p>
       </div>
 
@@ -113,7 +109,7 @@ export function PayEntryForm({
         <legend className="mb-2 font-bold">{t("howPaid")}</legend>
         <div className="grid grid-cols-3 gap-2">
           {PRESETS.map((p) => {
-            const disabled = p === "no_overtime" && full.overtime === 0;
+            const disabled = p === "no_overtime" && all.overtime === 0;
             return (
               <label
                 key={p}
@@ -143,28 +139,34 @@ export function PayEntryForm({
 
       {preset === "custom" && (
         <div className="flex flex-col gap-3 rounded-2xl bg-surface-2/70 p-3">
-          {HOUR_KINDS.map((kind) => (
-            <div key={kind}>
-              <Label htmlFor={`paid-${kind}`} className="flex justify-between gap-2">
-                <span>{t(`${kind}Hours`)}</span>
-                <span className="figure">{t("hoursOf", { paid: hours[kind], total: full[kind] })}</span>
-              </Label>
-              <input
-                id={`paid-${kind}`}
-                type="range"
-                min={0}
-                max={full[kind]}
-                step={0.25}
-                value={hours[kind]}
-                disabled={full[kind] === 0}
-                onChange={(e) => {
-                  setOverride(null);
-                  setPaidHours({ ...hours, [kind]: Number(e.target.value) });
-                }}
-                className="mt-2 w-full accent-primary"
-              />
-            </div>
-          ))}
+          {HOUR_KINDS.map((kind) => {
+            const total = recorded(worker, kind);
+            return (
+              <div key={kind}>
+                <Label htmlFor={`paid-${kind}`} className="flex justify-between gap-2">
+                  <span>{t(`${kind}Hours`)}</span>
+                  <span className="figure">
+                    {t("hoursOf", { paid: formatDuration(minutes[kind]), total: formatDuration(total) })}
+                  </span>
+                </Label>
+                <input
+                  id={`paid-${kind}`}
+                  type="range"
+                  min={0}
+                  max={sliderStops(total)}
+                  step={1}
+                  value={stopFor(minutes[kind], total)}
+                  aria-valuetext={formatDuration(minutes[kind])}
+                  disabled={total === 0}
+                  onChange={(e) => {
+                    setOverride(null);
+                    setPaidMinutes({ ...minutes, [kind]: minutesAtStop(Number(e.target.value), total) });
+                  }}
+                  className="mt-2 w-full accent-primary"
+                />
+              </div>
+            );
+          })}
         </div>
       )}
 

@@ -22,6 +22,13 @@ export default defineConfig({
     url: `http://localhost:${PORT}/api/health`,
     timeout: 300_000,
     reuseExistingServer: !process.env.CI,
-    env: { DEMO_MODE: "true", SESSION_SECRET: "e2e-session-secret-0123456789abcdef" },
+    env: {
+      DEMO_MODE: "true",
+      SESSION_SECRET: "e2e-session-secret-0123456789abcdef",
+      // Always the simulated checkout: tests must never reach a real Cashfree account, even when
+      // .env.local holds test keys (an empty value here wins over .env.local).
+      CASHFREE_APP_ID: "",
+      CASHFREE_SECRET_KEY: "",
+    },
   },
 });

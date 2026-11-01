@@ -53,7 +53,8 @@ ensure_random_secret fairshift-feedback-secret
 ensure_random_secret fairshift-qr-secret
 ensure_random_secret fairshift-passport-secret
 ensure_random_secret fairshift-cron-secret
-SECRETS="MONGODB_URI=fairshift-mongodb-uri:latest,SESSION_SECRET=fairshift-session-secret:latest,FEEDBACK_HMAC_SECRET=fairshift-feedback-secret:latest,QR_SIGNING_SECRET=fairshift-qr-secret:latest,PASSPORT_SECRET=fairshift-passport-secret:latest,CRON_SECRET=fairshift-cron-secret:latest"
+ensure_random_secret fairshift-bank-key
+SECRETS="MONGODB_URI=fairshift-mongodb-uri:latest,SESSION_SECRET=fairshift-session-secret:latest,FEEDBACK_HMAC_SECRET=fairshift-feedback-secret:latest,QR_SIGNING_SECRET=fairshift-qr-secret:latest,PASSPORT_SECRET=fairshift-passport-secret:latest,CRON_SECRET=fairshift-cron-secret:latest,BANK_ENCRYPTION_KEY=fairshift-bank-key:latest"
 if [ -n "$GEMINI_KEY" ]; then
   put_secret fairshift-gemini-key "$GEMINI_KEY"
   SECRETS="$SECRETS,GEMINI_API_KEY=fairshift-gemini-key:latest"
@@ -62,7 +63,7 @@ fi
 echo "==> Letting the Cloud Run service account read the secrets"
 NUMBER="$("$GCLOUD" projects describe "$PROJECT" --format='value(projectNumber)')"
 SA="$NUMBER-compute@developer.gserviceaccount.com"
-for s in fairshift-mongodb-uri fairshift-session-secret fairshift-feedback-secret fairshift-qr-secret fairshift-passport-secret fairshift-cron-secret ${GEMINI_KEY:+fairshift-gemini-key}; do
+for s in fairshift-mongodb-uri fairshift-session-secret fairshift-feedback-secret fairshift-qr-secret fairshift-passport-secret fairshift-cron-secret fairshift-bank-key ${GEMINI_KEY:+fairshift-gemini-key}; do
   g secrets add-iam-policy-binding "$s" --member="serviceAccount:$SA" --role=roles/secretmanager.secretAccessor >/dev/null
 done
 

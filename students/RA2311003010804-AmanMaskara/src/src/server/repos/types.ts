@@ -6,6 +6,7 @@ import type { Hazard, Sector, Shift } from "@/core/types";
 import type { PaidRecord, FindingCode } from "@/core/pay-check";
 import type { IssueStatus } from "@/core/cosign";
 import type { SkillLevel } from "@/config/minimum-wage";
+import type { PayoutAccountStatus, PayoutFailure, PayoutKind, PayoutStatus } from "@/core/payouts";
 
 export type { Hazard, Shift };
 
@@ -169,6 +170,76 @@ export interface CertificateRequest {
   decidedBy?: string;
 }
 
+/** One change to a worker's bank details, kept so the worker and employer can see who did what. */
+export interface PayoutAccountEvent {
+  at: Date;
+  by: "employer" | "worker";
+  action: "changed" | "confirmed" | "disputed";
+  /** Last four digits of the account at that moment */
+  last4: string;
+}
+
+/**
+ * Where a worker's share of a checkout is settled. Kept apart from Worker, and the account number
+ * is stored only encrypted (see bank-crypto.ts): pages get the last four digits.
+ */
+export interface PayoutAccount {
+  /** The worker id: one account per worker */
+  id: string;
+  orgId: string;
+  holder: string;
+  /** AES-256-GCM, bound to the worker id */
+  accountEncrypted: string;
+  last4: string;
+  ifsc: string;
+  /** Changes made by the employer wait for the worker to confirm them (see core/payouts.ts) */
+  status: PayoutAccountStatus;
+  /** When the employer last entered these details */
+  changedAt: Date;
+  updatedAt: Date;
+  updatedBy: string;
+  /** Newest first, at most 20 */
+  history: PayoutAccountEvent[];
+}
+
+export interface PayoutItem {
+  /** "<batch id>_<n>": one share of the checkout */
+  transferId: string;
+  workerId: string;
+  name: string;
+  kind: PayoutKind;
+  /** Paise, computed by payroll when the batch was created */
+  amount: number;
+  /** "••••1191" and the IFSC, as they were when the checkout opened */
+  accountMasked: string;
+  ifsc: string;
+  status: PayoutStatus;
+  failure?: PayoutFailure;
+  /** The provider's own words when the checkout could not be opened */
+  detail?: string;
+  /** Payroll at the moment of paying, so a later "paid" records exactly what was charged */
+  payslip: { regularMinutes: number; overtimeMinutes: number; gross: number; deductions: number };
+  /** Set once the payment is written to the worker's pay record (never twice) */
+  recordedAt?: Date;
+}
+
+/** One checkout: the employer pays the total once, and it is split to each worker's bank account. */
+export interface PayoutBatch {
+  /** Also the provider's payment link id */
+  id: string;
+  orgId: string;
+  month: string;
+  provider: "cashfree" | "simulated";
+  createdAt: Date;
+  createdBy: string;
+  updatedAt: Date;
+  /** Where the employer pays (a Cashfree payment link, or the simulated checkout page) */
+  checkoutUrl?: string;
+  /** Simulation only: the outcome chosen on the stand-in checkout page */
+  simulatedStatus?: PayoutStatus;
+  items: PayoutItem[];
+}
+
 export interface AiLogEntry {
   feature: "hazard" | "explainPay" | "brief" | "similar" | "tts" | "help";
   model: string;
@@ -279,6 +350,20 @@ export interface CertificateRepo {
   update(id: string, data: Partial<CertificateRequest>): Promise<void>;
 }
 
+export interface PayoutAccountRepo {
+  getByOrg(orgId: string): Promise<PayoutAccount[]>;
+  get(workerId: string): Promise<PayoutAccount | undefined>;
+  /** Insert or replace the worker's account */
+  upsert(account: PayoutAccount): Promise<void>;
+}
+
+export interface PayoutBatchRepo {
+  getByOrgMonth(orgId: string, month: string): Promise<PayoutBatch[]>;
+  getById(id: string): Promise<PayoutBatch | undefined>;
+  create(batch: PayoutBatch): Promise<void>;
+  update(id: string, data: Partial<PayoutBatch>): Promise<void>;
+}
+
 export interface AiLogRepo {
   add(entry: AiLogEntry): Promise<void>;
   recent(limit: number): Promise<AiLogEntry[]>;
@@ -305,6 +390,8 @@ export interface Repos {
   issues: IssueRepo;
   issueSigners: GuardRepo;
   certificates: CertificateRepo;
+  payoutAccounts: PayoutAccountRepo;
+  payoutBatches: PayoutBatchRepo;
   aiLog: AiLogRepo;
   ttsCache: TtsCacheRepo;
 }

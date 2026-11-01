@@ -16,6 +16,8 @@ import type {
   Org,
   PaidRecordEntry,
   PayDispute,
+  PayoutAccount,
+  PayoutBatch,
   Shift,
   Site,
   SiteIssue,
@@ -25,8 +27,9 @@ import type {
 import { buildAdmins, buildWorkers, ORGS, SITES } from "./roster";
 import { generateShifts, rameshJoinedAt } from "./attendance";
 import { buildFeedback, buildHazards, buildIssues, SKILLS } from "./records";
+import { buildPayoutAccounts } from "./payouts";
 
-export const SEED_VERSION = 5;
+export const SEED_VERSION = 7;
 
 /** Ramesh was paid for 9h of overtime this month although 13h 32m were recorded. */
 export const RAMESH_UNPAID_OT_MINUTES = 4 * 60 + 32;
@@ -44,6 +47,8 @@ export interface SeedData {
   payDisputes: PayDispute[];
   issues: SiteIssue[];
   certificates: CertificateRequest[];
+  payoutAccounts: PayoutAccount[];
+  payoutBatches: PayoutBatch[];
 }
 
 // Simple seeded PRNG (mulberry32)
@@ -270,5 +275,7 @@ export function getSeedData(now: Date): SeedData {
     payDisputes: buildDisputes(now),
     issues: buildIssues(now),
     certificates: buildCertificates(shifts, now),
+    payoutAccounts: buildPayoutAccounts(workers, now),
+    payoutBatches: [],
   };
 }

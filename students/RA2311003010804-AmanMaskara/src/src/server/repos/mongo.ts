@@ -27,6 +27,8 @@ const SEEDED_COLLECTIONS = [
   "payDisputes",
   "issues",
   "certificates",
+  "payoutAccounts",
+  "payoutBatches",
 ] as const satisfies readonly (keyof SeedData)[];
 const GUARD_COLLECTIONS = ["feedbackGuards", "issueSigners"] as const;
 const AI_LOG_LIMIT = 200;
@@ -93,6 +95,8 @@ async function ensureSeeded(database: Db): Promise<void> {
     database.collection("issues").createIndex({ siteId: 1 }),
     database.collection("certificates").createIndex({ orgId: 1 }),
     database.collection("skills").createIndex({ workerId: 1 }),
+    database.collection("payoutAccounts").createIndex({ orgId: 1 }),
+    database.collection("payoutBatches").createIndex({ orgId: 1, month: 1 }),
     // Metadata only, kept 30 days; cached speech kept 90 days.
     database.collection("aiLog").createIndex({ at: 1 }, { expireAfterSeconds: 30 * 86_400 }),
     database.collection("ttsCache").createIndex({ at: 1 }, { expireAfterSeconds: 90 * 86_400 }),
@@ -227,6 +231,17 @@ export function createMongoRepos(): Repos {
       ...crud("certificates"),
       getByOrg: (orgId) => find("certificates", { orgId }),
       getByWorker: (workerId) => find("certificates", { workerId }),
+    },
+    payoutAccounts: {
+      getByOrg: (orgId) => find("payoutAccounts", { orgId }),
+      get: (workerId) => findOne("payoutAccounts", { _id: workerId }),
+      upsert: async (account) => {
+        await (await col("payoutAccounts")).replaceOne({ _id: account.id } as Document, account, { upsert: true });
+      },
+    },
+    payoutBatches: {
+      ...crud("payoutBatches"),
+      getByOrgMonth: (orgId, month) => find("payoutBatches", { orgId, month }),
     },
     aiLog: {
       add: async (entry) => {

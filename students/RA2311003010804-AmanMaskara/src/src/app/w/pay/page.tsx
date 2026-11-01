@@ -14,6 +14,8 @@ import { SpeakButton } from "@/components/speak-button";
 import { PageHeader } from "@/components/page-header";
 import { ExplainPay } from "@/components/worker/explain-pay";
 import { ShortfallCard } from "@/components/worker/shortfall-card";
+import { BankConfirmCard } from "@/components/worker/bank-confirm-card";
+import { workerPayoutAccount } from "@/server/services/payouts";
 
 export default async function PayPage({ searchParams }: PageProps<"/w/pay">) {
   const session = await requireRole("worker");
@@ -27,9 +29,11 @@ export default async function PayPage({ searchParams }: PageProps<"/w/pay">) {
       : payFocusMonth(now);
 
   const repos = getRepos();
-  const [check, disputes] = await Promise.all([
+  const [check, disputes, bank, org] = await Promise.all([
     payCheckFor(repos, session.uid, month),
     repos.payDisputes.getByWorker(session.uid),
+    workerPayoutAccount(repos, session.uid),
+    repos.orgs.getById(session.orgId),
   ]);
   if (!check) return null;
   const { payslip, daysWorked } = check.view;
@@ -66,6 +70,8 @@ export default async function PayPage({ searchParams }: PageProps<"/w/pay">) {
           </Link>
         ))}
       </nav>
+
+      {bank && bank.status !== "confirmed" && <BankConfirmCard account={bank} employer={org?.name ?? ""} />}
 
       {check.outstanding > 0 ? (
         <ShortfallCard

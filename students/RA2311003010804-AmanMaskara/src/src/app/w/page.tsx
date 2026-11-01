@@ -17,6 +17,7 @@ import { getRepos } from "@/server/repos";
 import { earnedFor } from "@/server/services/earned";
 import { payCheckFor } from "@/server/services/pay-check";
 import { benefitsFor } from "@/server/services/benefits";
+import { workerPayoutAccount } from "@/server/services/payouts";
 import { getISTDay, getISTWeekStart } from "@/core/time";
 import { minutesByDay } from "@/core/overtime";
 import { checkFatigue } from "@/core/fatigue";
@@ -32,6 +33,7 @@ import { SpeakButton } from "@/components/speak-button";
 import { todayLabel } from "@/components/page-header";
 import { ShiftTimer } from "@/components/worker/shift-timer";
 import { CountUp } from "@/components/worker/count-up";
+import { BankConfirmCard } from "@/components/worker/bank-confirm-card";
 import { GreetingTitle, WelcomeMoment } from "@/components/welcome/welcome";
 import { dayPart, istHour } from "@/lib/day-part";
 
@@ -59,13 +61,14 @@ export default async function WorkerHome({ searchParams }: PageProps<"/w">) {
   ]);
   const repos = getRepos();
   const now = new Date();
-  const [worker, shifts, org, earned, check, benefits] = await Promise.all([
+  const [worker, shifts, org, earned, check, benefits, bank] = await Promise.all([
     repos.workers.getById(session.uid),
     repos.shifts.getByWorker(session.uid),
     repos.orgs.getById(session.orgId),
     earnedFor(repos, session.uid, now),
     payCheckFor(repos, session.uid, payFocusMonth(now)),
     benefitsFor(repos, session.uid, now),
+    workerPayoutAccount(repos, session.uid),
   ]);
 
   const today = getISTDay(now);
@@ -123,6 +126,7 @@ export default async function WorkerHome({ searchParams }: PageProps<"/w">) {
         </header>
 
         <div className="stagger flex flex-col gap-4">
+          {bank && bank.status !== "confirmed" && <BankConfirmCard account={bank} employer={org?.name ?? ""} />}
           <section aria-labelledby="earned-title" className="hero-card flex flex-col gap-3 p-5 md:p-7">
             <div className="flex items-start justify-between gap-3">
               <h2 id="earned-title" className="eyebrow text-primary-strong">

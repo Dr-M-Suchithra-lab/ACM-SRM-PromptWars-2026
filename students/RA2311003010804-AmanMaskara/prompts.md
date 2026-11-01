@@ -14,7 +14,7 @@ The last section, *How I would write it today*, is hindsight. It is marked as su
 - [Who did what](#who-did-what)
 - [Techniques](#techniques-in-the-prompts-i-wrote-and-directed)
 - [Problem statement → prompt → feature](#problem-statement--prompt--feature)
-- **Build stages:** [1 Research](#1-research--learn-what-wins) · [2 Plan](#2-plan--docs-before-code) · [3 Build](#3-build--task-prompts-for-google-antigravity) · [4 Ship](#4-ship-early) · [5 Use it like a worker](#5-use-it-like-a-worker--prompts-from-testing-on-my-phone) · [6 Upgrade](#6-the-upgrade-prompt--from-covers-the-examples-to-solves-the-problem) · [7 Judgement](#7-product-judgement--asking-before-adding) · [8 Bug bash](#8-bug-bash--one-prompt-a-dozen-fixes-and-a-new-feature) · [9 Quality](#9-quality-bar--security-speed-testing) (incl. the release gate) · [10 Docs](#10-documentation-for-the-judges)
+- **Build stages:** [1 Research](#1-research--learn-what-wins) · [2 Plan](#2-plan--docs-before-code) · [3 Build](#3-build--task-prompts-for-google-antigravity) · [4 Ship](#4-ship-early) · [5 Use it like a worker](#5-use-it-like-a-worker--prompts-from-testing-on-my-phone) · [6 Upgrade](#6-the-upgrade-prompt--from-covers-the-examples-to-solves-the-problem) · [7 Judgement](#7-product-judgement--asking-before-adding) · [8 Bug bash](#8-bug-bash--one-prompt-a-dozen-fixes-and-a-new-feature) · [9 Quality](#9-quality-bar--security-speed-testing) (incl. the release gate) · [10 Docs](#10-documentation-for-the-judges) · [11 Paying workers safely](#11-paying-workers-safely--one-checkout-encrypted-accounts-the-worker-approves)
 - [What didn't work](#what-didnt-work-and-how-my-prompting-changed)
 - [How I would write it today](#how-i-would-write-it-today-hindsight)
 
@@ -76,7 +76,7 @@ Every point of the official brief, the prompt text that drove it, and what it be
 
 | The brief | Prompt that drove it (real text) | Feature | § |
 |---|---|---|---|
-| **Pain: opaque pay**, uncounted overtime | *"Add a second source: what the employer actually paid … show a 'Possible shortfall: ₹X' card … the arithmetic in plain words"* | FairPay Sentinel, *Pay the gap* | 6, 8 |
+| **Pain: opaque pay**, uncounted overtime | *"Add a second source: what the employer actually paid … show a 'Possible shortfall: ₹X' card … the arithmetic in plain words"* | FairPay Sentinel; gaps paid in one checkout | 6, 8, 11 |
 | **Pain: fear of identification** | *"anonymity.ts (k=5 gate)"*; *"At 5, the issue becomes escalated"* | Feedback shown only in groups of 5+; co-signed issues; signers never stored | 3, 6 |
 | **Pain: unreported safety risks** | *"its marking it low rank issue . the issue severity if understood by ai would be better"*; *"Automatic escalation: a missed deadline escalates through supervisor → site manager → safety officer/HR"* | Voice reports, severity judged by AI with code minimums, deadlines and escalation, *Is it really fixed?* | 6, 8 |
 | **Pain: lost career history** | *"the 'lost career history' pain point is about experience too … Add a verified work history section built from attendance"* | Skill passport with work history and a 30-day signed link; signed work certificate | 6 |
@@ -96,7 +96,7 @@ Every point of the official brief, the prompt text that drove it, and what it be
 | **Feature 8: voice and local** | (the languages and SpeakButton rules above) | Voice in and out, in 4 languages | 3 |
 | **Deliverable: 2 UIs** | *"/w layout (requireRole('worker')) … /a layout (requireRole('admin'))"* | Worker app `/w` and employer dashboard `/a` | 3 |
 | **Deliverable: 2+ industries** | *"Org 1 BuildRight Constructions, sector construction … Org 2 City Care Hospital, sector hospital"*; *"add a hospital admin demo login so both sectors are shown on the employer side"* | Construction and hospital live; campus and factory profiles | 3, 6 |
-| **Deliverable: 3+ working features** | All of the above | 14 working features | — |
+| **Deliverable: 3+ working features** | All of the above | 15 working features | — |
 | **Judging rubric** | Pasted in full into the final-build prompt | Every change weighed against it | 9 |
 
 ---
@@ -381,7 +381,7 @@ Each line names a page, a device, an action and what went wrong, and says which 
 
 **What it changed:** a release decision based on evidence instead of a feeling. All six targets passed:
 - lint, typecheck and formatting clean
-- 323/323 unit and 35/35 end-to-end tests, at 98% line coverage with the 95% gate enforced in CI (the final build, after the payday-window work, has 340 unit and 36 end-to-end tests, all passing)
+- 323/323 unit and 35/35 end-to-end tests, at 98% line coverage with the 95% gate enforced in CI (the final build, after the payments work in §11, has 416 unit and 39 end-to-end tests, all passing)
 - 0 production vulnerabilities
 - health OK, and 34/34 live security probes
 - all 36 page measurements under 400 ms (slowest 306 ms)
@@ -406,6 +406,49 @@ Each line names a page, a device, an action and what went wrong, and says which 
 - The architecture diagram shows both interfaces.
 - `SECURITY.md` is a threat model.
 
+## 11. Paying workers safely — one checkout, encrypted accounts, the worker approves
+
+After submission I kept going with one question: FairShift finds unpaid wages, but can it also *pay* them? I used Claude Code for this stage. Every change was built on a separate local branch and tested on my laptop before anything was pushed.
+
+**My prompts, in order:**
+
+> tell best payment gateway like phonepe sandbox for this projecct in which paying at once , 3-4 workers will be paid
+
+> through which sandbox i can pay using account credentials without upi
+
+> build it locally and i will test it . if we like it we will push it otherwise we will revert to old version locally
+
+> why isnt it redirecting me to cashfree gateway where i can write my account details
+
+> i need that version
+
+**What it changed:** the first build sent money *out* by bank transfer (a payout), but I wanted the employer to pay on a real checkout page. So it became one Cashfree payment link for the total, with Easy Split sending each worker's share to their own bank account (account number and IFSC, no UPI). FairShift only redirects to Cashfree's page, so no payment script runs on FairShift. Without keys, demo mode shows a simulated checkout.
+
+**Testing it on the real sandbox:**
+
+> on cashfree , when clicking on success or user dropped or failure , cashfree portal is working fine , but when selecting pending , the portal malfunctions .
+
+> okay you can do that . i need some more changes along with that . in the payroll section there are multiple features from previous build and in this new build . use your own brain and integrate them seamless with each other . so many different boxes dont look good and is not seamless. its not functioning well . also when clicking record pay for one worker [...] see even everything is full some amount shows due . thats a bug . also when i click pay in full and submit , there is same issue coming up
+
+**What it changed:**
+- **"Pending" explained:** Cashfree only sends the payer back after a final outcome, so a pending payment keeps its page waiting. FairShift lists the checkout as *Waiting for payment*, with *Continue payment*, *Check status*, *Cancel* and a one-line hint.
+- **One payroll page:** a summary card, then one worker list with pay, the FairPay check, the bank account and a tick box; a sticky bar pays everyone ticked in one checkout.
+- **The ₹11.52 bug:** the form rounded hours to a quarter, so *Paid in full* came out short. It now works in exact minutes, and a test records *Paid in full* for every worker and checks none shows a shortfall.
+
+**Security, then hardening:**
+
+> everything is working fine . do all security and testing now
+
+> how can we secure bank account keys more
+
+> build 1 and 2 as of now and then do all security and testing and if all test pass , update the landing page with this feature and update the pitch also with this feature . then update all docs and demo with this feature .
+
+**What it changed:**
+- **A real finding:** the security review found that a corrected bank account could still have been paid the old way, because Cashfree remembered the first one. Each Cashfree vendor now carries a fingerprint of the account, and a test proves the corrected account is paid.
+- **Encrypted at rest:** account numbers are stored only as AES-256-GCM ciphertext, bound to the worker, and decrypted in one place: the split sent to Cashfree.
+- **The worker approves changes:** a new or changed account waits for the worker: *"Is this your bank account?"* in their language, read aloud. *No, not mine* blocks it; no answer makes it payable after 48 hours, so nobody is left unpaid.
+- **Proof:** 416 unit and 39 end-to-end tests, 43/43 security probes, 0 production vulnerabilities.
+
 ---
 
 ## What didn't work, and how my prompting changed
@@ -418,6 +461,8 @@ Each line names a page, a device, an action and what went wrong, and says which 
 | **Google Cloud deployment was blocked**: the CLI was missing, then billing was not enabled, and no credits were available | Ship early on a host that works and keep the code portable | Deployed on Vercel and MongoDB Atlas within the hour (§4), and kept a Cloud Run–ready container and deploy script |
 | **Some features looked right but failed in use**: an old demo session hijacked "I'm an employer", duplicate merges joined unrelated hazards, and manual pay entry was confusing | Passing tests do not prove a good experience | Bug reports became concrete ("how can someone merge scaffolding and heat issue together"), and the fixes were locked in with tests (heat is never merged into scaffolding; an old demo session cannot hijack "I'm an employer") |
 | **Speed versus security.** A strict security header got in the way of the Lighthouse audit | A score is not worth a weaker app | I set the rule "dont compromise security … for lighthouse" and kept the header |
+| **A form looked right but the numbers were not.** *Paid in full* showed "₹11.52 less than due" | Rounding (hours to a quarter) hides inside correct-looking screens | I pasted the exact screen text into the prompt (§11); the fix came with a test across every worker |
+| **The docs and the real sandbox disagreed.** Cashfree's documentation said a missing vendor returns 404; the sandbox returned 400, and rejected a business type the docs did not list | Read the docs, then check against the real service early | Two read-only calls to my own sandbox found both before I tested it myself (§11) |
 | **Asking "is it done?" after the work** instead of defining done at the start | Verification belongs in the prompt, not after it | Later prompts set the bar up front: "make sure all tests passed", "make sure that nothing crashes"; the release-gate prompt then set six measurable pass/fail targets before submission (§9) |
 
 ## How I would write it today (hindsight)

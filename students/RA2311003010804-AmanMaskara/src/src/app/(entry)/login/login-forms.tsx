@@ -103,9 +103,9 @@ function WorkerForm() {
       ))}
 
       <div role="group" className="grid grid-cols-3 gap-2" aria-label={t("keypad")}>
-        {KEYS.map((key, i) =>
+        {KEYS.map((key) =>
           key === "" ? (
-            <span key={i} aria-hidden="true" />
+            <span key="blank" aria-hidden="true" />
           ) : (
             <Button
               key={key}

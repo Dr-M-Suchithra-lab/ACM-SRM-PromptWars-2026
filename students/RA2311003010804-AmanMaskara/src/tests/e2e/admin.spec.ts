@@ -130,19 +130,32 @@ test("sites page lists sector rules and kiosk links", async ({ page }) => {
   await expectNoA11yViolations(page);
 });
 
-test("manual pay entry from presets, then paying the gap clears it", async ({ page }) => {
+test("manual pay entry from presets, then marking the gap paid clears it", async ({ page }) => {
   await loginAs(page, /Priya/);
   await page.goto("/a/payroll");
   await page.getByRole("button", { name: "Record pay for one worker" }).click();
   await page.locator("#paid-worker").selectOption({ label: "Arun Yadav (#1002)" });
+  // Paid in full matches what is due exactly, whatever the odd minutes.
+  await expect(page.getByText("Matches what is due")).toBeVisible();
   await page.getByText("Overtime not paid").click();
   await expect(page.getByText(/less than due/)).toBeVisible();
   await page.getByRole("button", { name: "Save", exact: true }).click();
   const row = page.getByRole("row", { name: /Arun Yadav/ });
   await expect(row.getByText(/Possible shortfall/)).toBeVisible();
-  await row.getByRole("button", { name: /^Pay ₹/ }).click();
+  await row.getByRole("button", { name: "Mark the gap paid for Arun Yadav" }).click();
   await page.getByRole("button", { name: /I have paid/ }).click();
   await expect(row.getByText(/Gap paid/)).toBeVisible();
+});
+
+test("paid in full from a worker's own row matches FairPay Sentinel", async ({ page }) => {
+  await loginAs(page, /Priya/);
+  await page.goto("/a/payroll");
+  const row = page.getByRole("row", { name: /Murali Krishnan/ });
+  await row.getByRole("button", { name: "Record pay for Murali Krishnan" }).click();
+  await expect(page.locator("#paid-worker")).toHaveValue("w1015");
+  await expect(page.getByText("Matches what is due")).toBeVisible();
+  await page.getByRole("button", { name: "Save", exact: true }).click();
+  await expect(row.getByText("Matches")).toBeVisible();
 });
 
 test("a worker adds a skill, the admin verifies it", async ({ browser }) => {
@@ -170,4 +183,83 @@ test("a worker adds a skill, the admin verifies it", async ({ browser }) => {
   await expect(
     worker.getByRole("listitem").filter({ hasText: "Bar bending (e2e)" }).getByText("Verified"),
   ).toBeVisible();
+});
+
+test("pay three workers in one checkout: add bank details, the worker confirms, pay on the checkout page", async ({
+  page,
+  browser,
+}) => {
+  test.setTimeout(90_000); // drives the employer and the worker
+  await loginAs(page, /Priya/);
+  await page.goto("/a/payroll");
+  await expect(page.getByText("Simulated checkout")).toBeVisible();
+
+  // Valli has no bank details yet, so she can't be ticked until they are added...
+  const valliRow = page.getByRole("row", { name: /Valli Ammal/ });
+  await expect(valliRow.getByRole("checkbox")).toHaveCount(0);
+  await valliRow.getByRole("button", { name: "Add bank details" }).click();
+  await expect(page.getByText(/is asked in their app to confirm/)).toBeVisible();
+  await page.getByLabel("Account number").fill("1233943142");
+  await page.getByLabel("IFSC").fill("icic0000009");
+  await page.getByRole("button", { name: "Save bank details" }).click();
+  await expect(valliRow.getByText("••••3142")).toBeVisible();
+  // ...and then not until she confirms them in her own app.
+  await expect(valliRow.getByText(/Waiting for the worker to confirm/)).toBeVisible();
+  await expect(valliRow.getByRole("checkbox")).toHaveCount(0);
+
+  const worker = await (await browser.newContext()).newPage();
+  await worker.goto("/login");
+  await worker.locator("#worker-code").fill("1017");
+  await worker.locator("#worker-pin").fill("7101");
+  await worker.getByRole("button", { name: "Log in", exact: true }).click();
+  await worker.waitForURL(/\/w/);
+  const card = worker.getByRole("region", { name: "Is this your bank account?" });
+  await expect(card).toContainText("••••3142");
+  await expectNoA11yViolations(worker);
+  await card.getByRole("button", { name: "Yes, it's mine" }).click();
+  await expect(worker.getByText(/Your pay will go to ••••3142/)).toBeVisible();
+
+  await page.reload();
+  await expect(valliRow.getByText(/Waiting for the worker/)).toHaveCount(0);
+  await page.getByRole("checkbox", { name: /^Pay Venkat Rao/ }).check();
+  await page.getByRole("checkbox", { name: /^Pay Ravi Sharma/ }).check();
+  await page.getByRole("checkbox", { name: /^Pay Valli Ammal/ }).check();
+  await expect(page.getByText(/^3 workers selected · ₹/)).toBeVisible();
+  await page.getByRole("button", { name: "Pay with checkout" }).click();
+  await expectNoA11yViolations(page);
+  await page.getByRole("button", { name: /^Continue to checkout · ₹/ }).click();
+
+  // The checkout page: one payment, split to each worker's bank account.
+  await page.waitForURL(/\/a\/payroll\/checkout\/fs\d{6}_[a-f0-9]{12}$/);
+  await expect(page.getByRole("heading", { name: "Simulated checkout" })).toBeVisible();
+  await expect(page.getByRole("listitem").filter({ hasText: "Valli Ammal" })).toContainText("••••3142");
+  await expectNoA11yViolations(page);
+  await page.getByRole("button", { name: /^Pay ₹/ }).click();
+
+  // Back on payroll: each payment is the worker's pay record, so FairPay Sentinel shows it as matching.
+  await page.waitForURL(/\/a\/payroll\?m=/);
+  await expect(page.getByRole("row", { name: /Venkat Rao/ }).getByText("Matches")).toBeVisible();
+  await expect(page.getByRole("checkbox", { name: /^Pay Venkat Rao/ })).toHaveCount(0);
+  await page.getByText(/^Checkout history/).click();
+  await expect(page.getByText("3 paid · 0 not paid · 0 waiting")).toBeVisible();
+  await expectNoA11yViolations(page);
+});
+
+test("a checkout left unpaid waits at the top, and cancelling it frees the worker", async ({ page }) => {
+  await loginAs(page, /Priya/);
+  await page.goto("/a/payroll");
+  await page.getByRole("checkbox", { name: /^Pay Selvam Murugan/ }).check();
+  await page.getByRole("button", { name: "Pay with checkout" }).click();
+  await page.getByRole("button", { name: /^Continue to checkout · ₹/ }).click();
+  await page.waitForURL(/\/a\/payroll\/checkout\//);
+  await page.getByRole("link", { name: /Back to payroll/ }).click();
+
+  const waiting = page.getByRole("region", { name: "Waiting for payment" });
+  await expect(waiting.getByText(/Selvam Murugan/)).toBeVisible();
+  await expect(waiting.getByRole("link", { name: "Continue payment" })).toBeVisible();
+  await expect(waiting.getByText(/stuck on pending/)).toBeVisible();
+  await expect(page.getByRole("row", { name: /Selvam Murugan/ }).getByText("Waiting for payment")).toBeVisible();
+  await waiting.getByRole("button", { name: "Cancel" }).click();
+  await expect(waiting).toHaveCount(0);
+  await expect(page.getByRole("checkbox", { name: /^Pay Selvam Murugan/ })).toBeEnabled();
 });

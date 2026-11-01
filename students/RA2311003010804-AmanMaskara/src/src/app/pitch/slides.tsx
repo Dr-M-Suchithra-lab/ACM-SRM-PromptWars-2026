@@ -11,16 +11,20 @@ import {
   Fingerprint,
   Gauge,
   HardHat,
+  KeyRound,
+  Landmark,
   Languages,
   Lightbulb,
   Lock,
   Mic,
   QrCode,
   Scale,
+  Send,
   ShieldCheck,
   Smartphone,
   Sparkles,
   TestTube2,
+  UserCheck,
   UserRound,
   Users,
 } from "lucide-react";
@@ -112,7 +116,7 @@ export const SLIDES: Slide[] = [
         <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
           <Stat value="4" label="languages, read aloud" />
           <Stat value="2+" label="industries, one codebase" />
-          <Stat value="376" label="automated tests" />
+          <Stat value="455" label="automated tests" />
           <Stat value="0" label="accessibility violations" />
         </div>
       </div>
@@ -217,7 +221,7 @@ export const SLIDES: Slide[] = [
                 Home: earned so far
               </Node>,
               <Node key="d">Scan gate QR (works offline)</Node>,
-              <Node key="e">Check pay · speak a hazard · get help · speak up</Node>,
+              <Node key="e">Check pay · confirm a bank change · speak a hazard · get help</Node>,
             ]}
           />
         </div>
@@ -233,7 +237,7 @@ export const SLIDES: Slide[] = [
               </Node>,
               <Node key="g">Hazard → fixed → worker confirms</Node>,
               <Node key="h" tone="brand">
-                Pay shortfall → Pay the gap
+                Tick who is owed → one checkout, split to each bank
               </Node>,
               <Node key="i">Fatigue + quit-risk reasons</Node>,
               <Node key="j">Approve skills and certificates</Node>,
@@ -301,8 +305,8 @@ export const SLIDES: Slide[] = [
     body: (
       <div className="grid gap-4 md:grid-cols-3">
         <Card icon={<Scale className="size-5" />} title="Pay you can check">
-          FairPay Sentinel compares recorded hours with what was paid: “4h 32m × ₹200/h = ₹907”. The employer settles it
-          with <em>Pay the gap</em>.
+          FairPay Sentinel compares recorded hours with what was paid: “4h 32m × ₹200/h = ₹907”. The employer pays the
+          gap, and everyone else owed, in one checkout split to each worker&apos;s bank account.
         </Card>
         <Card icon={<Mic className="size-5" />} title="Speak, don't type">
           Report danger in Tamil, Hindi or Telugu. The AI judges how urgent it is; a fire is always critical, with a
@@ -321,6 +325,39 @@ export const SLIDES: Slide[] = [
         </Card>
         <Card icon={<Languages className="size-5" />} title="Built for real phones">
           Read-aloud on every screen, a Help tab with verified helplines, offline check-ins, every page under 400 ms.
+        </Card>
+      </div>
+    ),
+  },
+  {
+    id: "payments",
+    eyebrow: "Paying workers, safely",
+    title: "One checkout pays everyone, and nobody can redirect a worker's pay",
+    body: (
+      <div className="grid gap-4 md:grid-cols-3">
+        <Card icon={<Send className="size-5" />} title="One checkout">
+          Tick the workers who are owed. The employer pays the total once on Cashfree&apos;s sandbox checkout; Easy
+          Split sends each share to that worker&apos;s bank account. Amounts come from payroll, never typed.
+        </Card>
+        <Card icon={<UserCheck className="size-5" />} title="The worker confirms">
+          A new or changed account waits for the worker: “Is this your bank account?” in their language, read aloud.
+          “Not mine” blocks it; no answer, it is payable after 48 hours.
+        </Card>
+        <Card icon={<KeyRound className="size-5" />} title="Encrypted at rest">
+          Account numbers are stored only as AES-256-GCM ciphertext, bound to the worker, and decrypted in one place:
+          the split sent to the payment provider. Pages see ••••1191.
+        </Card>
+        <Card icon={<Landmark className="size-5" />} title="Pays the account on screen">
+          A security review found that a corrected account could still be paid the old way. Each Cashfree vendor now
+          carries a fingerprint of the account, so a correction registers the new one.
+        </Card>
+        <Card icon={<ShieldCheck className="size-5" />} title="Trust nothing from the browser">
+          Only a redirect to an https Cashfree page, so no payment script on FairShift. The return link proves nothing:
+          FairShift asks Cashfree whether it was paid before recording anything.
+        </Card>
+        <Card icon={<TestTube2 className="size-5" />} title="Proved">
+          Encryption, tampering, wrong worker and key rotation tested; tenant isolation for every checkout action; the
+          worker confirming in their app is an end-to-end test.
         </Card>
       </div>
     ),
@@ -466,7 +503,7 @@ export const SLIDES: Slide[] = [
         <div className="flex flex-col gap-3">
           <Card icon={<Gauge className="size-5" />} title="What came out">
             Four features beyond the brief. The lowest AI score (code quality, 89) became the next target: formatting,
-            focused components, coverage from 78% to 98%. Tenant-isolation tests, 34 live probes, and a release gate
+            focused components, coverage from 78% to 98%. Tenant-isolation tests, 43 security probes, and a release gate
             where all six targets passed.
           </Card>
           <Card icon={<Lightbulb className="size-5" />} title="What I learned">
@@ -592,16 +629,16 @@ export const SLIDES: Slide[] = [
         <div className="flex flex-col gap-3">
           {[
             [
-              "Unit · 340",
+              "Unit · 416",
               "Pay, overtime, fatigue, risk, eligibility, hazard deadlines, signed tokens, AI guard rails, contrast, 4 languages.",
             ],
             ["Coverage · 98%", "Of all measured lines, enforced in CI: the build fails below 95%."],
             [
-              "End-to-end · 36",
+              "End-to-end · 39",
               "Real browser (phone + desktop) through both interfaces, with axe accessibility checks.",
             ],
             [
-              "Live probes · 34",
+              "Security probes · 43",
               "Read-only attacks on the deployed site: forged logins, cross-site requests, tampering.",
             ],
           ].map(([name, text]) => (
@@ -618,6 +655,7 @@ export const SLIDES: Slide[] = [
             <li>Keypad and PIN field shared a screen-reader label.</li>
             <li>“Thank you” screen swallowed by a page refresh.</li>
             <li>Security policy silently blocking chart styles.</li>
+            <li>“Paid in full” showing ₹11.52 short: hours rounded to a quarter.</li>
           </ul>
         </Card>
       </div>
@@ -640,15 +678,16 @@ export const SLIDES: Slide[] = [
         <Card icon={<Lock className="size-5" />} title="Anonymity is a security property">
           No identity on feedback, one-way guards, names removed: a manager cannot unmask a worker.
         </Card>
-        <Card icon={<Fingerprint className="size-5" />} title="Accounts">
-          Hashed PINs, signed sessions, role checks on every action, login rate limits.
+        <Card icon={<Fingerprint className="size-5" />} title="Accounts and bank details">
+          Hashed PINs, signed sessions, role checks on every action, login rate limits. Bank numbers encrypted at rest;
+          the worker approves any change.
         </Card>
         <Card icon={<Bot className="size-5" />} title="Prompt injection">
           Speech and text are fenced as untrusted; output must match a strict schema; code decides the final severity.
         </Card>
         <Card icon={<TestTube2 className="size-5" />} title="Headers, secrets & dependencies">
           Nonce script policy, HSTS, no framing. Secrets only in encrypted environment settings. 0 production
-          vulnerabilities; 34/34 live probes.
+          vulnerabilities; 43/43 security probes.
         </Card>
       </div>
     ),
@@ -662,17 +701,17 @@ export const SLIDES: Slide[] = [
         {[
           [
             "Real-world impact",
-            "Unpaid overtime found with its arithmetic; hazards escalate on deadlines; a fire always offers Call 112.",
+            "Unpaid overtime found with its arithmetic and paid in one checkout; hazards escalate on deadlines; a fire always offers Call 112.",
           ],
           [
             "SDG 8",
-            "8.5 fair pay (pay check, 2× overtime, Pay the gap) · 8.8 safe workplaces and rights (hazards, anonymous voice, welfare eligibility).",
+            "8.5 fair pay (pay check, 2× overtime, gaps paid in one checkout) · 8.8 safe workplaces and rights (hazards, anonymous voice, welfare eligibility) · 8.10 banking (pay straight to each worker's own account, which only they can approve changing).",
           ],
           [
             "Inclusivity",
             "4 languages, voice in and out, offline, big targets, axe 0 violations, every page under 400 ms.",
           ],
-          ["Technical", "Strict TypeScript, nonce CSP, signed sessions, 376 tests, 98% coverage, green CI."],
+          ["Technical", "Strict TypeScript, nonce CSP, signed sessions, 455 tests, 98% coverage, green CI."],
           [
             "Feasibility",
             "Construction and hospital live from one codebase; a new industry is one config file; Cloud Run–ready.",

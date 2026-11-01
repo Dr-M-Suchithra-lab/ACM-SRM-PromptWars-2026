@@ -21,6 +21,8 @@ import {
   Wallet,
   WifiOff,
   type LucideIcon,
+  LockKeyhole,
+  Send,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
@@ -47,11 +49,13 @@ export default async function LandingPage() {
     { Icon: Users, key: "numbers" },
     { Icon: Landmark, key: "welfare" },
     { Icon: BadgeCheck, key: "passport" },
+    { Icon: LockKeyhole, key: "bank" },
   ] as const;
   const managerFeatures = [
     { Icon: UserCheck, key: "duty" },
     { Icon: Hourglass, key: "hazards" },
     { Icon: Wallet, key: "payroll" },
+    { Icon: Send, key: "checkout" },
     { Icon: Activity, key: "risk" },
   ] as const;
   const chips = [
@@ -166,8 +170,8 @@ export default async function LandingPage() {
               {t("sdgTitle")}
             </h2>
           </div>
-          <ul className="grid flex-1 gap-3 sm:grid-cols-2">
-            {(["t85", "t88"] as const).map((key) => (
+          <ul className="grid flex-1 gap-3 sm:grid-cols-3">
+            {(["t85", "t88", "t810"] as const).map((key) => (
               <li key={key} className="flex flex-col gap-0.5">
                 <span className="figure text-sm font-extrabold text-primary-strong">
                   {t(`sdgTargets.${key}.label`)}

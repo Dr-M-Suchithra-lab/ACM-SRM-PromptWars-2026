@@ -4,15 +4,24 @@ import { Download } from "lucide-react";
 import { requireRole } from "@/server/dal";
 import { getRepos } from "@/server/repos";
 import { buildPayroll } from "@/server/services/payroll";
+import { buildLedger } from "@/server/services/payroll-ledger";
+import { payoutOverview } from "@/server/services/payouts";
+import { getCheckoutProvider } from "@/server/payouts/provider";
 import { isMonthKey, monthKey, payFocusMonth } from "@/core/period";
 import { formatMonth } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
 import { PageHeader } from "@/components/page-header";
 import { DisputeList } from "@/components/admin/dispute-list";
-import { PaidRecordTools } from "@/components/admin/paid-records";
-import { PayrollTable } from "@/components/admin/payroll-table";
+import { PayrollSummary } from "@/components/admin/payroll/summary";
+import { PayrollLedger } from "@/components/admin/payroll/ledger";
+import { CheckoutHistory, WaitingCheckouts } from "@/components/admin/payroll/checkouts";
 
+/**
+ * Payroll in one flow: the month at a glance, any checkout still waiting to be paid, then every
+ * worker with their pay, FairPay Sentinel's check and bank account (tick to pay in one checkout),
+ * then past checkouts and pay reviews.
+ */
 export default async function PayrollPage({ searchParams }: PageProps<"/a/payroll">) {
   const session = await requireRole("admin");
   const [t, locale] = await Promise.all([getTranslations("admin.payrollPage"), getLocale()]);
@@ -24,11 +33,16 @@ export default async function PayrollPage({ searchParams }: PageProps<"/a/payrol
       ? requested
       : payFocusMonth(now);
   const repos = getRepos();
-  const [rows, disputes] = await Promise.all([
-    buildPayroll(repos, session.orgId, month),
+  const payroll = buildPayroll(repos, session.orgId, month);
+  const [rows, disputes, payouts] = await Promise.all([
+    payroll,
     repos.payDisputes.getByOrg(session.orgId),
+    payoutOverview(repos, session.orgId, month, payroll),
   ]);
-  const flagged = rows.filter((r) => r.outstanding > 0);
+  const ledger = buildLedger(rows, payouts);
+  const provider = getCheckoutProvider()?.name ?? null;
+  const waiting = payouts.batches.filter((b) => b.summary.pending > 0);
+  const finished = payouts.batches.filter((b) => b.summary.pending === 0);
 
   return (
     <div className="flex flex-col gap-5">
@@ -65,30 +79,13 @@ export default async function PayrollPage({ searchParams }: PageProps<"/a/payrol
         ))}
       </nav>
 
-      <section aria-labelledby="sentinel-title" className="hero-card flex flex-col gap-3 p-5">
-        <h2 id="sentinel-title" className="font-display text-xl font-extrabold">
-          {t("sentinel.title")}
-        </h2>
-        <p className="text-ink-2">{t("sentinel.hint")}</p>
-        <p className="font-bold">
-          {flagged.length ? t("sentinel.flagged", { count: flagged.length }) : t("sentinel.clear")}
-        </p>
-        <PaidRecordTools
-          month={month}
-          workers={rows.map((r) => ({
-            id: r.workerId,
-            label: `${r.name} (#${r.code})`,
-            regularMinutes: r.regularMinutes,
-            overtimeMinutes: r.overtimeMinutes,
-            rates: r.rates,
-            gross: r.gross,
-            deductions: r.deductions,
-          }))}
-        />
-        <p className="text-xs text-ink-2">{t("sentinel.minimumWageNote")}</p>
-      </section>
+      <PayrollSummary summary={ledger.summary} />
 
-      <PayrollTable rows={rows} month={month} />
+      <WaitingCheckouts batches={waiting} enabled={provider !== null} />
+
+      <PayrollLedger month={month} provider={provider} rows={ledger.rows} />
+
+      <CheckoutHistory batches={finished} />
 
       <DisputeList disputes={disputes} nameOf={new Map(rows.map((r) => [r.workerId, r.name]))} />
     </div>

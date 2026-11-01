@@ -77,11 +77,19 @@
       },
       "payroll": {
         "title": "Fair payroll",
-        "text": "Overtime by labour law, shortfalls flagged, and “Pay the gap” settles them."
+        "text": "Overtime by labour law, and shortfalls flagged with the sum before workers have to ask."
       },
       "risk": {
         "title": "Early warning on quitting",
         "text": "Quit risk for each worker with the reasons, and site conditions shown apart."
+      },
+      "bank": {
+        "title": "Your pay account is safe",
+        "text": "If your bank account is changed, you are asked first. Say “not mine” and no pay goes there."
+      },
+      "checkout": {
+        "title": "Pay everyone in one checkout",
+        "text": "Tick who is owed, pay the total once, and each share goes to that worker’s own bank account."
       }
     },
     "sdgTitle": "Built for UN SDG 8",
@@ -93,6 +101,10 @@
       "t88": {
         "label": "SDG 8.8",
         "text": "Labour rights and safe workplaces: danger reported, fixed on time, voices heard."
+      },
+      "t810": {
+        "label": "SDG 8.10",
+        "text": "Access to banking: pay goes straight to each worker’s own bank account, and only they can approve a change."
       }
     }
   },
@@ -174,6 +186,16 @@
       "shortfall": "Possible pay shortfall: {amount}",
       "shortfallHint": "See the details and ask for a review",
       "benefitProgress": "{done} of {needed} days done"
+    },
+    "bank": {
+      "title": "Is this your bank account?",
+      "body": "{employer} set your pay account to {masked} ({ifsc}) on {when}. Your pay will go to this account.",
+      "autoNote": "If you don't answer, it will be used from {when}.",
+      "yes": "Yes, it's mine",
+      "no": "No, not mine",
+      "confirmed": "Thank you. Your pay will go to {masked}.",
+      "disputed": "Your employer has been told. No pay will go to {masked} until they correct it.",
+      "error": "Could not save your answer. Please try again."
     }
   },
   "pay": {
@@ -670,12 +692,6 @@
       "month": "Month",
       "intro": "Hours and pay are calculated by tested code from check-in records. Overtime is paid at 2×. FairPay Sentinel compares them with what you actually paid.",
       "worker": "Worker",
-      "days": "Days",
-      "regular": "Regular",
-      "overtime": "Overtime",
-      "gross": "Gross",
-      "pf": "PF",
-      "net": "Net",
       "total": "Total",
       "basis": {
         "daily": "daily wage",
@@ -693,8 +709,6 @@
       "sentinel": {
         "title": "FairPay Sentinel",
         "hint": "Enter what you actually paid each worker. FairShift compares it with their check-ins and flags possible shortfalls before workers have to.",
-        "flagged": "{count, plural, one {1 worker has} other {# workers have}} a possible shortfall this month.",
-        "clear": "No possible shortfalls for the records entered.",
         "minimumWageNote": "Minimum wages used in checks are demo values — verify for your state."
       },
       "record": {
@@ -724,7 +738,7 @@
           "columns": "The columns do not match the template."
         },
         "manualHint": "Start from what FairShift calculated, then say what was actually paid.",
-        "calculated": "FairShift recorded {hours} h + {overtime} h overtime. Due: {amount}.",
+        "calculated": "FairShift recorded {hours} + {overtime} overtime. Due: {amount}.",
         "howPaid": "How was this worker paid?",
         "presets": {
           "full": "Paid in full",
@@ -733,7 +747,7 @@
         },
         "regularHours": "Regular hours paid",
         "overtimeHours": "Overtime hours paid",
-        "hoursOf": "{paid} of {total} h",
+        "hoursOf": "{paid} of {total}",
         "amounts": "Amounts",
         "changeAmounts": "Change amounts",
         "useCalculated": "Use calculated",
@@ -762,11 +776,123 @@
         "settled": "Settled: {amount} arrears paid"
       },
       "arrears": {
-        "button": "Pay {amount}",
-        "title": "Pay the {amount} gap?",
-        "hint": "This records an arrears payment of exactly the gap FairPay Sentinel found. The worker sees it as paid, and any review they asked for is closed.",
+        "button": "Mark as paid",
+        "title": "Already paid the {amount} gap?",
+        "hint": "Use this when you paid the gap outside FairShift, in cash or from your bank. It records an arrears payment of exactly the gap FairPay Sentinel found. The worker sees it as paid, and any review they asked for is closed.",
         "confirm": "I have paid {amount}",
         "error": "Could not record it. Please try again."
+      },
+      "payouts": {
+        "mode": {
+          "cashfree": "Cashfree sandbox checkout",
+          "simulated": "Simulated checkout",
+          "off": "Paying from FairShift is off. Add Cashfree payment gateway test keys to switch it on."
+        },
+        "kind": {
+          "salary": "Month's pay",
+          "gap": "Gap"
+        },
+        "addAccount": "Add bank details",
+        "clear": "Clear",
+        "confirmTitle": "Pay {amount} in one checkout?",
+        "confirmHint": "You'll go to the checkout page to pay {amount} once. It is split to {count, plural, one {1 worker's bank account} other {# workers' bank accounts}}, and each payment is added to their pay record when the checkout is paid.",
+        "send": "Continue to checkout · {amount}",
+        "batchSummary": "{paid} paid · {failed} not paid · {pending} waiting",
+        "status": {
+          "paid": "Paid",
+          "failed": "Not paid",
+          "pending": "Waiting for payment"
+        },
+        "failure": {
+          "payment_failed": "the payment did not go through",
+          "payment_cancelled": "checkout cancelled",
+          "checkout_failed": "the checkout could not be opened"
+        },
+        "checkStatus": "Check status",
+        "errors": {
+          "rejected": "Some of these workers can no longer be paid. The list is updated; please choose again.",
+          "rate_limited": "Too many checkouts. Please wait a few minutes.",
+          "unavailable": "Paying is not available right now. Please try again.",
+          "invalid": "Could not open the checkout. Please try again.",
+          "checkout_failed": "The checkout could not be opened. Please try again."
+        },
+        "account": {
+          "edit": "Bank details",
+          "title": "Bank details",
+          "hint": "Pay goes by IMPS to this account. After saving, only the last 4 digits are shown.",
+          "worker": "Worker",
+          "current": "On file: {masked} · {ifsc}",
+          "none": "No bank details yet.",
+          "holder": "Account holder's name",
+          "number": "Account number",
+          "ifsc": "IFSC",
+          "save": "Save bank details",
+          "errors": {
+            "holder": "Enter the name as it is on the bank account.",
+            "account": "The account number should be 9 to 18 digits.",
+            "ifsc": "An IFSC has 11 characters, like YESB0000262.",
+            "not_found": "Choose one of your workers.",
+            "invalid": "Please check the details.",
+            "rate_limited": "Too many changes. Please wait a few minutes."
+          },
+          "waiting": "Waiting for the worker to confirm · payable from {when}",
+          "waitingOver": "Not confirmed yet · payable (48 hours passed)",
+          "disputed": "The worker says this isn't their account",
+          "history": "Change history",
+          "events": {
+            "changed": "Entered by employer",
+            "confirmed": "Confirmed by worker",
+            "disputed": "Worker said it isn't theirs"
+          },
+          "confirmNote": "{name} is asked in their app to confirm new or changed details. Until they do, or for 48 hours, nothing can be paid into them, and if they say it isn't their account it stays blocked."
+        },
+        "continueCheckout": "Continue payment",
+        "cancel": "Cancel",
+        "simulated": {
+          "eyebrow": "Checkout",
+          "title": "Simulated checkout",
+          "intro": "With Cashfree test keys, this step happens on Cashfree's own checkout page, where you pay with test net banking or a test card. Without keys, this page stands in for it.",
+          "notice": "Simulation: no money moves, and nothing here asks for bank or card details.",
+          "total": "Total",
+          "splitTitle": "Split to each worker's bank account",
+          "pay": "Pay {amount}",
+          "fail": "Make the payment fail",
+          "back": "Back to payroll (pay later)"
+        },
+        "sandboxNote": "Test mode: no real money moves."
+      },
+      "summary": {
+        "due": "Net pay due",
+        "dueHint": "{count, plural, one {for # worker} other {for # workers}}",
+        "paid": "Recorded as paid",
+        "paidHint": "{recorded} of {total} workers recorded",
+        "shortfalls": "Possible shortfalls",
+        "shortfallsHint": "{amount} still owed",
+        "noShortfalls": "None found",
+        "notEntered": "Not entered yet",
+        "notEnteredHint": "Record what was paid, or pay them here"
+      },
+      "ledger": {
+        "title": "Workers",
+        "workedColumn": "Worked",
+        "worked": "{days, plural, one {# day} other {# days}} · {time}",
+        "overtime": "{time} overtime",
+        "due": "Net due",
+        "bank": "Bank account",
+        "select": "Pay {name}: {amount}",
+        "selectAll": "Select everyone who can be paid",
+        "record": "Record pay",
+        "recordFor": "Record pay for {name}",
+        "markPaidFor": "Mark the gap paid for {name}",
+        "editBank": "Change bank details for {name}",
+        "idle": "Tick the workers who are owed pay to pay them together in one checkout.",
+        "selected": "{count, plural, one {1 worker} other {# workers}} selected · {amount}",
+        "pay": "Pay with checkout"
+      },
+      "checkouts": {
+        "waitingTitle": "Waiting for payment",
+        "stuck": "Checkout page stuck on pending? Close it and press Check status.",
+        "history": "Checkout history ({count})"
       }
     },
     "sitesPage": {

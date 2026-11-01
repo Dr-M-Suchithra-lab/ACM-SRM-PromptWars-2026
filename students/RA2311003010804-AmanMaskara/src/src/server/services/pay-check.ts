@@ -115,17 +115,28 @@ export async function payArrears(
   const check = await payCheckFor(repos, input.workerId, input.month);
   if (!check?.record || check.outstanding === 0) return { ok: false, error: "nothing_owed" };
   const amount = check.outstanding;
+  await recordArrears(repos, check.record, { ...input, amount });
+  return { ok: true, amount };
+}
+
+/** Adds an arrears payment to a pay record and closes the worker's open reviews for that month. */
+export async function recordArrears(
+  repos: Repos,
+  record: PaidRecordEntry,
+  input: { adminId: string; workerId: string; month: string; amount: number; now: Date },
+): Promise<void> {
   await repos.paidRecords.upsert({
-    ...check.record,
-    arrears: [...(check.record.arrears ?? []), { amount, at: input.now, by: input.adminId }],
+    ...record,
+    arrears: [...(record.arrears ?? []), { amount: input.amount, at: input.now, by: input.adminId }],
   });
   const disputes = await repos.payDisputes.getByWorker(input.workerId);
   await Promise.all(
     disputes
       .filter((d) => d.month === input.month && d.status !== "resolved")
-      .map((d) => repos.payDisputes.update(d.id, { status: "resolved", settledAmount: amount, updatedAt: input.now })),
+      .map((d) =>
+        repos.payDisputes.update(d.id, { status: "resolved", settledAmount: input.amount, updatedAt: input.now }),
+      ),
   );
-  return { ok: true, amount };
 }
 
 export const PAID_CSV_HEADER = [

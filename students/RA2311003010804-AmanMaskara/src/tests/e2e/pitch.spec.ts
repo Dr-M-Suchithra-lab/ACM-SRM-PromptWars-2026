@@ -6,18 +6,18 @@ test.use({ viewport: { width: 1366, height: 860 }, isMobile: false, hasTouch: fa
 test("pitch deck navigates with the keyboard and keeps the slide in the URL", async ({ page }) => {
   await page.goto("/pitch");
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Fair work. Fair pay. Your voice.");
-  await expect(page.getByText("01 / 17")).toBeVisible();
+  await expect(page.getByText("01 / 18")).toBeVisible();
 
   await page.keyboard.press("ArrowRight");
-  await expect(page.getByText("02 / 17")).toBeVisible();
+  await expect(page.getByText("02 / 18")).toBeVisible();
   await expect(page).toHaveURL(/#problem$/);
 
   await page.keyboard.press("End");
-  await expect(page.getByText("17 / 17")).toBeVisible();
+  await expect(page.getByText("18 / 18")).toBeVisible();
   await expect(page.getByRole("button", { name: "Next slide" })).toBeDisabled();
 
   await page.keyboard.press("Home");
-  await expect(page.getByText("01 / 17")).toBeVisible();
+  await expect(page.getByText("01 / 18")).toBeVisible();
 });
 
 test("pitch deck opens on a linked slide and embeds the live demo at a real phone size", async ({ page }) => {

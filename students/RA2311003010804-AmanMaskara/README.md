@@ -76,13 +76,14 @@ Theme: UN SDG 8 — Decent Work and Economic Growth
 
 **FairShift** is a voice-first phone app in English, हिन्दी, தமிழ் and తెలుగు for daily-wage and shift workers, with a dashboard for their employers.
 Workers check in with a QR code (even offline), see every rupee checked against what was actually paid, report hazards by speaking, speak up anonymously, and turn their attendance into welfare eligibility and a signed work certificate.
-Employers see who is on duty, who is overworked or likely to quit, and which hazards are overdue, so problems reach them before they become severe.
+Employers see who is on duty, who is overworked or likely to quit, and which hazards are overdue, and pay everyone owed in one checkout that is split to each worker's own bank account.
 It runs construction sites and hospitals on the same code; *the AI understands what people say, and tested code computes every number.*
 
 ## What it covers
 
 - **Every hour is recorded.** Workers check in with a rotating QR, and it works offline.
-- **Pay is checked.** Every rupee is checked against what was actually paid; FairShift shows a *possible shortfall* with the arithmetic, and the employer can *pay the gap*.
+- **Pay is checked, then paid.** Every rupee is checked against what was actually paid; FairShift shows a *possible shortfall* with the arithmetic. The employer ticks everyone owed and pays them **in one checkout** (Cashfree sandbox), split to each worker's bank account.
+- **Pay goes to the right account.** Account numbers are stored encrypted, and if an account is changed the worker is asked *“Is this your bank account?”* in their language; *No, not mine* blocks it.
 - **Hazards are reported by speaking.** Deadlines escalate automatically, and a fire always offers *Call 112*.
 - **Workers speak up safely.** Feedback is anonymous, and issues reach management only when 5 workers sign.
 - **Attendance becomes proof.** It turns into welfare-scheme eligibility and a signed work certificate.
@@ -93,15 +94,16 @@ On the employer side, quit risk comes with its reasons, fatigue is flagged befor
 
 | Asked for | FairShift |
 |---|---|
-| 3+ working features | **14**: all 8 example features, plus pay-gap detection with *Pay the gap*, welfare eligibility with a signed work certificate, *Safe in numbers* issues, a Help tab with verified helplines, hazard deadlines with escalation, and an AI weekly brief |
+| 3+ working features | **15**: all 8 example features, plus pay-gap detection, **paying everyone owed in one checkout with protected bank accounts**, welfare eligibility with a signed work certificate, *Safe in numbers* issues, a Help tab with verified helplines, hazard deadlines with escalation, and an AI weekly brief |
 | 2 UIs | **Worker app** `/w` (phone first) and **employer dashboard** `/a` (Overview, Hazards, People, Feedback, Payroll, Sites, QR kiosk) |
 | 2+ industries | **Construction** (BuildRight, Chennai) and **hospital** (City Care, Lucknow) live. Pay basis, rosters, fatigue rules, hazard types, escalation chains and welfare schemes are all configuration, so a new industry is one config file |
 
 The full mapping of every point of the brief and every judging criterion to code is in [`src/README.md`](src/README.md#the-brief-point-by-point).
 
 **Quality, in numbers:**
-- 340 unit tests and 36 end-to-end tests, all passing, at 98% line coverage (CI fails below 95%)
-- 34 of 34 live security probes pass, and `npm audit` shows 0 production vulnerabilities
+- 416 unit tests and 39 end-to-end tests, all passing, at 98% line coverage (CI fails below 95%)
+- 43 of 43 security probes pass against a production build, and `npm audit` shows 0 production vulnerabilities
+- a security review of the payments work found one issue, fixed and covered by a test
 - axe reports 0 accessibility violations
 - every page loads in under 400 ms on phone and desktop (typically 150–200 ms, measured on the live demo)
 
@@ -132,6 +134,8 @@ flowchart LR
     SA --> REPO
     AI --> GEM["Google Gemini<br/>3.5 Flash-Lite · 3.8 Flash · TTS"]
     REPO --> DB[("MongoDB Atlas<br/>Mumbai")]
+    SA -- "checkout, server to server" --> CF["Cashfree PG sandbox<br/>payment link + Easy Split"]
+    A -. "redirect to pay" .-> CF
 ```
 
 - **Frontend:** React 19 Server Components, so phones download little JavaScript. Small client islands handle voice, the QR scanner and forms; a service worker gives an offline shell and check-in queue.
@@ -150,6 +154,8 @@ flowchart LR
 | **QR check-in** | Each site's QR is HMAC-signed with a per-site secret and changes every 30 seconds. A code is accepted for one window either side, so a photo of it stops working within about a minute; an offline scan is accepted for up to 12 hours. The same check-in sent twice (for example from the offline queue) is recorded once |
 | **Signed links** | Skill passports and work certificates are HMAC-signed with the link type built into the signature, so one kind can't be used as another. Passports expire after 30 days |
 | **Privacy** | Feedback is shown only in groups of 5+; co-signed issues stay hidden below 5 signers; signers are never stored. Names and phone numbers are removed before anything reaches AI or storage |
+| **Bank accounts** | Stored only encrypted (AES-256-GCM, bound to the worker, key rotation supported) and decrypted in one place: the split sent to the payment provider. Pages see ••••1772. Any change waits for the worker's *Yes, it's mine* (or 48 hours); *No, not mine* blocks it. A checkout pays only the account on screen |
+| **Payments** | Amounts always come from payroll on the server. The browser is only redirected to an `https` Cashfree page, and the result is confirmed with Cashfree server to server before anything is recorded. A checkout is refused whole if any worker can't be paid; each paid share is recorded once |
 | **Browser and data** | A per-request nonce Content Security Policy, HSTS, `nosniff`, COOP `same-origin`. Same-origin and size checks on JSON routes. CSV exports neutralise spreadsheet formulas. Secrets only from environment variables |
 
 The full threat model, with the code and test for each control, is in [`src/SECURITY.md`](src/SECURITY.md).
@@ -158,14 +164,14 @@ The full threat model, with the code and test for each control, is in [`src/SECU
 
 | Suite | Tests | What it proves |
 |---|---|---|
-| Core rules | 158 | Pay, overtime, pay check, fatigue, quit risk, eligibility, hazard deadlines, urgency, anonymity threshold, signed tokens: boundaries, rounding, error paths |
-| Server and services | 110 | Each feature's workflow, the batched admin pages, **security** (cookies, role checks, tampered links, origin and size checks), **tenant isolation** |
+| Core rules | 174 | Pay, overtime, pay check, *Paid in full* to the paisa, fatigue, quit risk, eligibility, hazard deadlines, urgency, anonymity threshold, payouts and bank-change rules, signed tokens: boundaries, rounding, error paths |
+| Server and services | 170 | Each feature's workflow, the batched admin pages, the checkout (Cashfree client and simulation), **bank encryption** (tampering, wrong worker, key rotation), **security** (cookies, role checks, tampered links, origin and size checks), **tenant isolation** |
 | AI | 25 | Fallbacks, guard rails (no invented phone numbers, numbers in rewordings must match), PII removal |
 | Design, languages, admin, device | 47 | Colour contrast meets WCAG AA; all 4 languages have every key; CSV safety; read-aloud, speech and the offline queue |
-| **End to end** | 36 | Both interfaces on a production build, phone viewport, with axe accessibility scans (0 violations) |
-| **Live security probes** | 34 | Read-only attacks on the deployed site: anonymous and forged access, cross-site requests, oversized bodies, tampered links, cookie flags |
+| **End to end** | 39 | Both interfaces on a production build, phone viewport, with axe accessibility scans (0 violations), including paying three workers in one checkout and the worker confirming their bank account |
+| **Security probes** | 43 | Read-only attacks on a production build: anonymous and forged access, cross-site requests, oversized bodies, tampered links, cookie flags, checkout routes, bank accounts never in a page |
 
-**Coverage** (unit, enforced in CI: the build fails below 95% of lines): **98% lines**, 97% statements, 97% functions, 91% branches. By area: core rules 99%, services 97%, the security and session code at or near 100%. Every push runs lint, a format check, typecheck, unit tests with the coverage limit, a dependency audit, all end-to-end tests, and a Docker build with a container smoke test. [CI runs](https://github.com/amanmaskara04/fairshift/actions).
+**Coverage** (unit, enforced in CI: the build fails below 95% of lines): **98% lines**, 97% statements, 97% functions, 92% branches. By area: core rules 99%, services 97%, the security and session code at or near 100%. Every push runs lint, a format check, typecheck, unit tests with the coverage limit, a dependency audit, all end-to-end tests, and a Docker build with a container smoke test. [CI runs](https://github.com/amanmaskara04/fairshift/actions).
 
 ### Design decisions and trade-offs
 
@@ -177,7 +183,8 @@ The full threat model, with the code and test for each control, is in [`src/SECU
 | **Server Components, no chart or animation libraries** | Small pages for ₹7,000 phones on slow networks | Charts and animations hand-built in HTML, SVG and CSS |
 | **One repository interface** | Keyless local runs and fast tests in memory; MongoDB in production; another database later | An extra layer to maintain |
 | **Groups of 5 for feedback and issues** | Workers can't be identified by elimination | Very small teams see no feedback until 5 respond |
-| **No payment gateway** | FairShift checks wages, it doesn't move money; a gateway would weaken the strict security policy | *Pay the gap* records a payment rather than making it |
+| **Hosted checkout by redirect, with Easy Split** | The employer pays once on Cashfree's own page and the total is split to each worker's bank account; FairShift only redirects, so no payment script runs on its pages | One payment for the batch, paid or not paid as a whole; sandbox only (the live demo uses a simulated checkout) |
+| **The worker approves bank changes, with a 48-hour fallback** | Nobody can quietly redirect a worker's pay; *No, not mine* blocks it | A worker who never answers is paid into the new account after 48 hours |
 | **Pay screens open on last month for the first 7 days** | Wages for a month are due within 7 days after it ends (Payment of Wages Act, s. 5), so that is the pay check that matters at the start of a month | Workers and managers tap one tab to see the month in progress |
 | **Strict security headers over Lighthouse points** | COOP and CSP protect users | Some local Lighthouse runs can't measure the page with these headers on, so scores were measured another way |
 
@@ -189,6 +196,7 @@ The full threat model, with the code and test for each control, is in [`src/SECU
 | AI inside the app | **Google Gemini API**: Gemini 3.5 Flash-Lite and 3.8 Flash (speech and text understanding, structured JSON), Gemini 3.8 Flash-Lite TTS (read-aloud in Tamil and Telugu) |
 | App | Next.js 16, React 19, TypeScript, Tailwind CSS, next-intl (4 languages), Zod, PWA with an offline queue |
 | Data and hosting | MongoDB Atlas (Mumbai), Vercel (Mumbai); a Google Cloud Run container and one-command deploy script are included |
+| Payments | **Cashfree Payment Gateway** sandbox (payment links with Easy Split); a built-in simulation when no keys are set |
 | Quality | Vitest, Playwright with axe-core, ESLint, Prettier, GitHub Actions CI |
 
 **About hosting:** Google Cloud credits could not be provided, and the organisers allowed deployment on any platform, so the live demo runs on Vercel in Mumbai. The project still includes a Cloud Run–ready `Dockerfile`, which CI builds and smoke-tests on every push, and a one-command deploy script (`scripts/deploy-cloudrun.sh`).
@@ -212,7 +220,9 @@ npm run dev          # http://localhost:3000
 | `DEMO_MODE` | Optional | `true` shows one-tap demo logins and re-seeds the demo data daily |
 | `SESSION_SECRET` | **Production** | Signs login cookies (32+ random characters) |
 | `FEEDBACK_HMAC_SECRET` | **Production** (unless demo) | One-way keys for anonymous feedback, issue signing and private hazard tracking |
+| `BANK_ENCRYPTION_KEY` | **Production** (unless demo) | Encrypts workers' bank account numbers at rest |
 | `QR_SIGNING_SECRET`, `PASSPORT_SECRET`, `CRON_SECRET` | Optional | QR codes, passport and certificate links, the scheduled escalation sweep |
+| `CASHFREE_APP_ID`, `CASHFREE_SECRET_KEY` | Optional | Cashfree sandbox checkout (Easy Split enabled on the account). Without them, demo mode shows a simulated checkout |
 
 Production build and deployment:
 
@@ -228,9 +238,9 @@ Then tap a demo person on the home page:
 
 | Demo login | Who |
 |---|---|
-| **Ramesh** (code `1001`, PIN `1234`) | Mason, construction, Tamil |
+| **Ramesh** (code `1001`, PIN `1234`) | Mason, construction, Tamil; asked to confirm a bank change on his home screen |
 | **Sunita** (code `2001`, PIN `1234`) | Ward attendant, hospital, Hindi |
-| **Priya** (`priya@buildright.demo` / `demo1234`) | Construction employer |
+| **Priya** (`priya@buildright.demo` / `demo1234`) | Construction employer; Payroll → tick workers → *Pay with checkout* |
 | **Dr. Arjun** (`arjun@citycare.demo` / `demo1234`) | Hospital employer |
 
 These are public demo accounts that exist only in the seeded demo data.
@@ -238,9 +248,9 @@ These are public demo accounts that exist only in the seeded demo data.
 Tests and checks:
 
 ```bash
-npm test                          # 340 unit tests
+npm test                          # 416 unit tests
 npx playwright install chromium   # once, before the first end-to-end run
-npm run e2e                       # 36 end-to-end tests on a production build, with accessibility scans
+npm run e2e                       # 39 end-to-end tests on a production build, with accessibility scans
 npm run lint && npm run typecheck
 ```
 
@@ -260,6 +270,7 @@ The full set, with what each prompt changed and who wrote it, is in **[`prompts.
 5. **Testing the live app as a worker:** *"in danger when i am using voice command to report fire , its marking it low rank issue . the issue severity if understood by ai would be better…"* Now a fire is always critical, with a one-tap Call 112.
 6. **Quality bar:** *"do full test and security audit … make sure all tests passed . act as proper testing engineer."* This added the tenant-isolation and security tests, the coverage gate and the live security probes.
 7. **Release gate** (drafted with the agent, sent by me): *"Act as a release engineer … Verify against these exact targets and report a pass/fail table: … line coverage ≥ 95%, enforced by CI … npm audit --omit=dev: 0 vulnerabilities … npm run probe passes 34/34 … Every page … load under 400 ms."* All six targets passed before submission.
+8. **Paying workers, safely:** *"tell best payment gateway like phonepe sandbox for this projecct in which paying at once , 3-4 workers will be paid"* and later *"how can we secure bank account keys more"*. This brought one checkout split to each worker's bank account, encrypted account numbers, and the worker's approval of any change (§11 of `prompts.md`).
 
 ## Screenshots
 
@@ -268,13 +279,16 @@ The full set, with what each prompt changed and who wrote it, is in **[`prompts.
 | ![Home](screenshots/01-home-phone.png) | ![Worker home](screenshots/03-worker-home-ramesh-phone.png) | ![Pay check](screenshots/04-pay-check-shortfall-phone.png) |
 | ![Fire is critical, call 112](screenshots/06-fire-is-critical-call-112-phone.png) | ![Help](screenshots/07-help-helplines-phone.png) | ![Pay in Tamil](screenshots/09c-pay-in-tamil-phone.png) |
 | ![Home in Tamil](screenshots/09b-worker-home-in-tamil-phone.png) | ![Hospital worker in Hindi](screenshots/10-hospital-worker-in-hindi-phone.png) | ![Speak up](screenshots/11-speak-up-anonymous-in-hindi-phone.png) |
+| ![Is this your bank account?](screenshots/03-worker-home-ramesh-phone.png) | | |
 
 | Employer (laptop) | |
 |---|---|
 | ![Overview](screenshots/14-employer-overview-desktop.png) | ![Hazards](screenshots/15-hazards-escalation-desktop.png) |
 | ![People](screenshots/16-people-fatigue-quit-risk-certificates-desktop.png) | ![Payroll](screenshots/17-payroll-fairpay-sentinel-desktop.png) |
+| ![Tick workers to pay](screenshots/21-payroll-tick-workers-desktop.png) | ![Pay in one checkout](screenshots/22-pay-in-one-checkout-desktop.png) |
+| ![Split to each bank account](screenshots/23-checkout-split-to-each-bank-desktop.png) | ![Bank details with change history](screenshots/24-bank-details-history-desktop.png) |
 
-All screenshots are in [`screenshots/`](screenshots), taken from the live app on 31 October 2026.
+All screenshots are in [`screenshots/`](screenshots), taken on 1 November 2026 from a production build with the live demo's data (so taking them changed nothing judges see).
 
 ## Limitations: built vs not built
 
@@ -283,7 +297,7 @@ All screenshots are in [`screenshots/`](screenshots), taken from the live app on
 | Everything listed under *My solution* and *What it covers*, in both interfaces and both industries | **Location check-in:** sites store a geofence, but check-in is QR only |
 | AI features with rule-based fallbacks | **Keypad phones:** no IVR or missed-call reporting yet, so a smartphone browser is needed |
 | Construction and hospital, seeded end to end | Campus and factory are configured, but not seeded with demo data |
-| | **Real payroll integration:** paid amounts are entered or imported from CSV, not read from a payroll system |
+| Paying everyone owed in one checkout, protected bank accounts | **Real payroll integration:** paid amounts are entered, imported from CSV or recorded by the checkout, not read from a payroll system |
 | | **WhatsApp or SMS alerts** |
 
 Also note:
@@ -291,6 +305,7 @@ Also note:
 - Rate limits are counted per server instance; a real deployment needs a shared store.
 - The live demo is shared: a visitor can change demo data (for example, *Pay the gap*). It resets once a day.
 - Hosted on Vercel, not Cloud Run, as the organisers allowed; the Cloud Run setup is included but not deployed.
+- Payments run only in Cashfree's sandbox, and the live demo uses the simulated checkout: no real money moves. Going live needs the employer's and each worker's KYC with Cashfree.
 
 ## Security note
 

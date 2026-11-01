@@ -45,6 +45,16 @@ for (const path of ["/a", "/a/payroll", "/w", "/w/pay"]) {
     `${r.status} ${r.headers.get("location")}`,
   );
 }
+// Checkout: the return link and the checkout page are for the employer only.
+const someBatch = "fs202610_000000000000";
+for (const path of [`/api/checkout/return?batch=${someBatch}`, `/a/payroll/checkout/${someBatch}`]) {
+  const r = await req(path);
+  check(
+    `anonymous ${path.split("?")[0]} → login`,
+    r.status >= 300 && r.status < 400 && /\/login/.test(r.headers.get("location") ?? ""),
+    `${r.status} ${r.headers.get("location")}`,
+  );
+}
 const forged = await req("/a", { headers: { cookie: "fs_session=eyJ1aWQiOiJhZG1pbjEiLCJyb2xlIjoiYWRtaW4ifQ.forged" } });
 check("forged admin cookie → login", /\/login/.test(forged.headers.get("location") ?? ""), String(forged.status));
 check("cron without secret → 401", (await req("/api/cron/hazards", { method: "POST" })).status === 401);
@@ -99,9 +109,13 @@ for (const path of ["/certificate/abc.def", "/passport/abc.def"]) {
   );
 }
 const traversal = await req("/certificate/..%2F..%2Fetc%2Fpasswd");
+const traversalBody = await traversal.text();
+// Rejected either by the platform (4xx, as on Vercel) or by the page itself ("could not be verified",
+// as on a plain `next start`); never any file content or stack trace.
 check(
   "path traversal rejected",
-  traversal.status >= 400 && !/root:/.test(await traversal.text()),
+  (traversal.status >= 400 || /could not be verified/.test(traversalBody)) &&
+    !/root:|at \w+ \(|node_modules/.test(traversalBody),
   String(traversal.status),
 );
 const missing = await req("/no-such-page");
@@ -148,6 +162,53 @@ const syncBad = await page.evaluate(
     ).status,
 );
 check("worker sync with invalid ops → 400", syncBad === 400, String(syncBad));
+await page.goto(`${BASE}/a/payroll/checkout/${someBatch}`);
+check("worker opening a checkout page lands on /w", new URL(page.url()).pathname === "/w", page.url());
+const workerReturn = await page.evaluate(async (path) => {
+  const r = await fetch(path, { redirect: "manual" });
+  return r.type === "opaqueredirect" ? "redirect" : String(r.status);
+}, `/api/checkout/return?batch=${someBatch}`);
+check("worker hitting the checkout return link is turned away", workerReturn === "redirect", workerReturn);
+
+// A signed-in employer: forged checkout ids change nothing, and no full bank account reaches the page.
+const adminCtx = await browser.newContext();
+const admin = await adminCtx.newPage();
+await admin.goto(BASE + "/login");
+await admin.getByRole("button", { name: /Priya/ }).first().click();
+await admin.waitForURL(/\/a/);
+for (const batch of [someBatch, "..%2F..%2Fadmin", "fs202610_<script>"]) {
+  await admin.goto(`${BASE}/api/checkout/return?batch=${batch}`);
+  check(
+    `employer return link with a forged id (${batch.slice(0, 14)}) → back to payroll`,
+    new URL(admin.url()).pathname === "/a/payroll",
+    admin.url(),
+  );
+}
+await admin.goto(`${BASE}/a/payroll/checkout/${someBatch}`);
+// Admin pages stream behind a loading screen, so this redirect completes in the browser.
+await admin.waitForURL((url) => url.pathname === "/a/payroll", { timeout: 15_000 }).catch(() => {});
+check(
+  "employer opening an unknown checkout → back to payroll",
+  new URL(admin.url()).pathname === "/a/payroll",
+  admin.url(),
+);
+await admin.goto(BASE + "/a/payroll");
+const payrollHtml = await admin.content();
+const fullAccounts = [
+  "026291800001191",
+  "00011020001772",
+  "1233943142",
+  "388108022658",
+  "000890289871772",
+  "000100289877623",
+];
+check(
+  "payroll page shows bank accounts masked, never in full or encrypted",
+  /••••\d{4}/.test(payrollHtml) &&
+    !fullAccounts.some((a) => payrollHtml.includes(a)) &&
+    // nor the stored ciphertext ("v1.<key id>.<iv>.<tag>.<data>")
+    !/v1\.[\w-]{8}\.[\w-]{16}\./.test(payrollHtml),
+);
 await browser.close();
 
 const failed = results.filter((r) => !r.pass);
