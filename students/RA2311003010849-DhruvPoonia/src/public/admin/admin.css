@@ -1,0 +1,61 @@
+/* Employer dashboard: a left sidebar from 900px, a scrollable bottom bar on phones (both in base.css). */
+main { padding-top: var(--space-5); padding-bottom: var(--space-7); outline: none; display: flex; flex-direction: column; gap: var(--space-5); min-width: 0; min-height: 60vh; }
+@media (min-width: 56.25rem) { main { padding-top: var(--space-6); } }
+
+/* ---- Overview: the Decent Work Score is the hero ------------------------------------------------------------- */
+.card-hero { position: relative; overflow: hidden; gap: var(--space-5); padding: clamp(1.25rem, 4vw, 2.25rem); border-radius: calc(var(--radius-lg) + 0.5rem); background: linear-gradient(135deg, var(--surface) 55%, var(--accent-soft)); box-shadow: var(--shadow-2); }
+.card-hero::before { content: ""; position: absolute; inset-inline: 0; top: 0; height: 4px; background: var(--primary); }
+.card-hero > h2 { font-size: clamp(1.5rem, 4vw, 2rem); }
+.score-card .gauge { width: min(100%, 20rem); }
+.score-top { display: flex; flex-wrap: wrap; gap: var(--space-6); align-items: center; }
+.score-top .big { font-size: clamp(2.25rem, 6vw, 3rem); }
+.score-top > .stack-sm { flex: 1 1 14rem; min-width: 0; }
+.score-cols { display: grid; gap: var(--space-6); grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr)); }
+.score-row { flex-wrap: nowrap; }
+.score-row progress { flex: 1; }
+.score-num { font-weight: 700; white-space: nowrap; font-variant-numeric: tabular-nums; }
+
+.kpi { display: flex; flex-direction: column; gap: 0.25rem; text-decoration: none; color: var(--text); }
+.kpi .row { color: var(--muted); font-weight: 600; flex-wrap: nowrap; }
+.kpi .row svg.icon { color: var(--accent); }
+.kpi .row[data-tone] svg.icon { color: var(--tone); }
+.kpi .big { color: var(--text); }
+
+/* Charts and the gauge: gold and the status colours only. */
+.chart { width: 100%; height: auto; }
+.chart text { fill: var(--muted); font-size: 11px; text-anchor: middle; }
+.chart .grid-line { stroke: var(--line); stroke-width: 1; }
+.chart rect.bar { fill: var(--accent); }
+.chart rect.today { stroke: var(--text); stroke-width: 2; }
+.gauge { width: min(100%, 16rem); height: auto; }
+.gauge-track, .gauge-fill { fill: none; stroke-width: 10; }
+.gauge-track { stroke: var(--line); }
+.gauge-fill { stroke-linecap: round; }
+.gauge-fill.band-healthy { stroke: var(--ok); }
+.gauge-fill.band-needs_attention { stroke: var(--warn); }
+.gauge-fill.band-at_risk { stroke: var(--danger); }
+.gauge-tick { stroke: var(--text); stroke-width: 1.5; }
+.gauge-score { font-family: var(--font-display); font-size: 28px; font-weight: 700; fill: var(--text); text-anchor: middle; }
+.gauge-of { font-size: 9px; fill: var(--muted); text-anchor: middle; }
+.trend-line { fill: none; stroke: var(--accent); stroke-width: 2.5; }
+.trend-dot { fill: var(--accent); }
+
+.bullets { list-style: disc; padding-inline-start: 1.25rem; }
+.qr-card img { width: min(100%, 16rem); height: auto; background: #fff; padding: 0.5rem; border-radius: var(--radius); border: 1px solid var(--line); }
+.code-big { font-family: var(--font-display); font-size: clamp(2rem, 9vw, 2.75rem); font-weight: 600; letter-spacing: 0.2em; font-variant-numeric: tabular-nums; }
+.reasons li { display: flex; gap: 0.5rem; align-items: baseline; }
+.reasons .pts { font-weight: 700; white-space: nowrap; }
+td .chip, td .btn { white-space: nowrap; }
+.cell-wide { min-width: 11rem; }
+.shortfall { font-weight: 700; color: var(--danger); white-space: nowrap; }
+.person { display: flex; flex-direction: column; gap: 0.5rem; }
+.summary-line { font-weight: 600; }
+.seg { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.seg .btn { flex: 1 1 8rem; max-width: 14rem; }
+.seg .btn[aria-pressed="true"] { background: var(--primary); color: var(--on-primary); border-color: var(--accent); font-weight: 700; }
+.seg .btn[aria-pressed="true"]::before { content: "✓"; font-weight: 800; }
+
+@media print {
+  .sidenav, .tabbar, .topbar, .no-print { display: none !important; }
+  .app-body { margin: 0; }
+}
