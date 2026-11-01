@@ -21,23 +21,26 @@ export default async function AdminLayout({ children }: LayoutProps<"/a">) {
       {/* Laptops: a full-height rail. Persistent: page transitions never move it. */}
       <aside
         style={{ viewTransitionName: "app-header" }}
-        className="sticky top-0 hidden h-dvh w-64 shrink-0 flex-col gap-6 border-r border-line bg-surface p-4 md:flex"
+        className="sticky top-0 hidden h-dvh w-64 shrink-0 flex-col gap-6 border-r border-line bg-surface p-4 md:flex [@media(max-height:760px)]:gap-3 [@media(max-height:760px)]:py-3"
       >
-        <Link href="/a" className="w-fit rounded-xl px-2 pt-1">
+        <Link href="/a" className="w-fit shrink-0 rounded-xl px-2 pt-1">
           <BrandMark className="text-xl" />
         </Link>
-        <div className="flex items-center gap-3 rounded-2xl bg-surface-2/70 p-3">
-          <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary text-on-primary">
-            <Building2 aria-hidden="true" className="size-5" />
-          </span>
-          <div className="min-w-0">
-            <p className="truncate font-bold">{org?.name}</p>
-            <p className="text-sm text-ink-2">{sector}</p>
+        {/* Short screens (laptop scaling, taskbar): the middle scrolls so Log out is always on screen. */}
+        <div className="-m-1.5 flex min-h-0 flex-1 flex-col gap-6 overflow-y-auto p-1.5 [@media(max-height:760px)]:gap-3">
+          <div className="flex shrink-0 items-center gap-3 rounded-2xl bg-surface-2/70 p-3">
+            <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary text-on-primary">
+              <Building2 aria-hidden="true" className="size-5" />
+            </span>
+            <div className="min-w-0">
+              <p className="truncate font-bold">{org?.name}</p>
+              <p className="text-sm text-ink-2">{sector}</p>
+            </div>
           </div>
+          <OnDuty variant="rail" />
+          <Sidebar variant="rail" />
         </div>
-        <OnDuty variant="rail" />
-        <Sidebar variant="rail" />
-        <div className="mt-auto flex flex-wrap items-center justify-between gap-2 border-t border-line pt-4">
+        <div className="flex shrink-0 flex-wrap items-center justify-between gap-2 border-t border-line pt-4 [@media(max-height:760px)]:pt-3">
           <LanguageMenu side="top" />
           <LogoutButton variant="ghost" size="sm" />
         </div>

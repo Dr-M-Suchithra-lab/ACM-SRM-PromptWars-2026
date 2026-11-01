@@ -50,7 +50,9 @@ export function Sidebar({ variant }: { variant: "rail" | "strip" }) {
                 aria-current={current ? "page" : undefined}
                 className={cn(
                   "flex items-center gap-3 font-bold whitespace-nowrap transition-colors duration-200",
-                  rail ? "min-h-12 rounded-xl px-3" : "min-h-11 rounded-full px-4 text-sm",
+                  rail
+                    ? "min-h-12 rounded-xl px-3 [@media(max-height:760px)]:min-h-11"
+                    : "min-h-11 rounded-full px-4 text-sm",
                   rail && (current ? "text-primary-strong" : "text-ink-2 hover:bg-surface-2 hover:text-ink"),
                   !rail && (current ? "text-on-primary" : "bg-surface text-ink-2 hover:text-ink"),
                 )}
