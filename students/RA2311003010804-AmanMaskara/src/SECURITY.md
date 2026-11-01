@@ -1,0 +1,73 @@
+# Security policy
+
+FairShift handles wages, safety reports and anonymous feedback from workers who may fear retaliation, so **privacy failures are treated as security bugs**.
+
+## Reporting a vulnerability
+
+Please open a private security advisory on GitHub (Security → Advisories → *Report a vulnerability*) rather than a public issue. Include steps to reproduce; we aim to respond within 72 hours.
+
+## Who we protect, from whom
+
+| Asset | Threat | Actor |
+|---|---|---|
+| A worker's identity on feedback, issues and anonymous hazard reports | De-anonymisation, retaliation | A manager, or anyone with database access |
+| Pay records and disputes | Tampering, cross-organisation access | Another employer, a worker trying to read others' data |
+| Workers' bank accounts and their pay | Theft of account numbers; pay quietly redirected to someone else's account | Anyone with database access, a dishonest supervisor, another employer |
+| Sessions and roles | Forgery, role escalation (worker → admin) | Any visitor |
+| Signed links (passport, certificate, site QR) | Forgery, replay after expiry | Any visitor |
+| Worker text sent to AI | Leaking names and numbers to a third party, prompt injection | The model provider, a malicious report |
+| The service | Abuse, scraping, script injection | Any visitor, bots |
+
+## Controls → code → tests
+
+| Control | How | Code | Tested by |
+|---|---|---|---|
+| **Signed sessions** | HMAC-SHA256 cookie, constant-time compare, 5-day expiry, `httpOnly`, `secure` in production, `sameSite=lax` | [`server/session.ts`](src/server/session.ts) | `server.test.ts`: *rejects a tampered payload (role escalation)*, *rejects expired, malformed and garbage tokens*; `security.test.ts`: *is httpOnly, SameSite=Lax…*, *is Secure in production*, *rejects a cookie signed with another secret* |
+| **Authorisation on every mutation** | Every Server Action calls `requireRole("worker" \| "admin")` and scopes reads and writes to the session's organisation; read helpers live in `server-only` modules, not in action files | [`server/dal.ts`](src/server/dal.ts) · [`server/actions/`](src/server/actions) | `security.test.ts`: *requireRole* (no session → login, wrong role → own home); `tenant-isolation.test.ts`: another organisation's manager is refused on hazards, skills, disputes, payments, arrears, payouts, bank details, certificates and issues; `attendance.test.ts`: *rejects a site from another organisation*; e2e: *a worker cannot open admin pages* |
+| **API routes** | Session + role check (`/api/payroll`, `/api/on-duty`, `/api/sync`, `/api/voice`, `/api/tts`; `/api/checkout/return` sends anyone but an employer to login); `CRON_SECRET` with timing-safe compare (`/api/cron/hazards`); same-origin and body-size checks on JSON routes | [`server/http.ts`](src/server/http.ts) · [`app/api/`](src/app/api) | `security.test.ts`: *request checks*; e2e: *sync endpoint rejects bad input and unauthenticated calls*, *voice endpoint … rejects outsiders*; probes, including the checkout return link for visitors and workers |
+| **Input validation** | Zod schemas on every action and route (lengths, enums, ISO dates not in the future, JPEG data URLs with size caps) | [`server/validation.ts`](src/server/validation.ts) · actions | `security.test.ts`: *input validation* (PNG, HTML and attribute-injection data URLs rejected); service tests across `tests/unit/server` |
+| **Money computed on the server** | *Mark as paid* and the checkout recompute every amount from attendance and paid records; the browser only names the workers and month | [`services/pay-check.ts`](src/server/services/pay-check.ts) · [`services/payouts.ts`](src/server/services/payouts.ts) | `features.test.ts`: *paying the gap*; `payouts.test.ts`: *asks for the server's total, split to each worker's stored bank account* |
+| **Bank details** | Stored apart from worker records and read only by the checkout service; pages and the browser get `••••1191` only; IFSC and account formats checked; organisation-scoped | [`services/payouts.ts`](src/server/services/payouts.ts) · [`core/payouts.ts`](src/core/payouts.ts) | `payouts.test.ts`: *never sends a full account number to the page*, *refuses a bad name, account number or IFSC* |
+| **No double payments** | A checkout is saved before it opens; a worker already in a waiting checkout is refused; a checkout is refused whole if any worker can't be paid; each paid share is written to the pay record exactly once; cancelling first checks whether it was paid; the payment link is created with an idempotency key | [`services/payouts.ts`](src/server/services/payouts.ts) · [`payouts/cashfree.ts`](src/server/payouts/cashfree.ts) | `payouts.test.ts`: *never puts a worker in two checkouts at once*, *never twice*, *records the payment instead when the checkout was paid just before cancelling* |
+| **Bank accounts encrypted at rest** | Account numbers are stored only as AES-256-GCM ciphertext; the key comes from `BANK_ENCRYPTION_KEY` (required in production), the worker id is bound in as associated data so a value moved onto another worker does not decrypt, and `BANK_ENCRYPTION_KEY_PREVIOUS` allows rotation. Decrypted in one place: the split sent to the payment provider | [`server/bank-crypto.ts`](src/server/bank-crypto.ts) · [`services/payouts.ts`](src/server/services/payouts.ts) | `bank-crypto.test.ts`: round trip, fresh nonce, tampering, wrong worker, unknown key and rotation, required in production; `payouts.test.ts`: *the number itself is nowhere in the record*; probe: no ciphertext in the page |
+| **The worker approves bank changes** | Any account the employer enters or changes is `pending_worker` until the worker answers in their own app; *No, not mine* makes it `disputed` (never payable until the employer enters it again); unanswered, it becomes payable after 48 hours. Only the signed-in worker can answer, only for their own account. Every change is kept (who, when, last 4 digits) | [`core/payouts.ts`](src/core/payouts.ts) · [`services/payouts.ts`](src/server/services/payouts.ts) · [`worker/bank-confirm-card.tsx`](src/components/worker/bank-confirm-card.tsx) | `payouts.test.ts`: *a changed account can't be paid until the worker confirms it*, *an unanswered change can be paid after 48 hours*, *'this isn't my account' blocks it*, *a worker can only answer about their own account*; e2e: the worker confirms in their app |
+| **Pays the account on screen** | Each Cashfree vendor id carries a fingerprint of the worker's account and IFSC, so correcting a worker's bank details registers the new account; a checkout can never split to an account the employer no longer sees | [`payouts/cashfree.ts`](src/server/payouts/cashfree.ts) | `cashfree.test.ts`: *pays a corrected bank account, never the one registered before* |
+| **Checkout trust** | The browser is only redirected to Cashfree's hosted page, and only to an `https` `cashfree.com` address (no payment script on FairShift's pages, CSP unchanged). The return URL proves nothing: the outcome is always asked of Cashfree server to server, by an admin session of the same organisation. Sandbox URL only, 10 s timeout, keys only from environment variables | [`payouts/cashfree.ts`](src/server/payouts/cashfree.ts) · [`api/checkout/return`](src/app/api/checkout/return/route.ts) | `cashfree.test.ts`: request shape and splits; `payouts.test.ts`: *keeps waiting while the checkout is unpaid*; probes: forged checkout ids change nothing |
+| **Rate limits** | Token buckets on login (with lockout), hazard reports, issues, disputes, pay records, CSV import, skills, help questions, TTS and AI calls, opening and checking checkouts, bank details and workers' answers about them | [`server/rate-limit.ts`](src/server/rate-limit.ts) | `server.test.ts` |
+| **Anonymity: groups of 5** | Feedback groups and co-signed issues are hidden from management below 5 participants; not even a count leaks | [`core/anonymity.ts`](src/core/anonymity.ts) · [`core/cosign.ts`](src/core/cosign.ts) | `cosign` and feedback tests: the 4→5 threshold, admin sees nothing below it |
+| **Signers never stored** | Double voting and signing blocked with `HMAC(secret, worker + week/issue)`; timestamps coarsened to the day | [`services/issues.ts`](src/server/services/issues.ts) · [`services/feedback.ts`](src/server/services/feedback.ts) | `feedback.test.ts`: *stores answers without any worker identity* |
+| **Private hazard tracking** | Anonymous reporters get `FS-XXXXXX`; only its HMAC is stored; the reference lives in an `httpOnly` cookie on the reporter's own phone | [`server/hazard-tracking.ts`](src/server/hazard-tracking.ts) | `security.test.ts`: *ignores tampered or injected entries*, at most 20, scoped to `/w`; e2e: *tracks it anonymously with a private number* |
+| **Signed, expiring links** | Passport, certificate and site QR tokens are HMAC-signed with the token *kind* bound into the MAC; passports expire in 30 days; QR tokens rotate | [`core/signed-token.ts`](src/core/signed-token.ts) · [`core/qr-token.ts`](src/core/qr-token.ts) | *rejects an expired token*, *rejects a tampered token*, *rejects forged, unknown and expired tokens*; `security.test.ts`: *never accepts one kind of link as another*, edited passport links rejected |
+| **PII never reaches AI or storage** | Names of every worker and admin in the org, phone numbers, emails and long ids are scrubbed first; help questions are never stored | [`ai/redact.ts`](src/ai/redact.ts) | `feedback.test.ts`: *redacts names and phone numbers*; `ai.test.ts`: *does not redact names inside other words* |
+| **Prompt-injection containment** | User text is wrapped as untrusted data; outputs must match a JSON schema; code re-checks every value (categories from the sector list, helplines from a fixed list, digits stripped, numbers in rewordings must match) | [`ai/prompts.ts`](src/ai/prompts.ts) · [`ai/schemas.ts`](src/ai/schemas.ts) · [`ai/help.ts`](src/ai/help.ts) | `ai.test.ts`: *rejects helplines that are not on the official list*, *never a phone number it wrote* |
+| **Browser hardening** | Per-request nonce CSP with `strict-dynamic`, `form-action 'self'`, `frame-ancestors 'self'`, `connect-src 'self'`; HSTS; `nosniff`; COOP `same-origin`; strict referrer; camera/mic/geolocation only for this origin; no `x-powered-by` | [`proxy.ts`](src/proxy.ts) · [`next.config.ts`](next.config.ts) | e2e: *landing sends security headers*; CI container smoke test checks the CSP header |
+| **CSV formula injection** | Exported cells starting with `=`, `+`, `-`, `@` are neutralised | [`core/csv.ts`](src/core/csv.ts) | `admin.test.ts` |
+| **Secrets** | Only from environment variables (Vercel encrypted environment on the live demo, Secret Manager on Cloud Run); production refuses to start without `SESSION_SECRET` or `BANK_ENCRYPTION_KEY`; `.env*` is git-ignored and the history contains no secrets | [`.env.example`](.env.example) · [`server/secrets.ts`](src/server/secrets.ts) | `security.test.ts`: session, passport and feedback secrets all throw in production when missing; `bank-crypto.test.ts`: the bank key is required in production; history scanned before release |
+| **Supply chain** | Lockfile installs (`npm ci`), `npm audit --omit=dev --audit-level=high` in CI, unused dependencies removed, non-root container | [`ci.yml`](.github/workflows/ci.yml) · [`Dockerfile`](Dockerfile) | CI · [Dependencies](#dependencies) |
+
+## Audit, 1 November 2026
+
+| Check | Result |
+|---|---|
+| Every API route and Server Action reviewed for role, organisation scope, Zod validation and rate limits | All guarded; the only unauthenticated actions are login, language choice and demo login (demo mode only) |
+| Every service that takes a record id checked for an organisation match | Every one checks it (hazards, skills, disputes, payments, arrears, payouts, bank details, certificates, issues, sites); locked in by `tenant-isolation.test.ts` |
+| Dangerous sinks (`dangerouslySetInnerHTML`, `eval`, `new Function`, `innerHTML`, shell calls) | None in `src/` |
+| Security review of the checkout and bank-account changes | One finding, fixed: a corrected bank account could still have been paid the old way (a Cashfree vendor was keyed by worker only). Vendor ids now carry a fingerprint of the account. Hardening: redirect only to `https` Cashfree pages; account numbers encrypted; worker approval of changes |
+| Secrets in the tree and the full git history (Google, MongoDB, private keys, tokens) | None; only `.env.example` is tracked |
+| `npm audit --omit=dev` | 0 vulnerabilities (after removing an unused `firebase-admin` that pulled in a vulnerable `glob`) |
+| Black-box probes ([`scripts/security-probe.mjs`](scripts/security-probe.mjs), read-only) | **43/43** against a production build: headers and per-request nonce, anonymous and forged-cookie access, cron secret, cross-site POSTs, oversized and malformed bodies, tampered links, path traversal, cookie flags, worker → manager APIs; checkout return link and checkout page refused to visitors and workers, forged checkout ids change nothing, bank accounts only ever masked in the page (never in full, never the ciphertext) |
+
+Run the probes against any deployment with `npm run probe -- https://your-deployment`.
+
+## Dependencies
+
+Production dependencies have no known vulnerabilities. Two moderate advisories remain in **build-time tooling only** (`glob` / `minimatch` inside ESLint and the service-worker builder). They run on the developer's machine and in CI over the project's own files, never on the server and never on user input, and the only fix is a breaking major upgrade of those tools, so they are tracked rather than forced.
+
+## Deliberate non-goals
+
+- **No payment script on FairShift's pages.** Paying happens on Cashfree's own hosted page, reached by a redirect, so the CSP stays strict and no card or bank login is ever typed into FairShift. Only the sandbox is wired up; going live is a deliberate change, not a setting.
+- **Demo mode** exposes one-tap logins and daily re-seeding. Set `DEMO_MODE=false` for any real deployment.
+
+## Before a real deployment
+
+Rotate every secret (including `BANK_ENCRYPTION_KEY`, keeping the old one as `BANK_ENCRYPTION_KEY_PREVIOUS` until accounts are re-saved), use production Cashfree keys only after KYC, turn off demo mode, put the rate limiter on a shared store (it is per instance today), and review the minimum-wage and scheme tables for the target state.

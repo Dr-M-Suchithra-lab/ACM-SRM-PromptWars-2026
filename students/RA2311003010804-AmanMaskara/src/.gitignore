@@ -1,0 +1,35 @@
+# dependencies
+/node_modules
+/.pnp
+.pnp.*
+
+# next.js / build output
+/.next/
+/out/
+/build
+*.tsbuildinfo
+next-env.d.ts
+
+# serwist (generated service worker)
+public/sw*
+public/swe-worker*
+
+# test output
+/coverage
+/test-results
+/playwright-report
+/shots
+
+# env files: secrets never leave this machine (the template is committed)
+.env*
+!.env.example
+
+# platform
+.vercel
+.DS_Store
+*.pem
+*.log
+
+# agent instruction files that `next dev` writes locally
+AGENTS.md
+CLAUDE.md

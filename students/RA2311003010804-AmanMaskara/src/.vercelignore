@@ -1,0 +1,11 @@
+# Never upload local secrets: the deployment uses Vercel's encrypted environment variables.
+.env*
+!.env.example
+
+# Build and test output
+node_modules
+.next
+coverage
+test-results
+playwright-report
+shots
