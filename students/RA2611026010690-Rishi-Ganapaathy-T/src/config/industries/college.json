@@ -1,0 +1,48 @@
+{
+  "id": "college",
+  "name": "Apex Engineering & Arts College",
+  "icon": "🎓",
+  "siteCode": "APEX-1",
+  "terminology": {
+    "worker": "Adjunct / Support Staff",
+    "workers": "Academic & Support Staff",
+    "supervisor": "Department Dean",
+    "workplace": "Campus & Science Labs",
+    "shiftUnit": "Academic Block",
+    "overtimeUnit": "Extra Lab & Invigilation Hours"
+  },
+  "roles": [
+    { "id": "adjunct_lecturer", "title": "Adjunct Lecturer", "baseHourlyRate": 150.0, "dailyRate": 1200 },
+    { "id": "lab_technician", "title": "Lab Demonstrator", "baseHourlyRate": 90.0, "dailyRate": 720 },
+    { "id": "library_assistant", "title": "Library Assistant", "baseHourlyRate": 75.0, "dailyRate": 600 },
+    { "id": "warden", "title": "Hostel Resident Warden", "baseHourlyRate": 110.0, "dailyRate": 880 }
+  ],
+  "shifts": [
+    { "id": "col-morn", "name": "Morning Lecture Block", "start": "08:30", "end": "16:30", "hours": 8 },
+    { "id": "col-eve", "name": "Evening Lab Block", "start": "11:30", "end": "19:30", "hours": 8 },
+    { "id": "col-night", "name": "Hostel Night Supervision", "start": "20:00", "end": "08:00", "hours": 12 }
+  ],
+  "wageRules": {
+    "standardDayHours": 8,
+    "overtimeMultiplier": 1.5,
+    "currencySymbol": "₹",
+    "currencyCode": "INR",
+    "deductions": [
+      { "id": "prof_tax", "name": "Professional Tax", "type": "fixed", "amount": 150 },
+      { "id": "staff_welfare", "name": "Staff Welfare Fund", "type": "fixed", "amount": 50 }
+    ]
+  },
+  "hazardCategories": [
+    { "id": "chemical_spill", "label": "Chemistry Lab Fume / Reagent Leak", "severityDefault": "high" },
+    { "id": "electrical_short", "label": "Computer Lab / Power Rack Overheat", "severityDefault": "medium" },
+    { "id": "hostel_security", "label": "Hostel Safety / Gate Incident", "severityDefault": "medium" },
+    { "id": "delayed_stipend", "label": "Adjunct Honorarium Delay", "severityDefault": "high" },
+    { "id": "workplace_bias", "label": "Workplace Harassment / Grievance", "severityDefault": "critical" }
+  ],
+  "geofence": {
+    "name": "Main Academic Quad & Central Labs",
+    "latitude": 12.9716,
+    "longitude": 77.5946,
+    "radiusMeters": 500
+  }
+}
